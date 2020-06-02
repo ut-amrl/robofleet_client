@@ -7,6 +7,10 @@ add_executable(client)
 add_subdirectory(src)
 include_directories(client include)
 
+find_package(Boost REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
+target_link_libraries(client ${Boost_LIBRARIES})
+
 # Build an executable that uses an existing ROS msg: find_package() the ROS
 # package that contains the message, then use its reported include directories.
 find_package(roscpp REQUIRED)

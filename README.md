@@ -4,8 +4,10 @@
 
 ## Dependencies
 
-* ROS Melodic
+* C++ compiler for std >= 11
 * CMake
+* ROS Melodic
+* OpenSSL
 
 ## Building
 
