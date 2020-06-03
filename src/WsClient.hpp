@@ -40,6 +40,7 @@ public:
         QObject::connect(&ws, &QWebSocket::connected, this, &WsClient::on_connected);
         QObject::connect(&ws, &QWebSocket::disconnected, this, &WsClient::on_disconnected);
         QObject::connect(&ws, &QWebSocket::binaryMessageReceived, this, &WsClient::on_binary_message);
+        std::cerr << "Websocket connecting to: " << url.toString().toStdString() << std::endl;
         ws.open(url);
     }
 };

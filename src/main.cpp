@@ -9,8 +9,8 @@
 #include "WsClient.hpp"
 
 
-const static std::string server_host = "localhost";
-const static std::string server_port = "8080";
+const static QString server_host = "localhost";
+const static int server_port = 8080;
 const static std::string node_name = "robofleet_client";
 
 
@@ -19,7 +19,11 @@ int main(int argc, char** argv) {
     ros::init(argc, argv, node_name, ros::init_options::NoSigintHandler);
 
     // Websocket client
-    WsClient ws_client{QUrl("ws://localhost:8080")}; 
+    QUrl url;
+    url.setScheme("ws");
+    url.setHost(server_host);
+    url.setPort(server_port);
+    WsClient ws_client{url}; 
 
     // Client ROS node
     RosClientNode ros_node;
