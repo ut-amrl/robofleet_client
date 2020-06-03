@@ -9,9 +9,9 @@
 #include "WsClient.hpp"
 
 
-const static QString server_host = "localhost";
-const static int server_port = 8080;
-const static std::string node_name = "robofleet_client";
+static const QString server_host = "localhost";
+static const int server_port = 8080;
+static const std::string node_name = "robofleet_client";
 
 
 int main(int argc, char** argv) {
@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
     url.setScheme("ws");
     url.setHost(server_host);
     url.setPort(server_port);
-    WsClient ws_client{url}; 
+    WsClient ws_client{url};
 
     // Client ROS node
     RosClientNode ros_node;
