@@ -13,3 +13,4 @@
 
 * `make` to build
 * `make run` to run
+* `make format` to run clang-format

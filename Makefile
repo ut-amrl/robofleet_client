@@ -11,6 +11,10 @@ run: build/client
 clean:
 	-rm -rf build
 
+.PHONY: format
+format:
+	clang-format --style=file -i src/**.cpp src/**.hpp
+
 build/client: build/Makefile
 	(cd build; make -j)
 
