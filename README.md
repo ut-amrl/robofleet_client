@@ -7,7 +7,7 @@
 * C++ compiler for std >= 11
 * CMake
 * ROS Melodic
-* OpenSSL
+* Qt5
 
 ## Building
 
