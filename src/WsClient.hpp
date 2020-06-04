@@ -8,6 +8,7 @@
 class WsClient : public QObject {
   Q_OBJECT;
 
+  QUrl url;
   QWebSocket ws;
 
  public Q_SLOTS:
@@ -18,14 +19,22 @@ class WsClient : public QObject {
 
   void on_connected() {
     std::cerr << "Websocket connected" << std::endl;
+    Q_EMIT connected();
   }
 
   void on_disconnected() {
     std::cerr << "Websocket disconnected" << std::endl;
+    Q_EMIT disconnected();
   }
 
   void on_binary_message(QByteArray data) {
     Q_EMIT message_received(data);
+  }
+
+  void reconnect() {
+    std::cerr << "Websocket connecting to: " << url.toString().toStdString()
+              << std::endl;
+    ws.open(url);
   }
 
   void send_message(const QByteArray& data) {
@@ -33,10 +42,12 @@ class WsClient : public QObject {
   }
 
  Q_SIGNALS:
+  void connected();
+  void disconnected();
   void message_received(const QByteArray& data);
 
  public:
-  WsClient(const QUrl& url) {
+  WsClient(const QUrl& url) : url(url) {
     QObject::connect(
         &ws, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
         this, &WsClient::on_error);
@@ -46,8 +57,6 @@ class WsClient : public QObject {
                      &WsClient::on_disconnected);
     QObject::connect(&ws, &QWebSocket::binaryMessageReceived, this,
                      &WsClient::on_binary_message);
-    std::cerr << "Websocket connecting to: " << url.toString().toStdString()
-              << std::endl;
-    ws.open(url);
+    reconnect();
   }
 };
