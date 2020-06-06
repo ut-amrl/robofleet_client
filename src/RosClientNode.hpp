@@ -1,12 +1,14 @@
 #pragma once
 
 #include <ros/ros.h>
-#include <std_msgs/String.h>
+#include <sensor_msgs/NavSatFix.h>
 
 #include <QObject>
 #include <thread>
 
 #include "encoding.hpp"
+
+const static std::string nav_sat_fix_topic = "navsat/fix";
 
 class RosClientNode : public QObject {
   Q_OBJECT
@@ -16,8 +18,8 @@ class RosClientNode : public QObject {
   ros::Subscriber test_sub;
   ros::Publisher test_pub;
 
-  void test_callback(const std_msgs::String& msg) {
-    std::cerr << "received ROS message: " << msg.data << std::endl;
+  void nav_sat_fix_callback(const sensor_msgs::NavSatFix& msg) {
+    std::cerr << "received ROS message" << std::endl;
     const std::vector<uint8_t> data = encode(msg);
     Q_EMIT ros_message_encoded(
         QByteArray(reinterpret_cast<const char*>(data.data()), data.size()));
@@ -28,16 +30,16 @@ class RosClientNode : public QObject {
 
  public Q_SLOTS:
   void handle_message(const QByteArray& data) {
-    const auto msg = decode_string(
+    const auto msg = decode_nav_sat_fix(
         reinterpret_cast<const uint8_t*>(data.data()), data.size());
-    std::cerr << "received WS message: " << msg.data << std::endl;
+    std::cerr << "received WS message" << std::endl;
     test_pub.publish(msg);
   }
 
  public:
   RosClientNode() {
-    test_sub = n.subscribe("test", 1, &RosClientNode::test_callback, this);
-    test_pub = n.advertise<std_msgs::String>("test", 1);
+    test_sub = n.subscribe(nav_sat_fix_topic, 1, &RosClientNode::nav_sat_fix_callback, this);
+    test_pub = n.advertise<sensor_msgs::NavSatFix>(nav_sat_fix_topic, 1);
 
     // run forever
     spinner.start();
