@@ -14,3 +14,10 @@
 * `make` to build
 * `make run` to run
 * `make format` to run clang-format
+
+## Development
+
+* Make sure to clone submodules, or `git submodule init`, `git submodule update`
+* Code completion for amrl_msgs
+  * Build once to generate amrl_msgs
+  * Add `amrl_msgs/msg_gen/cpp/include` to your include paths

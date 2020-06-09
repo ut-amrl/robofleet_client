@@ -1,0 +1,3 @@
+[submodule "amrl_msgs"]
+	path = amrl_msgs
+	url = https://github.com/ut-amrl/amrl_msgs
