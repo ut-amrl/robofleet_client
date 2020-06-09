@@ -13,7 +13,7 @@ const static std::string nav_sat_fix_topic = "navsat/fix";
 class RosClientNode : public QObject {
   Q_OBJECT
 
-  ros::AsyncSpinner spinner = ros::AsyncSpinner(2);
+  ros::AsyncSpinner spinner = ros::AsyncSpinner(1);
   ros::NodeHandle n;
   ros::Subscriber test_sub;
   ros::Publisher test_pub;
