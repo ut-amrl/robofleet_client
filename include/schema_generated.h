@@ -20,6 +20,14 @@ struct RosTime;
 
 struct RosDuration;
 
+namespace amrl_msgs {
+
+struct RobofleetStatus;
+struct RobofleetStatusBuilder;
+struct RobofleetStatusT;
+
+}  // namespace amrl_msgs
+
 namespace std_msgs {
 
 struct Header;
@@ -30,22 +38,345 @@ struct HeaderT;
 
 namespace sensor_msgs {
 
-struct NavSatStatusConstants;
-struct NavSatStatusConstantsBuilder;
-struct NavSatStatusConstantsT;
-
 struct NavSatStatus;
 struct NavSatStatusBuilder;
 struct NavSatStatusT;
-
-struct NavSatFixConstants;
-struct NavSatFixConstantsBuilder;
-struct NavSatFixConstantsT;
 
 struct NavSatFix;
 struct NavSatFixBuilder;
 struct NavSatFixT;
 
+namespace NavSatStatusConstants {
+
+enum status_no_fix {
+  status_no_fix_value = -1,
+  status_no_fix_MIN = status_no_fix_value,
+  status_no_fix_MAX = status_no_fix_value
+};
+
+inline const status_no_fix (&EnumValuesstatus_no_fix())[1] {
+  static const status_no_fix values[] = {
+    status_no_fix_value
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesstatus_no_fix() {
+  static const char * const names[2] = {
+    "value",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNamestatus_no_fix(status_no_fix e) {
+  if (flatbuffers::IsOutRange(e, status_no_fix_value, status_no_fix_value)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(status_no_fix_value);
+  return EnumNamesstatus_no_fix()[index];
+}
+
+enum status_fix {
+  status_fix_value = 0,
+  status_fix_MIN = status_fix_value,
+  status_fix_MAX = status_fix_value
+};
+
+inline const status_fix (&EnumValuesstatus_fix())[1] {
+  static const status_fix values[] = {
+    status_fix_value
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesstatus_fix() {
+  static const char * const names[2] = {
+    "value",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNamestatus_fix(status_fix e) {
+  if (flatbuffers::IsOutRange(e, status_fix_value, status_fix_value)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesstatus_fix()[index];
+}
+
+enum status_sbas_fix {
+  status_sbas_fix_value = 1,
+  status_sbas_fix_MIN = status_sbas_fix_value,
+  status_sbas_fix_MAX = status_sbas_fix_value
+};
+
+inline const status_sbas_fix (&EnumValuesstatus_sbas_fix())[1] {
+  static const status_sbas_fix values[] = {
+    status_sbas_fix_value
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesstatus_sbas_fix() {
+  static const char * const names[2] = {
+    "value",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNamestatus_sbas_fix(status_sbas_fix e) {
+  if (flatbuffers::IsOutRange(e, status_sbas_fix_value, status_sbas_fix_value)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(status_sbas_fix_value);
+  return EnumNamesstatus_sbas_fix()[index];
+}
+
+enum status_gbas_fix {
+  status_gbas_fix_value = 2,
+  status_gbas_fix_MIN = status_gbas_fix_value,
+  status_gbas_fix_MAX = status_gbas_fix_value
+};
+
+inline const status_gbas_fix (&EnumValuesstatus_gbas_fix())[1] {
+  static const status_gbas_fix values[] = {
+    status_gbas_fix_value
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesstatus_gbas_fix() {
+  static const char * const names[2] = {
+    "value",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNamestatus_gbas_fix(status_gbas_fix e) {
+  if (flatbuffers::IsOutRange(e, status_gbas_fix_value, status_gbas_fix_value)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(status_gbas_fix_value);
+  return EnumNamesstatus_gbas_fix()[index];
+}
+
+enum service_gps {
+  service_gps_value = 1,
+  service_gps_MIN = service_gps_value,
+  service_gps_MAX = service_gps_value
+};
+
+inline const service_gps (&EnumValuesservice_gps())[1] {
+  static const service_gps values[] = {
+    service_gps_value
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesservice_gps() {
+  static const char * const names[2] = {
+    "value",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameservice_gps(service_gps e) {
+  if (flatbuffers::IsOutRange(e, service_gps_value, service_gps_value)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(service_gps_value);
+  return EnumNamesservice_gps()[index];
+}
+
+enum service_glonass {
+  service_glonass_value = 2,
+  service_glonass_MIN = service_glonass_value,
+  service_glonass_MAX = service_glonass_value
+};
+
+inline const service_glonass (&EnumValuesservice_glonass())[1] {
+  static const service_glonass values[] = {
+    service_glonass_value
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesservice_glonass() {
+  static const char * const names[2] = {
+    "value",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameservice_glonass(service_glonass e) {
+  if (flatbuffers::IsOutRange(e, service_glonass_value, service_glonass_value)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(service_glonass_value);
+  return EnumNamesservice_glonass()[index];
+}
+
+enum service_compass {
+  service_compass_value = 4,
+  service_compass_MIN = service_compass_value,
+  service_compass_MAX = service_compass_value
+};
+
+inline const service_compass (&EnumValuesservice_compass())[1] {
+  static const service_compass values[] = {
+    service_compass_value
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesservice_compass() {
+  static const char * const names[2] = {
+    "value",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameservice_compass(service_compass e) {
+  if (flatbuffers::IsOutRange(e, service_compass_value, service_compass_value)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(service_compass_value);
+  return EnumNamesservice_compass()[index];
+}
+
+enum service_galileo {
+  service_galileo_value = 8,
+  service_galileo_MIN = service_galileo_value,
+  service_galileo_MAX = service_galileo_value
+};
+
+inline const service_galileo (&EnumValuesservice_galileo())[1] {
+  static const service_galileo values[] = {
+    service_galileo_value
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesservice_galileo() {
+  static const char * const names[2] = {
+    "value",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameservice_galileo(service_galileo e) {
+  if (flatbuffers::IsOutRange(e, service_galileo_value, service_galileo_value)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(service_galileo_value);
+  return EnumNamesservice_galileo()[index];
+}
+
+}  // namespace NavSatStatusConstants
+
+namespace NavSatFixConstants {
+
+enum covariance_type_unknown {
+  covariance_type_unknown_value = 0,
+  covariance_type_unknown_MIN = covariance_type_unknown_value,
+  covariance_type_unknown_MAX = covariance_type_unknown_value
+};
+
+inline const covariance_type_unknown (&EnumValuescovariance_type_unknown())[1] {
+  static const covariance_type_unknown values[] = {
+    covariance_type_unknown_value
+  };
+  return values;
+}
+
+inline const char * const *EnumNamescovariance_type_unknown() {
+  static const char * const names[2] = {
+    "value",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNamecovariance_type_unknown(covariance_type_unknown e) {
+  if (flatbuffers::IsOutRange(e, covariance_type_unknown_value, covariance_type_unknown_value)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamescovariance_type_unknown()[index];
+}
+
+enum covariance_type_approximated {
+  covariance_type_approximated_value = 1,
+  covariance_type_approximated_MIN = covariance_type_approximated_value,
+  covariance_type_approximated_MAX = covariance_type_approximated_value
+};
+
+inline const covariance_type_approximated (&EnumValuescovariance_type_approximated())[1] {
+  static const covariance_type_approximated values[] = {
+    covariance_type_approximated_value
+  };
+  return values;
+}
+
+inline const char * const *EnumNamescovariance_type_approximated() {
+  static const char * const names[2] = {
+    "value",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNamecovariance_type_approximated(covariance_type_approximated e) {
+  if (flatbuffers::IsOutRange(e, covariance_type_approximated_value, covariance_type_approximated_value)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(covariance_type_approximated_value);
+  return EnumNamescovariance_type_approximated()[index];
+}
+
+enum covariance_type_diagonal_known {
+  covariance_type_diagonal_known_value = 2,
+  covariance_type_diagonal_known_MIN = covariance_type_diagonal_known_value,
+  covariance_type_diagonal_known_MAX = covariance_type_diagonal_known_value
+};
+
+inline const covariance_type_diagonal_known (&EnumValuescovariance_type_diagonal_known())[1] {
+  static const covariance_type_diagonal_known values[] = {
+    covariance_type_diagonal_known_value
+  };
+  return values;
+}
+
+inline const char * const *EnumNamescovariance_type_diagonal_known() {
+  static const char * const names[2] = {
+    "value",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNamecovariance_type_diagonal_known(covariance_type_diagonal_known e) {
+  if (flatbuffers::IsOutRange(e, covariance_type_diagonal_known_value, covariance_type_diagonal_known_value)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(covariance_type_diagonal_known_value);
+  return EnumNamescovariance_type_diagonal_known()[index];
+}
+
+enum covariance_type_known {
+  covariance_type_known_value = 3,
+  covariance_type_known_MIN = covariance_type_known_value,
+  covariance_type_known_MAX = covariance_type_known_value
+};
+
+inline const covariance_type_known (&EnumValuescovariance_type_known())[1] {
+  static const covariance_type_known values[] = {
+    covariance_type_known_value
+  };
+  return values;
+}
+
+inline const char * const *EnumNamescovariance_type_known() {
+  static const char * const names[2] = {
+    "value",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNamecovariance_type_known(covariance_type_known e) {
+  if (flatbuffers::IsOutRange(e, covariance_type_known_value, covariance_type_known_value)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(covariance_type_known_value);
+  return EnumNamescovariance_type_known()[index];
+}
+
+}  // namespace NavSatFixConstants
 }  // namespace sensor_msgs
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) RosTime FLATBUFFERS_FINAL_CLASS {
@@ -213,6 +544,118 @@ inline flatbuffers::Offset<MsgWithMetadata> CreateMsgWithMetadata(
 
 flatbuffers::Offset<MsgWithMetadata> CreateMsgWithMetadata(flatbuffers::FlatBufferBuilder &_fbb, const MsgWithMetadataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+namespace amrl_msgs {
+
+struct RobofleetStatusT : public flatbuffers::NativeTable {
+  typedef RobofleetStatus TableType;
+  std::unique_ptr<fb::MsgMetadataT> __metadata;
+  std::string status;
+  float battery_level;
+  std::string location;
+  RobofleetStatusT()
+      : battery_level(0.0f) {
+  }
+};
+
+struct RobofleetStatus FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef RobofleetStatusT NativeTableType;
+  typedef RobofleetStatusBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT___METADATA = 4,
+    VT_STATUS = 6,
+    VT_BATTERY_LEVEL = 8,
+    VT_LOCATION = 10
+  };
+  const fb::MsgMetadata *__metadata() const {
+    return GetPointer<const fb::MsgMetadata *>(VT___METADATA);
+  }
+  const flatbuffers::String *status() const {
+    return GetPointer<const flatbuffers::String *>(VT_STATUS);
+  }
+  float battery_level() const {
+    return GetField<float>(VT_BATTERY_LEVEL, 0.0f);
+  }
+  const flatbuffers::String *location() const {
+    return GetPointer<const flatbuffers::String *>(VT_LOCATION);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT___METADATA) &&
+           verifier.VerifyTable(__metadata()) &&
+           VerifyOffset(verifier, VT_STATUS) &&
+           verifier.VerifyString(status()) &&
+           VerifyField<float>(verifier, VT_BATTERY_LEVEL) &&
+           VerifyOffset(verifier, VT_LOCATION) &&
+           verifier.VerifyString(location()) &&
+           verifier.EndTable();
+  }
+  RobofleetStatusT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(RobofleetStatusT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<RobofleetStatus> Pack(flatbuffers::FlatBufferBuilder &_fbb, const RobofleetStatusT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct RobofleetStatusBuilder {
+  typedef RobofleetStatus Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add___metadata(flatbuffers::Offset<fb::MsgMetadata> __metadata) {
+    fbb_.AddOffset(RobofleetStatus::VT___METADATA, __metadata);
+  }
+  void add_status(flatbuffers::Offset<flatbuffers::String> status) {
+    fbb_.AddOffset(RobofleetStatus::VT_STATUS, status);
+  }
+  void add_battery_level(float battery_level) {
+    fbb_.AddElement<float>(RobofleetStatus::VT_BATTERY_LEVEL, battery_level, 0.0f);
+  }
+  void add_location(flatbuffers::Offset<flatbuffers::String> location) {
+    fbb_.AddOffset(RobofleetStatus::VT_LOCATION, location);
+  }
+  explicit RobofleetStatusBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  RobofleetStatusBuilder &operator=(const RobofleetStatusBuilder &);
+  flatbuffers::Offset<RobofleetStatus> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<RobofleetStatus>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<RobofleetStatus> CreateRobofleetStatus(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<fb::MsgMetadata> __metadata = 0,
+    flatbuffers::Offset<flatbuffers::String> status = 0,
+    float battery_level = 0.0f,
+    flatbuffers::Offset<flatbuffers::String> location = 0) {
+  RobofleetStatusBuilder builder_(_fbb);
+  builder_.add_location(location);
+  builder_.add_battery_level(battery_level);
+  builder_.add_status(status);
+  builder_.add___metadata(__metadata);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<RobofleetStatus> CreateRobofleetStatusDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<fb::MsgMetadata> __metadata = 0,
+    const char *status = nullptr,
+    float battery_level = 0.0f,
+    const char *location = nullptr) {
+  auto status__ = status ? _fbb.CreateString(status) : 0;
+  auto location__ = location ? _fbb.CreateString(location) : 0;
+  return fb::amrl_msgs::CreateRobofleetStatus(
+      _fbb,
+      __metadata,
+      status__,
+      battery_level,
+      location__);
+}
+
+flatbuffers::Offset<RobofleetStatus> CreateRobofleetStatus(flatbuffers::FlatBufferBuilder &_fbb, const RobofleetStatusT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+}  // namespace amrl_msgs
+
 namespace std_msgs {
 
 struct HeaderT : public flatbuffers::NativeTable {
@@ -325,146 +768,6 @@ flatbuffers::Offset<Header> CreateHeader(flatbuffers::FlatBufferBuilder &_fbb, c
 
 namespace sensor_msgs {
 
-struct NavSatStatusConstantsT : public flatbuffers::NativeTable {
-  typedef NavSatStatusConstants TableType;
-  int8_t status_no_fix;
-  int8_t status_fix;
-  int8_t status_sbas_fix;
-  int8_t status_gbas_fix;
-  uint16_t service_gps;
-  uint16_t service_glonass;
-  uint16_t service_compass;
-  uint16_t service_galileo;
-  NavSatStatusConstantsT()
-      : status_no_fix(-1),
-        status_fix(0),
-        status_sbas_fix(1),
-        status_gbas_fix(2),
-        service_gps(1),
-        service_glonass(2),
-        service_compass(4),
-        service_galileo(8) {
-  }
-};
-
-struct NavSatStatusConstants FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef NavSatStatusConstantsT NativeTableType;
-  typedef NavSatStatusConstantsBuilder Builder;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_STATUS_NO_FIX = 4,
-    VT_STATUS_FIX = 6,
-    VT_STATUS_SBAS_FIX = 8,
-    VT_STATUS_GBAS_FIX = 10,
-    VT_SERVICE_GPS = 12,
-    VT_SERVICE_GLONASS = 14,
-    VT_SERVICE_COMPASS = 16,
-    VT_SERVICE_GALILEO = 18
-  };
-  int8_t status_no_fix() const {
-    return GetField<int8_t>(VT_STATUS_NO_FIX, -1);
-  }
-  int8_t status_fix() const {
-    return GetField<int8_t>(VT_STATUS_FIX, 0);
-  }
-  int8_t status_sbas_fix() const {
-    return GetField<int8_t>(VT_STATUS_SBAS_FIX, 1);
-  }
-  int8_t status_gbas_fix() const {
-    return GetField<int8_t>(VT_STATUS_GBAS_FIX, 2);
-  }
-  uint16_t service_gps() const {
-    return GetField<uint16_t>(VT_SERVICE_GPS, 1);
-  }
-  uint16_t service_glonass() const {
-    return GetField<uint16_t>(VT_SERVICE_GLONASS, 2);
-  }
-  uint16_t service_compass() const {
-    return GetField<uint16_t>(VT_SERVICE_COMPASS, 4);
-  }
-  uint16_t service_galileo() const {
-    return GetField<uint16_t>(VT_SERVICE_GALILEO, 8);
-  }
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<int8_t>(verifier, VT_STATUS_NO_FIX) &&
-           VerifyField<int8_t>(verifier, VT_STATUS_FIX) &&
-           VerifyField<int8_t>(verifier, VT_STATUS_SBAS_FIX) &&
-           VerifyField<int8_t>(verifier, VT_STATUS_GBAS_FIX) &&
-           VerifyField<uint16_t>(verifier, VT_SERVICE_GPS) &&
-           VerifyField<uint16_t>(verifier, VT_SERVICE_GLONASS) &&
-           VerifyField<uint16_t>(verifier, VT_SERVICE_COMPASS) &&
-           VerifyField<uint16_t>(verifier, VT_SERVICE_GALILEO) &&
-           verifier.EndTable();
-  }
-  NavSatStatusConstantsT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(NavSatStatusConstantsT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static flatbuffers::Offset<NavSatStatusConstants> Pack(flatbuffers::FlatBufferBuilder &_fbb, const NavSatStatusConstantsT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-};
-
-struct NavSatStatusConstantsBuilder {
-  typedef NavSatStatusConstants Table;
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  void add_status_no_fix(int8_t status_no_fix) {
-    fbb_.AddElement<int8_t>(NavSatStatusConstants::VT_STATUS_NO_FIX, status_no_fix, -1);
-  }
-  void add_status_fix(int8_t status_fix) {
-    fbb_.AddElement<int8_t>(NavSatStatusConstants::VT_STATUS_FIX, status_fix, 0);
-  }
-  void add_status_sbas_fix(int8_t status_sbas_fix) {
-    fbb_.AddElement<int8_t>(NavSatStatusConstants::VT_STATUS_SBAS_FIX, status_sbas_fix, 1);
-  }
-  void add_status_gbas_fix(int8_t status_gbas_fix) {
-    fbb_.AddElement<int8_t>(NavSatStatusConstants::VT_STATUS_GBAS_FIX, status_gbas_fix, 2);
-  }
-  void add_service_gps(uint16_t service_gps) {
-    fbb_.AddElement<uint16_t>(NavSatStatusConstants::VT_SERVICE_GPS, service_gps, 1);
-  }
-  void add_service_glonass(uint16_t service_glonass) {
-    fbb_.AddElement<uint16_t>(NavSatStatusConstants::VT_SERVICE_GLONASS, service_glonass, 2);
-  }
-  void add_service_compass(uint16_t service_compass) {
-    fbb_.AddElement<uint16_t>(NavSatStatusConstants::VT_SERVICE_COMPASS, service_compass, 4);
-  }
-  void add_service_galileo(uint16_t service_galileo) {
-    fbb_.AddElement<uint16_t>(NavSatStatusConstants::VT_SERVICE_GALILEO, service_galileo, 8);
-  }
-  explicit NavSatStatusConstantsBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  NavSatStatusConstantsBuilder &operator=(const NavSatStatusConstantsBuilder &);
-  flatbuffers::Offset<NavSatStatusConstants> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<NavSatStatusConstants>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<NavSatStatusConstants> CreateNavSatStatusConstants(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    int8_t status_no_fix = -1,
-    int8_t status_fix = 0,
-    int8_t status_sbas_fix = 1,
-    int8_t status_gbas_fix = 2,
-    uint16_t service_gps = 1,
-    uint16_t service_glonass = 2,
-    uint16_t service_compass = 4,
-    uint16_t service_galileo = 8) {
-  NavSatStatusConstantsBuilder builder_(_fbb);
-  builder_.add_service_galileo(service_galileo);
-  builder_.add_service_compass(service_compass);
-  builder_.add_service_glonass(service_glonass);
-  builder_.add_service_gps(service_gps);
-  builder_.add_status_gbas_fix(status_gbas_fix);
-  builder_.add_status_sbas_fix(status_sbas_fix);
-  builder_.add_status_fix(status_fix);
-  builder_.add_status_no_fix(status_no_fix);
-  return builder_.Finish();
-}
-
-flatbuffers::Offset<NavSatStatusConstants> CreateNavSatStatusConstants(flatbuffers::FlatBufferBuilder &_fbb, const NavSatStatusConstantsT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-
 struct NavSatStatusT : public flatbuffers::NativeTable {
   typedef NavSatStatus TableType;
   std::unique_ptr<fb::MsgMetadataT> __metadata;
@@ -544,98 +847,6 @@ inline flatbuffers::Offset<NavSatStatus> CreateNavSatStatus(
 }
 
 flatbuffers::Offset<NavSatStatus> CreateNavSatStatus(flatbuffers::FlatBufferBuilder &_fbb, const NavSatStatusT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-
-struct NavSatFixConstantsT : public flatbuffers::NativeTable {
-  typedef NavSatFixConstants TableType;
-  uint8_t covariance_type_unknown;
-  uint8_t covariance_type_approximated;
-  uint8_t covariance_type_diagonal_known;
-  uint8_t covariance_type_known;
-  NavSatFixConstantsT()
-      : covariance_type_unknown(0),
-        covariance_type_approximated(1),
-        covariance_type_diagonal_known(2),
-        covariance_type_known(3) {
-  }
-};
-
-struct NavSatFixConstants FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef NavSatFixConstantsT NativeTableType;
-  typedef NavSatFixConstantsBuilder Builder;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_COVARIANCE_TYPE_UNKNOWN = 4,
-    VT_COVARIANCE_TYPE_APPROXIMATED = 6,
-    VT_COVARIANCE_TYPE_DIAGONAL_KNOWN = 8,
-    VT_COVARIANCE_TYPE_KNOWN = 10
-  };
-  uint8_t covariance_type_unknown() const {
-    return GetField<uint8_t>(VT_COVARIANCE_TYPE_UNKNOWN, 0);
-  }
-  uint8_t covariance_type_approximated() const {
-    return GetField<uint8_t>(VT_COVARIANCE_TYPE_APPROXIMATED, 1);
-  }
-  uint8_t covariance_type_diagonal_known() const {
-    return GetField<uint8_t>(VT_COVARIANCE_TYPE_DIAGONAL_KNOWN, 2);
-  }
-  uint8_t covariance_type_known() const {
-    return GetField<uint8_t>(VT_COVARIANCE_TYPE_KNOWN, 3);
-  }
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<uint8_t>(verifier, VT_COVARIANCE_TYPE_UNKNOWN) &&
-           VerifyField<uint8_t>(verifier, VT_COVARIANCE_TYPE_APPROXIMATED) &&
-           VerifyField<uint8_t>(verifier, VT_COVARIANCE_TYPE_DIAGONAL_KNOWN) &&
-           VerifyField<uint8_t>(verifier, VT_COVARIANCE_TYPE_KNOWN) &&
-           verifier.EndTable();
-  }
-  NavSatFixConstantsT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(NavSatFixConstantsT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static flatbuffers::Offset<NavSatFixConstants> Pack(flatbuffers::FlatBufferBuilder &_fbb, const NavSatFixConstantsT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-};
-
-struct NavSatFixConstantsBuilder {
-  typedef NavSatFixConstants Table;
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  void add_covariance_type_unknown(uint8_t covariance_type_unknown) {
-    fbb_.AddElement<uint8_t>(NavSatFixConstants::VT_COVARIANCE_TYPE_UNKNOWN, covariance_type_unknown, 0);
-  }
-  void add_covariance_type_approximated(uint8_t covariance_type_approximated) {
-    fbb_.AddElement<uint8_t>(NavSatFixConstants::VT_COVARIANCE_TYPE_APPROXIMATED, covariance_type_approximated, 1);
-  }
-  void add_covariance_type_diagonal_known(uint8_t covariance_type_diagonal_known) {
-    fbb_.AddElement<uint8_t>(NavSatFixConstants::VT_COVARIANCE_TYPE_DIAGONAL_KNOWN, covariance_type_diagonal_known, 2);
-  }
-  void add_covariance_type_known(uint8_t covariance_type_known) {
-    fbb_.AddElement<uint8_t>(NavSatFixConstants::VT_COVARIANCE_TYPE_KNOWN, covariance_type_known, 3);
-  }
-  explicit NavSatFixConstantsBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  NavSatFixConstantsBuilder &operator=(const NavSatFixConstantsBuilder &);
-  flatbuffers::Offset<NavSatFixConstants> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<NavSatFixConstants>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<NavSatFixConstants> CreateNavSatFixConstants(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    uint8_t covariance_type_unknown = 0,
-    uint8_t covariance_type_approximated = 1,
-    uint8_t covariance_type_diagonal_known = 2,
-    uint8_t covariance_type_known = 3) {
-  NavSatFixConstantsBuilder builder_(_fbb);
-  builder_.add_covariance_type_known(covariance_type_known);
-  builder_.add_covariance_type_diagonal_known(covariance_type_diagonal_known);
-  builder_.add_covariance_type_approximated(covariance_type_approximated);
-  builder_.add_covariance_type_unknown(covariance_type_unknown);
-  return builder_.Finish();
-}
-
-flatbuffers::Offset<NavSatFixConstants> CreateNavSatFixConstants(flatbuffers::FlatBufferBuilder &_fbb, const NavSatFixConstantsT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct NavSatFixT : public flatbuffers::NativeTable {
   typedef NavSatFix TableType;
@@ -854,6 +1065,45 @@ inline flatbuffers::Offset<MsgWithMetadata> CreateMsgWithMetadata(flatbuffers::F
       ___metadata);
 }
 
+namespace amrl_msgs {
+
+inline RobofleetStatusT *RobofleetStatus::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  std::unique_ptr<fb::amrl_msgs::RobofleetStatusT> _o = std::unique_ptr<fb::amrl_msgs::RobofleetStatusT>(new RobofleetStatusT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void RobofleetStatus::UnPackTo(RobofleetStatusT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = __metadata(); if (_e) _o->__metadata = std::unique_ptr<fb::MsgMetadataT>(_e->UnPack(_resolver)); }
+  { auto _e = status(); if (_e) _o->status = _e->str(); }
+  { auto _e = battery_level(); _o->battery_level = _e; }
+  { auto _e = location(); if (_e) _o->location = _e->str(); }
+}
+
+inline flatbuffers::Offset<RobofleetStatus> RobofleetStatus::Pack(flatbuffers::FlatBufferBuilder &_fbb, const RobofleetStatusT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateRobofleetStatus(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<RobofleetStatus> CreateRobofleetStatus(flatbuffers::FlatBufferBuilder &_fbb, const RobofleetStatusT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const RobofleetStatusT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto ___metadata = _o->__metadata ? CreateMsgMetadata(_fbb, _o->__metadata.get(), _rehasher) : 0;
+  auto _status = _o->status.empty() ? 0 : _fbb.CreateString(_o->status);
+  auto _battery_level = _o->battery_level;
+  auto _location = _o->location.empty() ? 0 : _fbb.CreateString(_o->location);
+  return fb::amrl_msgs::CreateRobofleetStatus(
+      _fbb,
+      ___metadata,
+      _status,
+      _battery_level,
+      _location);
+}
+
+}  // namespace amrl_msgs
+
 namespace std_msgs {
 
 inline HeaderT *Header::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -895,53 +1145,6 @@ inline flatbuffers::Offset<Header> CreateHeader(flatbuffers::FlatBufferBuilder &
 
 namespace sensor_msgs {
 
-inline NavSatStatusConstantsT *NavSatStatusConstants::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<fb::sensor_msgs::NavSatStatusConstantsT> _o = std::unique_ptr<fb::sensor_msgs::NavSatStatusConstantsT>(new NavSatStatusConstantsT());
-  UnPackTo(_o.get(), _resolver);
-  return _o.release();
-}
-
-inline void NavSatStatusConstants::UnPackTo(NavSatStatusConstantsT *_o, const flatbuffers::resolver_function_t *_resolver) const {
-  (void)_o;
-  (void)_resolver;
-  { auto _e = status_no_fix(); _o->status_no_fix = _e; }
-  { auto _e = status_fix(); _o->status_fix = _e; }
-  { auto _e = status_sbas_fix(); _o->status_sbas_fix = _e; }
-  { auto _e = status_gbas_fix(); _o->status_gbas_fix = _e; }
-  { auto _e = service_gps(); _o->service_gps = _e; }
-  { auto _e = service_glonass(); _o->service_glonass = _e; }
-  { auto _e = service_compass(); _o->service_compass = _e; }
-  { auto _e = service_galileo(); _o->service_galileo = _e; }
-}
-
-inline flatbuffers::Offset<NavSatStatusConstants> NavSatStatusConstants::Pack(flatbuffers::FlatBufferBuilder &_fbb, const NavSatStatusConstantsT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateNavSatStatusConstants(_fbb, _o, _rehasher);
-}
-
-inline flatbuffers::Offset<NavSatStatusConstants> CreateNavSatStatusConstants(flatbuffers::FlatBufferBuilder &_fbb, const NavSatStatusConstantsT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
-  (void)_rehasher;
-  (void)_o;
-  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const NavSatStatusConstantsT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _status_no_fix = _o->status_no_fix;
-  auto _status_fix = _o->status_fix;
-  auto _status_sbas_fix = _o->status_sbas_fix;
-  auto _status_gbas_fix = _o->status_gbas_fix;
-  auto _service_gps = _o->service_gps;
-  auto _service_glonass = _o->service_glonass;
-  auto _service_compass = _o->service_compass;
-  auto _service_galileo = _o->service_galileo;
-  return fb::sensor_msgs::CreateNavSatStatusConstants(
-      _fbb,
-      _status_no_fix,
-      _status_fix,
-      _status_sbas_fix,
-      _status_gbas_fix,
-      _service_gps,
-      _service_glonass,
-      _service_compass,
-      _service_galileo);
-}
-
 inline NavSatStatusT *NavSatStatus::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   std::unique_ptr<fb::sensor_msgs::NavSatStatusT> _o = std::unique_ptr<fb::sensor_msgs::NavSatStatusT>(new NavSatStatusT());
   UnPackTo(_o.get(), _resolver);
@@ -972,41 +1175,6 @@ inline flatbuffers::Offset<NavSatStatus> CreateNavSatStatus(flatbuffers::FlatBuf
       ___metadata,
       _status,
       _service);
-}
-
-inline NavSatFixConstantsT *NavSatFixConstants::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<fb::sensor_msgs::NavSatFixConstantsT> _o = std::unique_ptr<fb::sensor_msgs::NavSatFixConstantsT>(new NavSatFixConstantsT());
-  UnPackTo(_o.get(), _resolver);
-  return _o.release();
-}
-
-inline void NavSatFixConstants::UnPackTo(NavSatFixConstantsT *_o, const flatbuffers::resolver_function_t *_resolver) const {
-  (void)_o;
-  (void)_resolver;
-  { auto _e = covariance_type_unknown(); _o->covariance_type_unknown = _e; }
-  { auto _e = covariance_type_approximated(); _o->covariance_type_approximated = _e; }
-  { auto _e = covariance_type_diagonal_known(); _o->covariance_type_diagonal_known = _e; }
-  { auto _e = covariance_type_known(); _o->covariance_type_known = _e; }
-}
-
-inline flatbuffers::Offset<NavSatFixConstants> NavSatFixConstants::Pack(flatbuffers::FlatBufferBuilder &_fbb, const NavSatFixConstantsT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateNavSatFixConstants(_fbb, _o, _rehasher);
-}
-
-inline flatbuffers::Offset<NavSatFixConstants> CreateNavSatFixConstants(flatbuffers::FlatBufferBuilder &_fbb, const NavSatFixConstantsT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
-  (void)_rehasher;
-  (void)_o;
-  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const NavSatFixConstantsT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _covariance_type_unknown = _o->covariance_type_unknown;
-  auto _covariance_type_approximated = _o->covariance_type_approximated;
-  auto _covariance_type_diagonal_known = _o->covariance_type_diagonal_known;
-  auto _covariance_type_known = _o->covariance_type_known;
-  return fb::sensor_msgs::CreateNavSatFixConstants(
-      _fbb,
-      _covariance_type_unknown,
-      _covariance_type_approximated,
-      _covariance_type_diagonal_known,
-      _covariance_type_known);
 }
 
 inline NavSatFixT *NavSatFix::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
