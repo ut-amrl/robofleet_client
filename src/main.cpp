@@ -14,6 +14,12 @@ static const QString server_host = "localhost";
 static const int server_port = 8080;
 static const std::string node_name = "robofleet_client";
 
+void configure_msg_types(RosClientNode& cn) {
+  // All message types and subscribed topics must be enumerated here.
+  // Specializations must also be provided in encode.hpp and decode.hpp
+  cn.register_msg_type<amrl_msgs::RobofleetStatus>("/test/status");
+}
+
 int main(int argc, char** argv) {
   QCoreApplication a(argc, argv);
   ros::init(argc, argv, node_name, ros::init_options::NoSigintHandler);
@@ -27,12 +33,14 @@ int main(int argc, char** argv) {
 
   // Client ROS node
   RosClientNode ros_node;
+  configure_msg_types(ros_node);
 
-  // transmit
+  // send
   QObject::connect(&ros_node, &RosClientNode::ros_message_encoded, &ws_client,
                    &WsClient::send_message);
+  // receive
   QObject::connect(&ws_client, &WsClient::message_received, &ros_node,
-                   &RosClientNode::handle_message);
+                   &RosClientNode::decode_net_message);
 
   // auto reconnect
   QTimer recon_timer;
