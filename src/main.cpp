@@ -17,7 +17,7 @@ static const std::string node_name = "robofleet_client";
 void configure_msg_types(RosClientNode& cn) {
   // All message types and subscribed topics must be enumerated here.
   // Specializations must also be provided in encode.hpp and decode.hpp
-  cn.register_msg_type<amrl_msgs::RobofleetStatus>("/test/status");
+  cn.register_msg_type<amrl_msgs::RobofleetStatus>("status");
 }
 
 int main(int argc, char** argv) {

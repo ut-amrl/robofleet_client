@@ -39,7 +39,8 @@ class RosClientNode : public QObject {
   void encode_ros_msg(
       const T& msg, const std::string& msg_type,
       const std::string& from_topic) {
-    std::cerr << "encoding ROS message" << std::endl;
+    std::cerr << "encoding " << msg_type << " message from " << from_topic
+              << std::endl;
 
     flatbuffers::FlatBufferBuilder fbb;
     encode<T>(fbb, msg, msg_type, from_topic);
@@ -69,13 +70,13 @@ class RosClientNode : public QObject {
    * @param data the Flatbuffer-encoded message data
    */
   void decode_net_message(const QByteArray& data) {
-    std::cerr << "received WS message" << std::endl;
-
     // extract metadata
     const fb::MsgWithMetadata* msg =
         flatbuffers::GetRoot<fb::MsgWithMetadata>(data.data());
     const std::string& msg_type = msg->__metadata()->type()->str();
     const std::string& topic = msg->__metadata()->topic()->str();
+    std::cerr << "received " << msg_type << " message on " << topic
+              << std::endl;
 
     // try to publish
     if (pub_fns.count(msg_type) == 0) {
@@ -98,29 +99,33 @@ class RosClientNode : public QObject {
    */
   template <typename T>
   void register_msg_type(const std::string& from_topic) {
-    if (subs.count(from_topic) > 0) {
+    // apply remapping to encode full topic name
+    const std::string full_topic = ros::names::resolve(from_topic);
+    const std::string& msg_type = ros::message_traits::DataType<T>().value();
+
+    if (subs.count(full_topic) > 0) {
       throw std::runtime_error(
           "Trying to register topic that is already registered. Topics must be "
           "unique.");
     }
-    const std::string& msg_type = ros::message_traits::DataType<T>().value();
+
     std::cerr << "registering publisher for " << msg_type << " on topic "
-              << from_topic << std::endl;
+              << full_topic << std::endl;
 
     // create subscription
     // have to use boost function because of how roscpp is implemented
     boost::function<void(T)> subscriber_handler =
-        [this, msg_type, from_topic](T msg) {
-          encode_ros_msg<T>(msg, msg_type, from_topic);
+        [this, msg_type, full_topic](T msg) {
+          encode_ros_msg<T>(msg, msg_type, full_topic);
         };
-    subs[from_topic] = n.subscribe<T>(from_topic, 1, subscriber_handler);
+    subs[full_topic] = n.subscribe<T>(full_topic, 1, subscriber_handler);
 
     // create function that will decode and publish a T message to any topic
     if (pub_fns.count(msg_type) == 0) {
       pub_fns[msg_type] =
           [this](const QByteArray& data, const std::string& topic) {
             const T msg = decode<T>(data.data());
-            publish_ros_msg(msg, topic);
+            publish_ros_msg<T>(msg, topic);
           };
     }
   }
