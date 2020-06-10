@@ -109,18 +109,19 @@ class RosClientNode : public QObject {
 
     // create subscription
     // have to use boost function because of how roscpp is implemented
-    boost::function<void(T)> subscriber_handler = [&](T msg) {
-      encode_ros_msg<T>(msg, msg_type, from_topic);
-    };
-    n.subscribe<T>(from_topic, 1, subscriber_handler);
+    boost::function<void(T)> subscriber_handler =
+        [this, msg_type, from_topic](T msg) {
+          encode_ros_msg<T>(msg, msg_type, from_topic);
+        };
+    subs[from_topic] = n.subscribe<T>(from_topic, 1, subscriber_handler);
 
     // create function that will decode and publish a T message to any topic
     if (pub_fns.count(msg_type) == 0) {
-      pub_fns[msg_type] = [&](const QByteArray& data,
-                              const std::string& topic) {
-        const T msg = decode<T>(data.data());
-        publish_ros_msg(msg, topic);
-      };
+      pub_fns[msg_type] =
+          [this](const QByteArray& data, const std::string& topic) {
+            const T msg = decode<T>(data.data());
+            publish_ros_msg(msg, topic);
+          };
     }
   }
 
