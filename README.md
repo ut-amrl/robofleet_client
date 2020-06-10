@@ -16,6 +16,13 @@
 * `make run` to run
 * `make format` to run clang-format
 
+### Using namespaces
+
+1. Read the ROS wiki on [names](http://wiki.ros.org/Names) and [name remapping](http://wiki.ros.org/Remapping%20Arguments).
+2. Launch with `ROS_NAMESPACE` set, e.g. `ROS_NAMESPACE="/ut/testbot" make run`
+
+Note that if you run two client nodes on one machine (even in different namespaces), it is possible to create a feedback loop by client B receiving client A's messages from the server, and then re-publishing them to client A's topic.
+
 ## Development
 
 * Code completion for amrl_msgs
