@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 
-#include <QtCore/QCoreApplication>
 #include <QTimer>
+#include <QtCore/QCoreApplication>
 #include <chrono>
 #include <cstdint>
 #include <iostream>
@@ -36,17 +36,23 @@ int main(int argc, char** argv) {
   configure_msg_types(ros_node);
 
   // send
-  QObject::connect(&ros_node, &RosClientNode::ros_message_encoded, &ws_client,
-                   &WsClient::send_message);
+  QObject::connect(
+      &ros_node,
+      &RosClientNode::ros_message_encoded,
+      &ws_client,
+      &WsClient::send_message);
   // receive
-  QObject::connect(&ws_client, &WsClient::message_received, &ros_node,
-                   &RosClientNode::decode_net_message);
+  QObject::connect(
+      &ws_client,
+      &WsClient::message_received,
+      &ros_node,
+      &RosClientNode::decode_net_message);
 
   // auto reconnect
   QTimer recon_timer;
   recon_timer.setSingleShot(true);
   recon_timer.callOnTimeout(&ws_client, &WsClient::reconnect);
-  QObject::connect(&ws_client, &WsClient::disconnected, [&](){
+  QObject::connect(&ws_client, &WsClient::disconnected, [&]() {
     recon_timer.start(std::chrono::seconds(2));
   });
 

@@ -49,14 +49,19 @@ class WsClient : public QObject {
  public:
   WsClient(const QUrl& url) : url(url) {
     QObject::connect(
-        &ws, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
-        this, &WsClient::on_error);
-    QObject::connect(&ws, &QWebSocket::connected, this,
-                     &WsClient::on_connected);
-    QObject::connect(&ws, &QWebSocket::disconnected, this,
-                     &WsClient::on_disconnected);
-    QObject::connect(&ws, &QWebSocket::binaryMessageReceived, this,
-                     &WsClient::on_binary_message);
+        &ws,
+        QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
+        this,
+        &WsClient::on_error);
+    QObject::connect(
+        &ws, &QWebSocket::connected, this, &WsClient::on_connected);
+    QObject::connect(
+        &ws, &QWebSocket::disconnected, this, &WsClient::on_disconnected);
+    QObject::connect(
+        &ws,
+        &QWebSocket::binaryMessageReceived,
+        this,
+        &WsClient::on_binary_message);
     reconnect();
   }
 };
