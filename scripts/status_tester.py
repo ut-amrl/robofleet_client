@@ -4,7 +4,7 @@ import random
 import rospy
 from roslib.message import get_message_class
 
-seed = random.random()
+seed = random.random() * 100000
 
 def talker():
     # avoid that whole "make a ROS package" issue
@@ -12,18 +12,32 @@ def talker():
     RobofleetStatus = get_message_class("amrl_msgs/RobofleetStatus")
     if RobofleetStatus is None:
         raise Exception("Ensure that amrl_msgs is on ROS_PACKAGE_PATH")
+    Odometry = get_message_class("nav_msgs/Odometry")
 
-    pub = rospy.Publisher("status", RobofleetStatus, queue_size=1)
+    status_pub = rospy.Publisher("status", RobofleetStatus, queue_size=1)
+    odom_pub = rospy.Publisher("odometry/raw", Odometry, queue_size=1)
     rospy.init_node("status_tester", anonymous=True)
-    rate = rospy.Rate(2)
+    rate = rospy.Rate(15)
     while not rospy.is_shutdown():
+        t = rospy.get_time() + seed
+
         rf_status = RobofleetStatus()
-        rf_status.battery_level = math.sin(rospy.get_time() / 5 + seed) * 0.5 + 0.5
+        rf_status.battery_level = math.sin(t / 5) * 0.5 + 0.5
         rf_status.is_ok = True
         rf_status.location = "cyberspace"
         rf_status.status = "Testing"
-        rospy.loginfo(rf_status)
-        pub.publish(rf_status)
+
+        odom = Odometry()
+        odom.pose.pose.position.x = math.sin(t / 10) * 5 + 5
+        odom.pose.pose.position.y = math.sin(t / 10 + 0.5) * 5 + 5
+        odom.pose.pose.position.z = math.sin(t / 10 + 1) * 5 + 5
+        odom.twist.twist.linear.x = 1
+        odom.twist.twist.linear.y = 2
+        odom.twist.twist.linear.z = 3
+
+        rospy.loginfo("publishing")
+        status_pub.publish(rf_status)
+        odom_pub.publish(odom)
         rate.sleep()
 
 if __name__ == '__main__':
