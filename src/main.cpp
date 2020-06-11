@@ -17,7 +17,14 @@ static const std::string node_name = "robofleet_client";
 void configure_msg_types(RosClientNode& cn) {
   // All message types and subscribed topics must be enumerated here.
   // Specializations must also be provided in encode.hpp and decode.hpp
+  cn.register_msg_type<nav_msgs::Odometry>("odometry/raw");
   cn.register_msg_type<amrl_msgs::RobofleetStatus>("status");
+
+  // TODO: remove (testing)
+  cn.register_msg_type<amrl_msgs::RobofleetStatus>("/x/y/status");
+  cn.register_msg_type<amrl_msgs::RobofleetStatus>("/a/b/status");
+  cn.register_msg_type<nav_msgs::Odometry>("/x/y/odometry/raw");
+  cn.register_msg_type<nav_msgs::Odometry>("/a/b/odometry/raw");
 }
 
 int main(int argc, char** argv) {
