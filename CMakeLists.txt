@@ -10,7 +10,7 @@ set(CMAKE_AUTOUIC on)
 set(CMAKE_INCLUDE_CURRENT_DIR on)
 find_package(Qt5 COMPONENTS Core WebSockets REQUIRED)
 
-add_executable(client)
+add_executable(client src/main.cpp)
 add_subdirectory(src)
 include_directories(client include)
 target_link_libraries(client Qt5::Core Qt5::WebSockets) # also adds includes
