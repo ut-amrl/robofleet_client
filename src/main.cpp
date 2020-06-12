@@ -58,7 +58,8 @@ int main(int argc, char** argv) {
   // auto reconnect
   QTimer recon_timer;
   recon_timer.setSingleShot(true);
-  recon_timer.callOnTimeout(&ws_client, &WsClient::reconnect);
+  QObject::connect(
+      &recon_timer, &QTimer::timeout, &ws_client, &WsClient::reconnect);
   QObject::connect(&ws_client, &WsClient::disconnected, [&]() {
     recon_timer.start(std::chrono::seconds(2));
   });
