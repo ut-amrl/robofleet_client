@@ -4,14 +4,20 @@
 
 ## Dependencies
 
+* Make sure to clone submodules, or `git submodule init` and `git submodule update`
 * C++ compiler for std >= 11
 * CMake
 * ROS Melodic
 * Qt5
 
+## Configuration
+
+The client must be configured before building.
+1. `cp src/config.example.hpp src/config.hpp`
+2. Edit parameters in `src/config.hpp`
+
 ## Building
 
-* Make sure to clone submodules, or `git submodule init` and `git submodule update`
 * `make` to build
 * `make run` to run
 * `make format` to run clang-format

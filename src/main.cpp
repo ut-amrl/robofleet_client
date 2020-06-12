@@ -9,10 +9,7 @@
 
 #include "RosClientNode.hpp"
 #include "WsClient.hpp"
-
-static const QString server_host = "localhost";
-static const int server_port = 8080;
-static const std::string node_name = "robofleet_client";
+#include "config.hpp"
 
 void configure_msg_types(RosClientNode& cn) {
   // All message types and subscribed topics must be enumerated here.
@@ -29,13 +26,13 @@ void configure_msg_types(RosClientNode& cn) {
 
 int main(int argc, char** argv) {
   QCoreApplication a(argc, argv);
-  ros::init(argc, argv, node_name, ros::init_options::NoSigintHandler);
+  ros::init(argc, argv, config::ros_node_name, ros::init_options::NoSigintHandler);
 
   // Websocket client
   QUrl url;
-  url.setScheme("ws");
-  url.setHost(server_host);
-  url.setPort(server_port);
+  url.setScheme(QString::fromStdString(config::protocol));
+  url.setHost(QString::fromStdString(config::host));
+  url.setPort(config::port);
   WsClient ws_client{url};
 
   // Client ROS node
