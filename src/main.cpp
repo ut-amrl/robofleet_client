@@ -29,11 +29,7 @@ int main(int argc, char** argv) {
   ros::init(argc, argv, config::ros_node_name, ros::init_options::NoSigintHandler);
 
   // Websocket client
-  QUrl url;
-  url.setScheme(QString::fromStdString(config::protocol));
-  url.setHost(QString::fromStdString(config::host));
-  url.setPort(config::port);
-  WsClient ws_client{url};
+  WsClient ws_client{QString::fromStdString(config::host_url)};
 
   // Client ROS node
   RosClientNode ros_node;
