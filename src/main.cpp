@@ -1,4 +1,8 @@
+#include <amrl_msgs/Localization2DMsg.h>
+#include <amrl_msgs/RobofleetStatus.h>
+#include <nav_msgs/Odometry.h>
 #include <ros/ros.h>
+#include <sensor_msgs/NavSatFix.h>
 
 #include <QTimer>
 #include <QtCore/QCoreApplication>
@@ -14,19 +18,15 @@
 void configure_msg_types(RosClientNode& cn) {
   // All message types and subscribed topics must be enumerated here.
   // Specializations must also be provided in encode.hpp and decode.hpp
-  cn.register_msg_type<nav_msgs::Odometry>("odometry/raw");
   cn.register_msg_type<amrl_msgs::RobofleetStatus>("status");
-
-  // TODO: remove (testing)
-  cn.register_msg_type<amrl_msgs::RobofleetStatus>("/x/y/status");
-  cn.register_msg_type<amrl_msgs::RobofleetStatus>("/a/b/status");
-  cn.register_msg_type<nav_msgs::Odometry>("/x/y/odometry/raw");
-  cn.register_msg_type<nav_msgs::Odometry>("/a/b/odometry/raw");
+  cn.register_msg_type<amrl_msgs::Localization2DMsg>("localization");
+  cn.register_msg_type<nav_msgs::Odometry>("odometry/raw");
 }
 
 int main(int argc, char** argv) {
   QCoreApplication a(argc, argv);
-  ros::init(argc, argv, config::ros_node_name, ros::init_options::NoSigintHandler);
+  ros::init(
+      argc, argv, config::ros_node_name, ros::init_options::NoSigintHandler);
 
   // Websocket client
   WsClient ws_client{QString::fromStdString(config::host_url)};

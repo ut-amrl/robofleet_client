@@ -1,5 +1,6 @@
 #pragma once
 
+#include <amrl_msgs/Localization2DMsg.h>
 #include <amrl_msgs/RobofleetStatus.h>
 #include <flatbuffers/flatbuffers.h>
 #include <nav_msgs/Odometry.h>
@@ -31,6 +32,27 @@ void encode(
       msg.location.c_str());
 
   fbb.Finish(rf_status);
+}
+
+template <>
+void encode(
+    FBB& fbb, const amrl_msgs::Localization2DMsg& msg,
+    const std::string& msg_type, const std::string& topic) {
+  auto metadata =
+      fb::CreateMsgMetadataDirect(fbb, msg_type.c_str(), topic.c_str());
+
+  auto header_stamp =
+      fb::RosTime(msg.header.stamp.toSec(), msg.header.stamp.toNSec());
+  auto header = fb::std_msgs::CreateHeaderDirect(
+      fbb, 0, msg.header.seq, &header_stamp, msg.header.frame_id.c_str());
+
+  auto pose = fb::amrl_msgs::CreatePose2Df(
+      fbb, 0, msg.pose.x, msg.pose.y, msg.pose.theta);
+
+  auto loc = fb::amrl_msgs::CreateLocalization2DMsgDirect(
+      fbb, metadata, header, pose, msg.map.c_str());
+
+  fbb.Finish(loc);
 }
 
 template <>

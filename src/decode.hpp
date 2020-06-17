@@ -1,10 +1,11 @@
 #pragma once
 
+#include <amrl_msgs/Localization2DMsg.h>
 #include <amrl_msgs/RobofleetStatus.h>
 #include <flatbuffers/flatbuffers.h>
+#include <nav_msgs/Odometry.h>
 #include <schema_generated.h>
 #include <sensor_msgs/NavSatFix.h>
-#include <nav_msgs/Odometry.h>
 
 // to add a new message type, specialize this template to decode the message
 template <typename T>
@@ -23,19 +24,40 @@ amrl_msgs::RobofleetStatus decode(const void* const data) {
 }
 
 template <>
-nav_msgs::Odometry decode(const void* const data) {
-  const fb::nav_msgs::Odometry* src =
-      flatbuffers::GetRoot<fb::nav_msgs::Odometry>(data);
-  nav_msgs::Odometry dst;
-  
+amrl_msgs::Localization2DMsg decode(const void* const data) {
+  const fb::amrl_msgs::Localization2DMsg* src =
+      flatbuffers::GetRoot<fb::amrl_msgs::Localization2DMsg>(data);
+  amrl_msgs::Localization2DMsg dst;
+
   dst.header.frame_id = src->header()->frame_id()->str();
   dst.header.seq = src->header()->seq();
   dst.header.stamp = ros::Time(
       src->header()->stamp()->secs(), src->header()->stamp()->nsecs());
-  
+
+  dst.map = src->map()->str();
+  dst.pose.x = src->pose()->x();
+  dst.pose.y = src->pose()->y();
+  dst.pose.theta = src->pose()->theta();
+  return dst;
+}
+
+template <>
+nav_msgs::Odometry decode(const void* const data) {
+  const fb::nav_msgs::Odometry* src =
+      flatbuffers::GetRoot<fb::nav_msgs::Odometry>(data);
+  nav_msgs::Odometry dst;
+
+  dst.header.frame_id = src->header()->frame_id()->str();
+  dst.header.seq = src->header()->seq();
+  dst.header.stamp = ros::Time(
+      src->header()->stamp()->secs(), src->header()->stamp()->nsecs());
+
   dst.child_frame_id = src->child_frame_id()->str();
-  
-  std::copy(src->pose()->covariance()->begin(), src->pose()->covariance()->end(), dst.pose.covariance.begin());
+
+  std::copy(
+      src->pose()->covariance()->begin(),
+      src->pose()->covariance()->end(),
+      dst.pose.covariance.begin());
   dst.pose.pose.orientation.x = src->pose()->pose()->orientation()->x();
   dst.pose.pose.orientation.y = src->pose()->pose()->orientation()->y();
   dst.pose.pose.orientation.z = src->pose()->pose()->orientation()->z();
@@ -44,7 +66,10 @@ nav_msgs::Odometry decode(const void* const data) {
   dst.pose.pose.position.y = src->pose()->pose()->position()->y();
   dst.pose.pose.position.z = src->pose()->pose()->position()->z();
 
-  std::copy(src->twist()->covariance()->begin(), src->twist()->covariance()->end(), dst.twist.covariance.begin());
+  std::copy(
+      src->twist()->covariance()->begin(),
+      src->twist()->covariance()->end(),
+      dst.twist.covariance.begin());
   dst.twist.twist.angular.x = src->twist()->twist()->angular()->x();
   dst.twist.twist.angular.y = src->twist()->twist()->angular()->y();
   dst.twist.twist.angular.z = src->twist()->twist()->angular()->z();
