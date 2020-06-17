@@ -11,6 +11,17 @@
 template <typename T>
 static T decode(const void* const data);
 
+// *** utility functions ***
+template <typename Tsrc, typename Tdst>
+static void decode_header(const Tsrc& src, Tdst& dst) {
+  dst.header.frame_id = src->header()->frame_id()->str();
+  dst.header.seq = src->header()->seq();
+  dst.header.stamp = ros::Time(
+      src->header()->stamp()->secs(), src->header()->stamp()->nsecs());
+}
+
+// *** specializations below ***
+
 template <>
 amrl_msgs::RobofleetStatus decode(const void* const data) {
   const fb::amrl_msgs::RobofleetStatus* src =
@@ -28,12 +39,7 @@ amrl_msgs::Localization2DMsg decode(const void* const data) {
   const fb::amrl_msgs::Localization2DMsg* src =
       flatbuffers::GetRoot<fb::amrl_msgs::Localization2DMsg>(data);
   amrl_msgs::Localization2DMsg dst;
-
-  dst.header.frame_id = src->header()->frame_id()->str();
-  dst.header.seq = src->header()->seq();
-  dst.header.stamp = ros::Time(
-      src->header()->stamp()->secs(), src->header()->stamp()->nsecs());
-
+  decode_header(src, dst);
   dst.map = src->map()->str();
   dst.pose.x = src->pose()->x();
   dst.pose.y = src->pose()->y();
@@ -46,11 +52,7 @@ nav_msgs::Odometry decode(const void* const data) {
   const fb::nav_msgs::Odometry* src =
       flatbuffers::GetRoot<fb::nav_msgs::Odometry>(data);
   nav_msgs::Odometry dst;
-
-  dst.header.frame_id = src->header()->frame_id()->str();
-  dst.header.seq = src->header()->seq();
-  dst.header.stamp = ros::Time(
-      src->header()->stamp()->secs(), src->header()->stamp()->nsecs());
+  decode_header(src, dst);
 
   dst.child_frame_id = src->child_frame_id()->str();
 
@@ -84,13 +86,10 @@ sensor_msgs::NavSatFix decode(const void* const data) {
   const fb::sensor_msgs::NavSatFix* src =
       flatbuffers::GetRoot<fb::sensor_msgs::NavSatFix>(data);
   sensor_msgs::NavSatFix dst;
+  decode_header(src, dst);
   dst.altitude = src->altitude();
   dst.latitude = src->latitude();
   dst.longitude = src->longitude();
-  dst.header.frame_id = src->header()->frame_id()->str();
-  dst.header.seq = src->header()->seq();
-  dst.header.stamp = ros::Time(
-      src->header()->stamp()->secs(), src->header()->stamp()->nsecs());
   dst.position_covariance_type = src->position_covariance_type();
   dst.status.service = src->status()->service();
   dst.status.status = src->status()->status();

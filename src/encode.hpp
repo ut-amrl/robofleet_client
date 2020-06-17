@@ -16,12 +16,28 @@ static void encode(
     FBB& fbb, const T& msg, const std::string& msg_type,
     const std::string& topic);
 
+// *** utility functions ***
+static flatbuffers::Offset<fb::MsgMetadata> encode_metadata(
+    FBB& fbb, const std::string& msg_type, const std::string& topic) {
+  return fb::CreateMsgMetadataDirect(fbb, msg_type.c_str(), topic.c_str());
+}
+template <typename T>
+static flatbuffers::Offset<fb::std_msgs::Header> encode_header(
+    FBB& fbb, const T& msg) {
+  auto header_stamp =
+      fb::RosTime(msg.header.stamp.toSec(), msg.header.stamp.toNSec());
+  return fb::std_msgs::CreateHeaderDirect(
+      fbb, 0, msg.header.seq, &header_stamp, msg.header.frame_id.c_str());
+}
+
+// *** specializations below ***
+
+// amrl_msgs/RobofleetStatus
 template <>
 void encode(
     FBB& fbb, const amrl_msgs::RobofleetStatus& msg,
     const std::string& msg_type, const std::string& topic) {
-  auto metadata =
-      fb::CreateMsgMetadataDirect(fbb, msg_type.c_str(), topic.c_str());
+  auto metadata = encode_metadata(fbb, msg_type, topic);
 
   auto rf_status = fb::amrl_msgs::CreateRobofleetStatusDirect(
       fbb,
@@ -34,17 +50,13 @@ void encode(
   fbb.Finish(rf_status);
 }
 
+// amrl_msgs/Localization2DMsg
 template <>
 void encode(
     FBB& fbb, const amrl_msgs::Localization2DMsg& msg,
     const std::string& msg_type, const std::string& topic) {
-  auto metadata =
-      fb::CreateMsgMetadataDirect(fbb, msg_type.c_str(), topic.c_str());
-
-  auto header_stamp =
-      fb::RosTime(msg.header.stamp.toSec(), msg.header.stamp.toNSec());
-  auto header = fb::std_msgs::CreateHeaderDirect(
-      fbb, 0, msg.header.seq, &header_stamp, msg.header.frame_id.c_str());
+  auto metadata = encode_metadata(fbb, msg_type, topic);
+  auto header = encode_header(fbb, msg);
 
   auto pose = fb::amrl_msgs::CreatePose2Df(
       fbb, 0, msg.pose.x, msg.pose.y, msg.pose.theta);
@@ -55,17 +67,13 @@ void encode(
   fbb.Finish(loc);
 }
 
+// nav_msgs/Odometry
 template <>
 void encode(
     FBB& fbb, const nav_msgs::Odometry& msg, const std::string& msg_type,
     const std::string& topic) {
-  auto metadata =
-      fb::CreateMsgMetadataDirect(fbb, msg_type.c_str(), topic.c_str());
-
-  auto header_stamp =
-      fb::RosTime(msg.header.stamp.toSec(), msg.header.stamp.toNSec());
-  auto header = fb::std_msgs::CreateHeaderDirect(
-      fbb, 0, msg.header.seq, &header_stamp, msg.header.frame_id.c_str());
+  auto metadata = encode_metadata(fbb, msg_type, topic);
+  auto header = encode_header(fbb, msg);
 
   // pose
   auto pose_position = fb::geometry_msgs::CreatePoint(
@@ -122,17 +130,13 @@ void encode(
   fbb.Finish(odom);
 }
 
+// sensor_msgs/NavSatFix
 template <>
 void encode(
     FBB& fbb, const sensor_msgs::NavSatFix& msg, const std::string& msg_type,
     const std::string& topic) {
-  auto metadata =
-      fb::CreateMsgMetadataDirect(fbb, msg_type.c_str(), topic.c_str());
-
-  auto header_stamp =
-      fb::RosTime(msg.header.stamp.toSec(), msg.header.stamp.toNSec());
-  auto header = fb::std_msgs::CreateHeaderDirect(
-      fbb, 0, msg.header.seq, &header_stamp, msg.header.frame_id.c_str());
+  auto metadata = encode_metadata(fbb, msg_type, topic);
+  auto header = encode_header(fbb, msg);
 
   auto status = fb::sensor_msgs::CreateNavSatStatus(
       fbb, 0, msg.status.service, msg.status.status);
