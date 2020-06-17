@@ -15,14 +15,6 @@
 #include "WsClient.hpp"
 #include "config.hpp"
 
-void configure_msg_types(RosClientNode& cn) {
-  // All message types and subscribed topics must be enumerated here.
-  // Specializations must also be provided in encode.hpp and decode.hpp
-  cn.register_msg_type<amrl_msgs::RobofleetStatus>("status");
-  cn.register_msg_type<amrl_msgs::Localization2DMsg>("localization");
-  cn.register_msg_type<nav_msgs::Odometry>("odometry/raw");
-}
-
 int main(int argc, char** argv) {
   QCoreApplication a(argc, argv);
   ros::init(
@@ -33,7 +25,7 @@ int main(int argc, char** argv) {
 
   // Client ROS node
   RosClientNode ros_node;
-  configure_msg_types(ros_node);
+  config::configure_msg_types(ros_node);
 
   // send
   QObject::connect(
