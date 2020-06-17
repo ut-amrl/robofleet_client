@@ -36,6 +36,18 @@ struct HeaderT;
 
 }  // namespace std_msgs
 
+namespace amrl_msgs {
+
+struct Pose2Df;
+struct Pose2DfBuilder;
+struct Pose2DfT;
+
+struct Localization2DMsg;
+struct Localization2DMsgBuilder;
+struct Localization2DMsgT;
+
+}  // namespace amrl_msgs
+
 namespace sensor_msgs {
 
 struct NavSatStatus;
@@ -837,6 +849,209 @@ inline flatbuffers::Offset<Header> CreateHeaderDirect(
 flatbuffers::Offset<Header> CreateHeader(flatbuffers::FlatBufferBuilder &_fbb, const HeaderT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 }  // namespace std_msgs
+
+namespace amrl_msgs {
+
+struct Pose2DfT : public flatbuffers::NativeTable {
+  typedef Pose2Df TableType;
+  std::unique_ptr<fb::MsgMetadataT> __metadata;
+  float x;
+  float y;
+  float theta;
+  Pose2DfT()
+      : x(0.0f),
+        y(0.0f),
+        theta(0.0f) {
+  }
+};
+
+struct Pose2Df FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef Pose2DfT NativeTableType;
+  typedef Pose2DfBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT___METADATA = 4,
+    VT_X = 6,
+    VT_Y = 8,
+    VT_THETA = 10
+  };
+  const fb::MsgMetadata *__metadata() const {
+    return GetPointer<const fb::MsgMetadata *>(VT___METADATA);
+  }
+  float x() const {
+    return GetField<float>(VT_X, 0.0f);
+  }
+  float y() const {
+    return GetField<float>(VT_Y, 0.0f);
+  }
+  float theta() const {
+    return GetField<float>(VT_THETA, 0.0f);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT___METADATA) &&
+           verifier.VerifyTable(__metadata()) &&
+           VerifyField<float>(verifier, VT_X) &&
+           VerifyField<float>(verifier, VT_Y) &&
+           VerifyField<float>(verifier, VT_THETA) &&
+           verifier.EndTable();
+  }
+  Pose2DfT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(Pose2DfT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<Pose2Df> Pack(flatbuffers::FlatBufferBuilder &_fbb, const Pose2DfT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct Pose2DfBuilder {
+  typedef Pose2Df Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add___metadata(flatbuffers::Offset<fb::MsgMetadata> __metadata) {
+    fbb_.AddOffset(Pose2Df::VT___METADATA, __metadata);
+  }
+  void add_x(float x) {
+    fbb_.AddElement<float>(Pose2Df::VT_X, x, 0.0f);
+  }
+  void add_y(float y) {
+    fbb_.AddElement<float>(Pose2Df::VT_Y, y, 0.0f);
+  }
+  void add_theta(float theta) {
+    fbb_.AddElement<float>(Pose2Df::VT_THETA, theta, 0.0f);
+  }
+  explicit Pose2DfBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  Pose2DfBuilder &operator=(const Pose2DfBuilder &);
+  flatbuffers::Offset<Pose2Df> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<Pose2Df>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<Pose2Df> CreatePose2Df(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<fb::MsgMetadata> __metadata = 0,
+    float x = 0.0f,
+    float y = 0.0f,
+    float theta = 0.0f) {
+  Pose2DfBuilder builder_(_fbb);
+  builder_.add_theta(theta);
+  builder_.add_y(y);
+  builder_.add_x(x);
+  builder_.add___metadata(__metadata);
+  return builder_.Finish();
+}
+
+flatbuffers::Offset<Pose2Df> CreatePose2Df(flatbuffers::FlatBufferBuilder &_fbb, const Pose2DfT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct Localization2DMsgT : public flatbuffers::NativeTable {
+  typedef Localization2DMsg TableType;
+  std::unique_ptr<fb::MsgMetadataT> __metadata;
+  std::unique_ptr<fb::std_msgs::HeaderT> header;
+  std::unique_ptr<fb::amrl_msgs::Pose2DfT> pose;
+  std::string map;
+  Localization2DMsgT() {
+  }
+};
+
+struct Localization2DMsg FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef Localization2DMsgT NativeTableType;
+  typedef Localization2DMsgBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT___METADATA = 4,
+    VT_HEADER = 6,
+    VT_POSE = 8,
+    VT_MAP = 10
+  };
+  const fb::MsgMetadata *__metadata() const {
+    return GetPointer<const fb::MsgMetadata *>(VT___METADATA);
+  }
+  const fb::std_msgs::Header *header() const {
+    return GetPointer<const fb::std_msgs::Header *>(VT_HEADER);
+  }
+  const fb::amrl_msgs::Pose2Df *pose() const {
+    return GetPointer<const fb::amrl_msgs::Pose2Df *>(VT_POSE);
+  }
+  const flatbuffers::String *map() const {
+    return GetPointer<const flatbuffers::String *>(VT_MAP);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT___METADATA) &&
+           verifier.VerifyTable(__metadata()) &&
+           VerifyOffset(verifier, VT_HEADER) &&
+           verifier.VerifyTable(header()) &&
+           VerifyOffset(verifier, VT_POSE) &&
+           verifier.VerifyTable(pose()) &&
+           VerifyOffset(verifier, VT_MAP) &&
+           verifier.VerifyString(map()) &&
+           verifier.EndTable();
+  }
+  Localization2DMsgT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(Localization2DMsgT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<Localization2DMsg> Pack(flatbuffers::FlatBufferBuilder &_fbb, const Localization2DMsgT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct Localization2DMsgBuilder {
+  typedef Localization2DMsg Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add___metadata(flatbuffers::Offset<fb::MsgMetadata> __metadata) {
+    fbb_.AddOffset(Localization2DMsg::VT___METADATA, __metadata);
+  }
+  void add_header(flatbuffers::Offset<fb::std_msgs::Header> header) {
+    fbb_.AddOffset(Localization2DMsg::VT_HEADER, header);
+  }
+  void add_pose(flatbuffers::Offset<fb::amrl_msgs::Pose2Df> pose) {
+    fbb_.AddOffset(Localization2DMsg::VT_POSE, pose);
+  }
+  void add_map(flatbuffers::Offset<flatbuffers::String> map) {
+    fbb_.AddOffset(Localization2DMsg::VT_MAP, map);
+  }
+  explicit Localization2DMsgBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  Localization2DMsgBuilder &operator=(const Localization2DMsgBuilder &);
+  flatbuffers::Offset<Localization2DMsg> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<Localization2DMsg>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<Localization2DMsg> CreateLocalization2DMsg(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<fb::MsgMetadata> __metadata = 0,
+    flatbuffers::Offset<fb::std_msgs::Header> header = 0,
+    flatbuffers::Offset<fb::amrl_msgs::Pose2Df> pose = 0,
+    flatbuffers::Offset<flatbuffers::String> map = 0) {
+  Localization2DMsgBuilder builder_(_fbb);
+  builder_.add_map(map);
+  builder_.add_pose(pose);
+  builder_.add_header(header);
+  builder_.add___metadata(__metadata);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<Localization2DMsg> CreateLocalization2DMsgDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<fb::MsgMetadata> __metadata = 0,
+    flatbuffers::Offset<fb::std_msgs::Header> header = 0,
+    flatbuffers::Offset<fb::amrl_msgs::Pose2Df> pose = 0,
+    const char *map = nullptr) {
+  auto map__ = map ? _fbb.CreateString(map) : 0;
+  return fb::amrl_msgs::CreateLocalization2DMsg(
+      _fbb,
+      __metadata,
+      header,
+      pose,
+      map__);
+}
+
+flatbuffers::Offset<Localization2DMsg> CreateLocalization2DMsg(flatbuffers::FlatBufferBuilder &_fbb, const Localization2DMsgT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+}  // namespace amrl_msgs
 
 namespace sensor_msgs {
 
@@ -1983,6 +2198,80 @@ inline flatbuffers::Offset<Header> CreateHeader(flatbuffers::FlatBufferBuilder &
 }
 
 }  // namespace std_msgs
+
+namespace amrl_msgs {
+
+inline Pose2DfT *Pose2Df::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  std::unique_ptr<fb::amrl_msgs::Pose2DfT> _o = std::unique_ptr<fb::amrl_msgs::Pose2DfT>(new Pose2DfT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void Pose2Df::UnPackTo(Pose2DfT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = __metadata(); if (_e) _o->__metadata = std::unique_ptr<fb::MsgMetadataT>(_e->UnPack(_resolver)); }
+  { auto _e = x(); _o->x = _e; }
+  { auto _e = y(); _o->y = _e; }
+  { auto _e = theta(); _o->theta = _e; }
+}
+
+inline flatbuffers::Offset<Pose2Df> Pose2Df::Pack(flatbuffers::FlatBufferBuilder &_fbb, const Pose2DfT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreatePose2Df(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<Pose2Df> CreatePose2Df(flatbuffers::FlatBufferBuilder &_fbb, const Pose2DfT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const Pose2DfT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto ___metadata = _o->__metadata ? CreateMsgMetadata(_fbb, _o->__metadata.get(), _rehasher) : 0;
+  auto _x = _o->x;
+  auto _y = _o->y;
+  auto _theta = _o->theta;
+  return fb::amrl_msgs::CreatePose2Df(
+      _fbb,
+      ___metadata,
+      _x,
+      _y,
+      _theta);
+}
+
+inline Localization2DMsgT *Localization2DMsg::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  std::unique_ptr<fb::amrl_msgs::Localization2DMsgT> _o = std::unique_ptr<fb::amrl_msgs::Localization2DMsgT>(new Localization2DMsgT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void Localization2DMsg::UnPackTo(Localization2DMsgT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = __metadata(); if (_e) _o->__metadata = std::unique_ptr<fb::MsgMetadataT>(_e->UnPack(_resolver)); }
+  { auto _e = header(); if (_e) _o->header = std::unique_ptr<fb::std_msgs::HeaderT>(_e->UnPack(_resolver)); }
+  { auto _e = pose(); if (_e) _o->pose = std::unique_ptr<fb::amrl_msgs::Pose2DfT>(_e->UnPack(_resolver)); }
+  { auto _e = map(); if (_e) _o->map = _e->str(); }
+}
+
+inline flatbuffers::Offset<Localization2DMsg> Localization2DMsg::Pack(flatbuffers::FlatBufferBuilder &_fbb, const Localization2DMsgT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateLocalization2DMsg(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<Localization2DMsg> CreateLocalization2DMsg(flatbuffers::FlatBufferBuilder &_fbb, const Localization2DMsgT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const Localization2DMsgT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto ___metadata = _o->__metadata ? CreateMsgMetadata(_fbb, _o->__metadata.get(), _rehasher) : 0;
+  auto _header = _o->header ? CreateHeader(_fbb, _o->header.get(), _rehasher) : 0;
+  auto _pose = _o->pose ? CreatePose2Df(_fbb, _o->pose.get(), _rehasher) : 0;
+  auto _map = _o->map.empty() ? 0 : _fbb.CreateString(_o->map);
+  return fb::amrl_msgs::CreateLocalization2DMsg(
+      _fbb,
+      ___metadata,
+      _header,
+      _pose,
+      _map);
+}
+
+}  // namespace amrl_msgs
 
 namespace sensor_msgs {
 
