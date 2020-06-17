@@ -17,6 +17,18 @@ class WsClient : public QObject {
               << std::endl;
   }
 
+  void on_ssl_errors(const QList<QSslError>& errors) {
+    std::cerr << "SSL Errors: " << std::endl;
+    for (const QSslError& e : errors) {
+      std::cerr << e.errorString().toStdString() << std::endl;
+    }
+
+    // WARNING: Never ignore SSL errors in production code.
+    // The proper way to handle self-signed certificates is to add a custom root
+    // to the CA store.
+    // ws.ignoreSslErrors();
+  }
+
   void on_connected() {
     std::cerr << "Websocket connected" << std::endl;
     Q_EMIT connected();
@@ -53,6 +65,11 @@ class WsClient : public QObject {
         QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
         this,
         &WsClient::on_error);
+    QObject::connect(
+        &ws,
+        QOverload<const QList<QSslError>&>::of(&QWebSocket::sslErrors),
+        this,
+        &WsClient::on_ssl_errors);
     QObject::connect(
         &ws, &QWebSocket::connected, this, &WsClient::on_connected);
     QObject::connect(
