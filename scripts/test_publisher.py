@@ -12,11 +12,14 @@ def talker():
     RobofleetStatus = get_message_class("amrl_msgs/RobofleetStatus")
     if RobofleetStatus is None:
         raise Exception("Ensure that amrl_msgs is on ROS_PACKAGE_PATH")
+    Localization2DMsg = get_message_class("amrl_msgs/Localization2DMsg")
     Odometry = get_message_class("nav_msgs/Odometry")
 
     status_pub = rospy.Publisher("status", RobofleetStatus, queue_size=1)
     odom_pub = rospy.Publisher("odometry/raw", Odometry, queue_size=1)
-    rospy.init_node("status_tester", anonymous=True)
+    loc_pub = rospy.Publisher("localization", Localization2DMsg, queue_size=1)
+
+    rospy.init_node("test_publisher", anonymous=True)
     rate = rospy.Rate(15)
     while not rospy.is_shutdown():
         t = rospy.get_time() + seed
@@ -35,9 +38,16 @@ def talker():
         odom.twist.twist.linear.y = 2
         odom.twist.twist.linear.z = 3
 
+        loc = Localization2DMsg()
+        loc.map = "UT_Campus"
+        loc.pose.x = math.sin(t / 50) * 100 + 100
+        loc.pose.y = math.cos(t / 50) * -100 - 100
+        loc.pose.theta = t / 10
+
         rospy.loginfo("publishing")
         status_pub.publish(rf_status)
         odom_pub.publish(odom)
+        loc_pub.publish(loc)
         rate.sleep()
 
 if __name__ == '__main__':
