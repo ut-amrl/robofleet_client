@@ -58,6 +58,10 @@ struct NavSatFix;
 struct NavSatFixBuilder;
 struct NavSatFixT;
 
+struct LaserScan;
+struct LaserScanBuilder;
+struct LaserScanT;
+
 }  // namespace sensor_msgs
 
 namespace geometry_msgs {
@@ -1298,6 +1302,212 @@ inline flatbuffers::Offset<NavSatFix> CreateNavSatFixDirect(
 
 flatbuffers::Offset<NavSatFix> CreateNavSatFix(flatbuffers::FlatBufferBuilder &_fbb, const NavSatFixT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct LaserScanT : public flatbuffers::NativeTable {
+  typedef LaserScan TableType;
+  std::unique_ptr<fb::MsgMetadataT> __metadata;
+  std::unique_ptr<fb::std_msgs::HeaderT> header;
+  float angle_min;
+  float angle_max;
+  float angle_increment;
+  float time_increment;
+  float scan_time;
+  float range_min;
+  float range_max;
+  std::vector<float> ranges;
+  std::vector<float> intensities;
+  LaserScanT()
+      : angle_min(0.0f),
+        angle_max(0.0f),
+        angle_increment(0.0f),
+        time_increment(0.0f),
+        scan_time(0.0f),
+        range_min(0.0f),
+        range_max(0.0f) {
+  }
+};
+
+struct LaserScan FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef LaserScanT NativeTableType;
+  typedef LaserScanBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT___METADATA = 4,
+    VT_HEADER = 6,
+    VT_ANGLE_MIN = 8,
+    VT_ANGLE_MAX = 10,
+    VT_ANGLE_INCREMENT = 12,
+    VT_TIME_INCREMENT = 14,
+    VT_SCAN_TIME = 16,
+    VT_RANGE_MIN = 18,
+    VT_RANGE_MAX = 20,
+    VT_RANGES = 22,
+    VT_INTENSITIES = 24
+  };
+  const fb::MsgMetadata *__metadata() const {
+    return GetPointer<const fb::MsgMetadata *>(VT___METADATA);
+  }
+  const fb::std_msgs::Header *header() const {
+    return GetPointer<const fb::std_msgs::Header *>(VT_HEADER);
+  }
+  float angle_min() const {
+    return GetField<float>(VT_ANGLE_MIN, 0.0f);
+  }
+  float angle_max() const {
+    return GetField<float>(VT_ANGLE_MAX, 0.0f);
+  }
+  float angle_increment() const {
+    return GetField<float>(VT_ANGLE_INCREMENT, 0.0f);
+  }
+  float time_increment() const {
+    return GetField<float>(VT_TIME_INCREMENT, 0.0f);
+  }
+  float scan_time() const {
+    return GetField<float>(VT_SCAN_TIME, 0.0f);
+  }
+  float range_min() const {
+    return GetField<float>(VT_RANGE_MIN, 0.0f);
+  }
+  float range_max() const {
+    return GetField<float>(VT_RANGE_MAX, 0.0f);
+  }
+  const flatbuffers::Vector<float> *ranges() const {
+    return GetPointer<const flatbuffers::Vector<float> *>(VT_RANGES);
+  }
+  const flatbuffers::Vector<float> *intensities() const {
+    return GetPointer<const flatbuffers::Vector<float> *>(VT_INTENSITIES);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT___METADATA) &&
+           verifier.VerifyTable(__metadata()) &&
+           VerifyOffset(verifier, VT_HEADER) &&
+           verifier.VerifyTable(header()) &&
+           VerifyField<float>(verifier, VT_ANGLE_MIN) &&
+           VerifyField<float>(verifier, VT_ANGLE_MAX) &&
+           VerifyField<float>(verifier, VT_ANGLE_INCREMENT) &&
+           VerifyField<float>(verifier, VT_TIME_INCREMENT) &&
+           VerifyField<float>(verifier, VT_SCAN_TIME) &&
+           VerifyField<float>(verifier, VT_RANGE_MIN) &&
+           VerifyField<float>(verifier, VT_RANGE_MAX) &&
+           VerifyOffset(verifier, VT_RANGES) &&
+           verifier.VerifyVector(ranges()) &&
+           VerifyOffset(verifier, VT_INTENSITIES) &&
+           verifier.VerifyVector(intensities()) &&
+           verifier.EndTable();
+  }
+  LaserScanT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(LaserScanT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<LaserScan> Pack(flatbuffers::FlatBufferBuilder &_fbb, const LaserScanT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct LaserScanBuilder {
+  typedef LaserScan Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add___metadata(flatbuffers::Offset<fb::MsgMetadata> __metadata) {
+    fbb_.AddOffset(LaserScan::VT___METADATA, __metadata);
+  }
+  void add_header(flatbuffers::Offset<fb::std_msgs::Header> header) {
+    fbb_.AddOffset(LaserScan::VT_HEADER, header);
+  }
+  void add_angle_min(float angle_min) {
+    fbb_.AddElement<float>(LaserScan::VT_ANGLE_MIN, angle_min, 0.0f);
+  }
+  void add_angle_max(float angle_max) {
+    fbb_.AddElement<float>(LaserScan::VT_ANGLE_MAX, angle_max, 0.0f);
+  }
+  void add_angle_increment(float angle_increment) {
+    fbb_.AddElement<float>(LaserScan::VT_ANGLE_INCREMENT, angle_increment, 0.0f);
+  }
+  void add_time_increment(float time_increment) {
+    fbb_.AddElement<float>(LaserScan::VT_TIME_INCREMENT, time_increment, 0.0f);
+  }
+  void add_scan_time(float scan_time) {
+    fbb_.AddElement<float>(LaserScan::VT_SCAN_TIME, scan_time, 0.0f);
+  }
+  void add_range_min(float range_min) {
+    fbb_.AddElement<float>(LaserScan::VT_RANGE_MIN, range_min, 0.0f);
+  }
+  void add_range_max(float range_max) {
+    fbb_.AddElement<float>(LaserScan::VT_RANGE_MAX, range_max, 0.0f);
+  }
+  void add_ranges(flatbuffers::Offset<flatbuffers::Vector<float>> ranges) {
+    fbb_.AddOffset(LaserScan::VT_RANGES, ranges);
+  }
+  void add_intensities(flatbuffers::Offset<flatbuffers::Vector<float>> intensities) {
+    fbb_.AddOffset(LaserScan::VT_INTENSITIES, intensities);
+  }
+  explicit LaserScanBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  LaserScanBuilder &operator=(const LaserScanBuilder &);
+  flatbuffers::Offset<LaserScan> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<LaserScan>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<LaserScan> CreateLaserScan(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<fb::MsgMetadata> __metadata = 0,
+    flatbuffers::Offset<fb::std_msgs::Header> header = 0,
+    float angle_min = 0.0f,
+    float angle_max = 0.0f,
+    float angle_increment = 0.0f,
+    float time_increment = 0.0f,
+    float scan_time = 0.0f,
+    float range_min = 0.0f,
+    float range_max = 0.0f,
+    flatbuffers::Offset<flatbuffers::Vector<float>> ranges = 0,
+    flatbuffers::Offset<flatbuffers::Vector<float>> intensities = 0) {
+  LaserScanBuilder builder_(_fbb);
+  builder_.add_intensities(intensities);
+  builder_.add_ranges(ranges);
+  builder_.add_range_max(range_max);
+  builder_.add_range_min(range_min);
+  builder_.add_scan_time(scan_time);
+  builder_.add_time_increment(time_increment);
+  builder_.add_angle_increment(angle_increment);
+  builder_.add_angle_max(angle_max);
+  builder_.add_angle_min(angle_min);
+  builder_.add_header(header);
+  builder_.add___metadata(__metadata);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<LaserScan> CreateLaserScanDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<fb::MsgMetadata> __metadata = 0,
+    flatbuffers::Offset<fb::std_msgs::Header> header = 0,
+    float angle_min = 0.0f,
+    float angle_max = 0.0f,
+    float angle_increment = 0.0f,
+    float time_increment = 0.0f,
+    float scan_time = 0.0f,
+    float range_min = 0.0f,
+    float range_max = 0.0f,
+    const std::vector<float> *ranges = nullptr,
+    const std::vector<float> *intensities = nullptr) {
+  auto ranges__ = ranges ? _fbb.CreateVector<float>(*ranges) : 0;
+  auto intensities__ = intensities ? _fbb.CreateVector<float>(*intensities) : 0;
+  return fb::sensor_msgs::CreateLaserScan(
+      _fbb,
+      __metadata,
+      header,
+      angle_min,
+      angle_max,
+      angle_increment,
+      time_increment,
+      scan_time,
+      range_min,
+      range_max,
+      ranges__,
+      intensities__);
+}
+
+flatbuffers::Offset<LaserScan> CreateLaserScan(flatbuffers::FlatBufferBuilder &_fbb, const LaserScanT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 }  // namespace sensor_msgs
 
 namespace geometry_msgs {
@@ -2352,6 +2562,62 @@ inline flatbuffers::Offset<NavSatFix> CreateNavSatFix(flatbuffers::FlatBufferBui
       _altitude,
       _position_covariance,
       _position_covariance_type);
+}
+
+inline LaserScanT *LaserScan::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  std::unique_ptr<fb::sensor_msgs::LaserScanT> _o = std::unique_ptr<fb::sensor_msgs::LaserScanT>(new LaserScanT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void LaserScan::UnPackTo(LaserScanT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = __metadata(); if (_e) _o->__metadata = std::unique_ptr<fb::MsgMetadataT>(_e->UnPack(_resolver)); }
+  { auto _e = header(); if (_e) _o->header = std::unique_ptr<fb::std_msgs::HeaderT>(_e->UnPack(_resolver)); }
+  { auto _e = angle_min(); _o->angle_min = _e; }
+  { auto _e = angle_max(); _o->angle_max = _e; }
+  { auto _e = angle_increment(); _o->angle_increment = _e; }
+  { auto _e = time_increment(); _o->time_increment = _e; }
+  { auto _e = scan_time(); _o->scan_time = _e; }
+  { auto _e = range_min(); _o->range_min = _e; }
+  { auto _e = range_max(); _o->range_max = _e; }
+  { auto _e = ranges(); if (_e) { _o->ranges.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->ranges[_i] = _e->Get(_i); } } }
+  { auto _e = intensities(); if (_e) { _o->intensities.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->intensities[_i] = _e->Get(_i); } } }
+}
+
+inline flatbuffers::Offset<LaserScan> LaserScan::Pack(flatbuffers::FlatBufferBuilder &_fbb, const LaserScanT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateLaserScan(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<LaserScan> CreateLaserScan(flatbuffers::FlatBufferBuilder &_fbb, const LaserScanT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const LaserScanT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto ___metadata = _o->__metadata ? CreateMsgMetadata(_fbb, _o->__metadata.get(), _rehasher) : 0;
+  auto _header = _o->header ? CreateHeader(_fbb, _o->header.get(), _rehasher) : 0;
+  auto _angle_min = _o->angle_min;
+  auto _angle_max = _o->angle_max;
+  auto _angle_increment = _o->angle_increment;
+  auto _time_increment = _o->time_increment;
+  auto _scan_time = _o->scan_time;
+  auto _range_min = _o->range_min;
+  auto _range_max = _o->range_max;
+  auto _ranges = _o->ranges.size() ? _fbb.CreateVector(_o->ranges) : 0;
+  auto _intensities = _o->intensities.size() ? _fbb.CreateVector(_o->intensities) : 0;
+  return fb::sensor_msgs::CreateLaserScan(
+      _fbb,
+      ___metadata,
+      _header,
+      _angle_min,
+      _angle_max,
+      _angle_increment,
+      _time_increment,
+      _scan_time,
+      _range_min,
+      _range_max,
+      _ranges,
+      _intensities);
 }
 
 }  // namespace sensor_msgs
