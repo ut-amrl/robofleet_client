@@ -145,7 +145,7 @@ void encode(
 
   auto scan = fb::sensor_msgs::CreateLaserScan(
       fbb,
-      0,
+      metadata,
       header,
       msg.angle_min,
       msg.angle_max,
