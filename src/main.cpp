@@ -1,8 +1,4 @@
-#include <amrl_msgs/Localization2DMsg.h>
-#include <amrl_msgs/RobofleetStatus.h>
-#include <nav_msgs/Odometry.h>
 #include <ros/ros.h>
-#include <sensor_msgs/NavSatFix.h>
 
 #include <QTimer>
 #include <QtCore/QCoreApplication>

@@ -5,6 +5,7 @@
 #include <flatbuffers/flatbuffers.h>
 #include <nav_msgs/Odometry.h>
 #include <schema_generated.h>
+#include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/NavSatFix.h>
 
 using FBB = flatbuffers::FlatBufferBuilder;
@@ -128,6 +129,35 @@ void encode(
       twist_with_cov);
 
   fbb.Finish(odom);
+}
+
+// sensor_msgs/LaserScan
+template <>
+void encode(
+    FBB& fbb, const sensor_msgs::LaserScan& msg, const std::string& msg_type,
+    const std::string& topic) {
+  auto metadata = encode_metadata(fbb, msg_type, topic);
+  auto header = encode_header(fbb, msg);
+
+  auto ranges = fbb.CreateVector(msg.ranges.data(), msg.ranges.size());
+  auto intensities =
+      fbb.CreateVector(msg.intensities.data(), msg.intensities.size());
+
+  auto scan = fb::sensor_msgs::CreateLaserScan(
+      fbb,
+      0,
+      header,
+      msg.angle_min,
+      msg.angle_max,
+      msg.angle_increment,
+      msg.time_increment,
+      msg.scan_time,
+      msg.range_min,
+      msg.range_max,
+      ranges,
+      intensities);
+
+  fbb.Finish(scan);
 }
 
 // sensor_msgs/NavSatFix

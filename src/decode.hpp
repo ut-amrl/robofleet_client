@@ -5,6 +5,7 @@
 #include <flatbuffers/flatbuffers.h>
 #include <nav_msgs/Odometry.h>
 #include <schema_generated.h>
+#include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/NavSatFix.h>
 
 // to add a new message type, specialize this template to decode the message
@@ -78,6 +79,27 @@ nav_msgs::Odometry decode(const void* const data) {
   dst.twist.twist.linear.x = src->twist()->twist()->linear()->x();
   dst.twist.twist.linear.y = src->twist()->twist()->linear()->y();
   dst.twist.twist.linear.z = src->twist()->twist()->linear()->z();
+  return dst;
+}
+
+template <>
+sensor_msgs::LaserScan decode(const void* const data) {
+  const fb::sensor_msgs::LaserScan* src =
+      flatbuffers::GetRoot<fb::sensor_msgs::LaserScan>(data);
+  sensor_msgs::LaserScan dst;
+  decode_header(src, dst);
+  dst.angle_increment = src->angle_increment();
+  dst.angle_max = src->angle_max();
+  dst.angle_min = src->angle_min();
+  std::copy(
+      src->intensities()->begin(),
+      src->intensities()->end(),
+      dst.intensities.begin());
+  dst.range_max = src->range_max();
+  dst.range_min = src->range_min();
+  std::copy(src->ranges()->begin(), src->ranges()->end(), dst.ranges.begin());
+  dst.scan_time = src->scan_time();
+  dst.time_increment = src->time_increment();
   return dst;
 }
 
