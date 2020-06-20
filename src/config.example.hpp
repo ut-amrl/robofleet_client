@@ -2,6 +2,7 @@
 #include <amrl_msgs/Localization2DMsg.h>
 #include <amrl_msgs/RobofleetStatus.h>
 #include <nav_msgs/Odometry.h>
+#include <sensor_msgs/CompressedImage.h>
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/NavSatFix.h>
 
@@ -20,5 +21,7 @@ static void configure_msg_types(RosClientNode& cn) {
   cn.register_msg_type<amrl_msgs::Localization2DMsg>("localization");
   cn.register_msg_type<nav_msgs::Odometry>("odometry/raw");
   cn.register_msg_type<sensor_msgs::LaserScan>("velodyne_2dscan");
+  cn.register_msg_type<sensor_msgs::CompressedImage>(
+      "stereo/left/image_raw/compressed");
 }
 }  // namespace config

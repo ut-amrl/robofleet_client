@@ -62,6 +62,10 @@ struct LaserScan;
 struct LaserScanBuilder;
 struct LaserScanT;
 
+struct CompressedImage;
+struct CompressedImageBuilder;
+struct CompressedImageT;
+
 }  // namespace sensor_msgs
 
 namespace geometry_msgs {
@@ -1508,6 +1512,114 @@ inline flatbuffers::Offset<LaserScan> CreateLaserScanDirect(
 
 flatbuffers::Offset<LaserScan> CreateLaserScan(flatbuffers::FlatBufferBuilder &_fbb, const LaserScanT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct CompressedImageT : public flatbuffers::NativeTable {
+  typedef CompressedImage TableType;
+  std::unique_ptr<fb::MsgMetadataT> __metadata;
+  std::unique_ptr<fb::std_msgs::HeaderT> header;
+  std::string format;
+  std::vector<uint8_t> data;
+  CompressedImageT() {
+  }
+};
+
+struct CompressedImage FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef CompressedImageT NativeTableType;
+  typedef CompressedImageBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT___METADATA = 4,
+    VT_HEADER = 6,
+    VT_FORMAT = 8,
+    VT_DATA = 10
+  };
+  const fb::MsgMetadata *__metadata() const {
+    return GetPointer<const fb::MsgMetadata *>(VT___METADATA);
+  }
+  const fb::std_msgs::Header *header() const {
+    return GetPointer<const fb::std_msgs::Header *>(VT_HEADER);
+  }
+  const flatbuffers::String *format() const {
+    return GetPointer<const flatbuffers::String *>(VT_FORMAT);
+  }
+  const flatbuffers::Vector<uint8_t> *data() const {
+    return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_DATA);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT___METADATA) &&
+           verifier.VerifyTable(__metadata()) &&
+           VerifyOffset(verifier, VT_HEADER) &&
+           verifier.VerifyTable(header()) &&
+           VerifyOffset(verifier, VT_FORMAT) &&
+           verifier.VerifyString(format()) &&
+           VerifyOffset(verifier, VT_DATA) &&
+           verifier.VerifyVector(data()) &&
+           verifier.EndTable();
+  }
+  CompressedImageT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(CompressedImageT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<CompressedImage> Pack(flatbuffers::FlatBufferBuilder &_fbb, const CompressedImageT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct CompressedImageBuilder {
+  typedef CompressedImage Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add___metadata(flatbuffers::Offset<fb::MsgMetadata> __metadata) {
+    fbb_.AddOffset(CompressedImage::VT___METADATA, __metadata);
+  }
+  void add_header(flatbuffers::Offset<fb::std_msgs::Header> header) {
+    fbb_.AddOffset(CompressedImage::VT_HEADER, header);
+  }
+  void add_format(flatbuffers::Offset<flatbuffers::String> format) {
+    fbb_.AddOffset(CompressedImage::VT_FORMAT, format);
+  }
+  void add_data(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> data) {
+    fbb_.AddOffset(CompressedImage::VT_DATA, data);
+  }
+  explicit CompressedImageBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  CompressedImageBuilder &operator=(const CompressedImageBuilder &);
+  flatbuffers::Offset<CompressedImage> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<CompressedImage>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<CompressedImage> CreateCompressedImage(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<fb::MsgMetadata> __metadata = 0,
+    flatbuffers::Offset<fb::std_msgs::Header> header = 0,
+    flatbuffers::Offset<flatbuffers::String> format = 0,
+    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> data = 0) {
+  CompressedImageBuilder builder_(_fbb);
+  builder_.add_data(data);
+  builder_.add_format(format);
+  builder_.add_header(header);
+  builder_.add___metadata(__metadata);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<CompressedImage> CreateCompressedImageDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<fb::MsgMetadata> __metadata = 0,
+    flatbuffers::Offset<fb::std_msgs::Header> header = 0,
+    const char *format = nullptr,
+    const std::vector<uint8_t> *data = nullptr) {
+  auto format__ = format ? _fbb.CreateString(format) : 0;
+  auto data__ = data ? _fbb.CreateVector<uint8_t>(*data) : 0;
+  return fb::sensor_msgs::CreateCompressedImage(
+      _fbb,
+      __metadata,
+      header,
+      format__,
+      data__);
+}
+
+flatbuffers::Offset<CompressedImage> CreateCompressedImage(flatbuffers::FlatBufferBuilder &_fbb, const CompressedImageT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 }  // namespace sensor_msgs
 
 namespace geometry_msgs {
@@ -2618,6 +2730,41 @@ inline flatbuffers::Offset<LaserScan> CreateLaserScan(flatbuffers::FlatBufferBui
       _range_max,
       _ranges,
       _intensities);
+}
+
+inline CompressedImageT *CompressedImage::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  std::unique_ptr<fb::sensor_msgs::CompressedImageT> _o = std::unique_ptr<fb::sensor_msgs::CompressedImageT>(new CompressedImageT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void CompressedImage::UnPackTo(CompressedImageT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = __metadata(); if (_e) _o->__metadata = std::unique_ptr<fb::MsgMetadataT>(_e->UnPack(_resolver)); }
+  { auto _e = header(); if (_e) _o->header = std::unique_ptr<fb::std_msgs::HeaderT>(_e->UnPack(_resolver)); }
+  { auto _e = format(); if (_e) _o->format = _e->str(); }
+  { auto _e = data(); if (_e) { _o->data.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->data[_i] = _e->Get(_i); } } }
+}
+
+inline flatbuffers::Offset<CompressedImage> CompressedImage::Pack(flatbuffers::FlatBufferBuilder &_fbb, const CompressedImageT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateCompressedImage(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<CompressedImage> CreateCompressedImage(flatbuffers::FlatBufferBuilder &_fbb, const CompressedImageT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const CompressedImageT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto ___metadata = _o->__metadata ? CreateMsgMetadata(_fbb, _o->__metadata.get(), _rehasher) : 0;
+  auto _header = _o->header ? CreateHeader(_fbb, _o->header.get(), _rehasher) : 0;
+  auto _format = _o->format.empty() ? 0 : _fbb.CreateString(_o->format);
+  auto _data = _o->data.size() ? _fbb.CreateVector(_o->data) : 0;
+  return fb::sensor_msgs::CreateCompressedImage(
+      _fbb,
+      ___metadata,
+      _header,
+      _format,
+      _data);
 }
 
 }  // namespace sensor_msgs

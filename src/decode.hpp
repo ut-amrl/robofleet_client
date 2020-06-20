@@ -5,6 +5,7 @@
 #include <flatbuffers/flatbuffers.h>
 #include <nav_msgs/Odometry.h>
 #include <schema_generated.h>
+#include <sensor_msgs/CompressedImage.h>
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/NavSatFix.h>
 
@@ -115,5 +116,16 @@ sensor_msgs::NavSatFix decode(const void* const data) {
   dst.position_covariance_type = src->position_covariance_type();
   dst.status.service = src->status()->service();
   dst.status.status = src->status()->status();
+  return dst;
+}
+
+template <>
+sensor_msgs::CompressedImage decode(const void* const data) {
+  const fb::sensor_msgs::CompressedImage* src =
+      flatbuffers::GetRoot<fb::sensor_msgs::CompressedImage>(data);
+  sensor_msgs::CompressedImage dst;
+  decode_header(src, dst);
+  std::copy(src->data()->begin(), src->data()->end(), dst.data.begin());
+  dst.format = src->format()->str();
   return dst;
 }

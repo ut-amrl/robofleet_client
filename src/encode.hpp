@@ -5,6 +5,7 @@
 #include <flatbuffers/flatbuffers.h>
 #include <nav_msgs/Odometry.h>
 #include <schema_generated.h>
+#include <sensor_msgs/CompressedImage.h>
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/NavSatFix.h>
 
@@ -186,4 +187,21 @@ void encode(
       msg.position_covariance_type);
 
   fbb.Finish(nav_sat_fix);
+}
+
+// sensor_msgs/CompressedImage
+template <>
+void encode(
+    FBB& fbb, const sensor_msgs::CompressedImage& msg,
+    const std::string& msg_type, const std::string& topic) {
+  auto metadata = encode_metadata(fbb, msg_type, topic);
+  auto header = encode_header(fbb, msg);
+
+  auto format = fbb.CreateString(msg.format);
+  auto data = fbb.CreateVector(msg.data.data(), msg.data.size());
+
+  auto img = fb::sensor_msgs::CreateCompressedImage(
+      fbb, metadata, header, format, data);
+
+  fbb.Finish(img);
 }
