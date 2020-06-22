@@ -2,6 +2,7 @@
 
 #include <amrl_msgs/Localization2DMsg.h>
 #include <amrl_msgs/RobofleetStatus.h>
+#include <amrl_msgs/RobofleetSubscription.h>
 #include <flatbuffers/flatbuffers.h>
 #include <nav_msgs/Odometry.h>
 #include <schema_generated.h>
@@ -33,6 +34,16 @@ amrl_msgs::RobofleetStatus decode(const void* const data) {
   dst.is_ok = src->is_ok();
   dst.location = src->location()->str();
   dst.status = src->status()->str();
+  return dst;
+}
+
+template <>
+amrl_msgs::RobofleetSubscription decode(const void* const data) {
+  const fb::amrl_msgs::RobofleetSubscription* src =
+      flatbuffers::GetRoot<fb::amrl_msgs::RobofleetSubscription>(data);
+  amrl_msgs::RobofleetSubscription dst;
+  dst.action = src->action();
+  dst.topic_regex = src->topic_regex()->str();
   return dst;
 }
 

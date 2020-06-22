@@ -2,6 +2,7 @@
 
 #include <amrl_msgs/Localization2DMsg.h>
 #include <amrl_msgs/RobofleetStatus.h>
+#include <amrl_msgs/RobofleetSubscription.h>
 #include <flatbuffers/flatbuffers.h>
 #include <nav_msgs/Odometry.h>
 #include <schema_generated.h>
@@ -50,6 +51,19 @@ void encode(
       msg.location.c_str());
 
   fbb.Finish(rf_status);
+}
+
+// amrl_msgs/RobofleetSubscription
+template <>
+void encode(
+    FBB& fbb, const amrl_msgs::RobofleetSubscription& msg,
+    const std::string& msg_type, const std::string& topic) {
+  auto metadata = encode_metadata(fbb, msg_type, topic);
+
+  auto rf_sub = fb::amrl_msgs::CreateRobofleetSubscriptionDirect(
+      fbb, metadata, msg.topic_regex.c_str(), msg.action);
+
+  fbb.Finish(rf_sub);
 }
 
 // amrl_msgs/Localization2DMsg

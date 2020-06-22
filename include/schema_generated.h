@@ -26,6 +26,10 @@ struct RobofleetStatus;
 struct RobofleetStatusBuilder;
 struct RobofleetStatusT;
 
+struct RobofleetSubscription;
+struct RobofleetSubscriptionBuilder;
+struct RobofleetSubscriptionT;
+
 }  // namespace amrl_msgs
 
 namespace std_msgs {
@@ -107,6 +111,66 @@ struct OdometryBuilder;
 struct OdometryT;
 
 }  // namespace nav_msgs
+
+namespace amrl_msgs {
+namespace RobofleetSubscriptionConstants {
+
+enum action_unsubscribe {
+  action_unsubscribe_value = 0,
+  action_unsubscribe_MIN = action_unsubscribe_value,
+  action_unsubscribe_MAX = action_unsubscribe_value
+};
+
+inline const action_unsubscribe (&EnumValuesaction_unsubscribe())[1] {
+  static const action_unsubscribe values[] = {
+    action_unsubscribe_value
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesaction_unsubscribe() {
+  static const char * const names[2] = {
+    "value",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameaction_unsubscribe(action_unsubscribe e) {
+  if (flatbuffers::IsOutRange(e, action_unsubscribe_value, action_unsubscribe_value)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesaction_unsubscribe()[index];
+}
+
+enum action_subscribe {
+  action_subscribe_value = 1,
+  action_subscribe_MIN = action_subscribe_value,
+  action_subscribe_MAX = action_subscribe_value
+};
+
+inline const action_subscribe (&EnumValuesaction_subscribe())[1] {
+  static const action_subscribe values[] = {
+    action_subscribe_value
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesaction_subscribe() {
+  static const char * const names[2] = {
+    "value",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameaction_subscribe(action_subscribe e) {
+  if (flatbuffers::IsOutRange(e, action_subscribe_value, action_subscribe_value)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(action_subscribe_value);
+  return EnumNamesaction_subscribe()[index];
+}
+
+}  // namespace RobofleetSubscriptionConstants
+}  // namespace amrl_msgs
 
 namespace sensor_msgs {
 namespace NavSatStatusConstants {
@@ -448,8 +512,9 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) RosTime FLATBUFFERS_FINAL_CLASS {
   uint32_t nsecs_;
 
  public:
-  RosTime() {
-    memset(static_cast<void *>(this), 0, sizeof(RosTime));
+  RosTime()
+      : secs_(0),
+        nsecs_(0) {
   }
   RosTime(uint32_t _secs, uint32_t _nsecs)
       : secs_(flatbuffers::EndianScalar(_secs)),
@@ -470,8 +535,9 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) RosDuration FLATBUFFERS_FINAL_CLASS {
   int32_t nsecs_;
 
  public:
-  RosDuration() {
-    memset(static_cast<void *>(this), 0, sizeof(RosDuration));
+  RosDuration()
+      : secs_(0),
+        nsecs_(0) {
   }
   RosDuration(int32_t _secs, int32_t _nsecs)
       : secs_(flatbuffers::EndianScalar(_secs)),
@@ -534,7 +600,6 @@ struct MsgMetadataBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  MsgMetadataBuilder &operator=(const MsgMetadataBuilder &);
   flatbuffers::Offset<MsgMetadata> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<MsgMetadata>(end);
@@ -604,7 +669,6 @@ struct MsgWithMetadataBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  MsgWithMetadataBuilder &operator=(const MsgWithMetadataBuilder &);
   flatbuffers::Offset<MsgWithMetadata> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<MsgWithMetadata>(end);
@@ -702,7 +766,6 @@ struct RobofleetStatusBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  RobofleetStatusBuilder &operator=(const RobofleetStatusBuilder &);
   flatbuffers::Offset<RobofleetStatus> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<RobofleetStatus>(end);
@@ -745,6 +808,98 @@ inline flatbuffers::Offset<RobofleetStatus> CreateRobofleetStatusDirect(
 }
 
 flatbuffers::Offset<RobofleetStatus> CreateRobofleetStatus(flatbuffers::FlatBufferBuilder &_fbb, const RobofleetStatusT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct RobofleetSubscriptionT : public flatbuffers::NativeTable {
+  typedef RobofleetSubscription TableType;
+  std::unique_ptr<fb::MsgMetadataT> __metadata;
+  std::string topic_regex;
+  uint8_t action;
+  RobofleetSubscriptionT()
+      : action(0) {
+  }
+};
+
+struct RobofleetSubscription FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef RobofleetSubscriptionT NativeTableType;
+  typedef RobofleetSubscriptionBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT___METADATA = 4,
+    VT_TOPIC_REGEX = 6,
+    VT_ACTION = 8
+  };
+  const fb::MsgMetadata *__metadata() const {
+    return GetPointer<const fb::MsgMetadata *>(VT___METADATA);
+  }
+  const flatbuffers::String *topic_regex() const {
+    return GetPointer<const flatbuffers::String *>(VT_TOPIC_REGEX);
+  }
+  uint8_t action() const {
+    return GetField<uint8_t>(VT_ACTION, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT___METADATA) &&
+           verifier.VerifyTable(__metadata()) &&
+           VerifyOffset(verifier, VT_TOPIC_REGEX) &&
+           verifier.VerifyString(topic_regex()) &&
+           VerifyField<uint8_t>(verifier, VT_ACTION) &&
+           verifier.EndTable();
+  }
+  RobofleetSubscriptionT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(RobofleetSubscriptionT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<RobofleetSubscription> Pack(flatbuffers::FlatBufferBuilder &_fbb, const RobofleetSubscriptionT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct RobofleetSubscriptionBuilder {
+  typedef RobofleetSubscription Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add___metadata(flatbuffers::Offset<fb::MsgMetadata> __metadata) {
+    fbb_.AddOffset(RobofleetSubscription::VT___METADATA, __metadata);
+  }
+  void add_topic_regex(flatbuffers::Offset<flatbuffers::String> topic_regex) {
+    fbb_.AddOffset(RobofleetSubscription::VT_TOPIC_REGEX, topic_regex);
+  }
+  void add_action(uint8_t action) {
+    fbb_.AddElement<uint8_t>(RobofleetSubscription::VT_ACTION, action, 0);
+  }
+  explicit RobofleetSubscriptionBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<RobofleetSubscription> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<RobofleetSubscription>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<RobofleetSubscription> CreateRobofleetSubscription(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<fb::MsgMetadata> __metadata = 0,
+    flatbuffers::Offset<flatbuffers::String> topic_regex = 0,
+    uint8_t action = 0) {
+  RobofleetSubscriptionBuilder builder_(_fbb);
+  builder_.add_topic_regex(topic_regex);
+  builder_.add___metadata(__metadata);
+  builder_.add_action(action);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<RobofleetSubscription> CreateRobofleetSubscriptionDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<fb::MsgMetadata> __metadata = 0,
+    const char *topic_regex = nullptr,
+    uint8_t action = 0) {
+  auto topic_regex__ = topic_regex ? _fbb.CreateString(topic_regex) : 0;
+  return fb::amrl_msgs::CreateRobofleetSubscription(
+      _fbb,
+      __metadata,
+      topic_regex__,
+      action);
+}
+
+flatbuffers::Offset<RobofleetSubscription> CreateRobofleetSubscription(flatbuffers::FlatBufferBuilder &_fbb, const RobofleetSubscriptionT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 }  // namespace amrl_msgs
 
@@ -817,7 +972,6 @@ struct HeaderBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  HeaderBuilder &operator=(const HeaderBuilder &);
   flatbuffers::Offset<Header> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Header>(end);
@@ -928,7 +1082,6 @@ struct Pose2DfBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  Pose2DfBuilder &operator=(const Pose2DfBuilder &);
   flatbuffers::Offset<Pose2Df> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Pose2Df>(end);
@@ -1020,7 +1173,6 @@ struct Localization2DMsgBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  Localization2DMsgBuilder &operator=(const Localization2DMsgBuilder &);
   flatbuffers::Offset<Localization2DMsg> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Localization2DMsg>(end);
@@ -1121,7 +1273,6 @@ struct NavSatStatusBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  NavSatStatusBuilder &operator=(const NavSatStatusBuilder &);
   flatbuffers::Offset<NavSatStatus> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<NavSatStatus>(end);
@@ -1251,7 +1402,6 @@ struct NavSatFixBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  NavSatFixBuilder &operator=(const NavSatFixBuilder &);
   flatbuffers::Offset<NavSatFix> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<NavSatFix>(end);
@@ -1444,7 +1594,6 @@ struct LaserScanBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  LaserScanBuilder &operator=(const LaserScanBuilder &);
   flatbuffers::Offset<LaserScan> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<LaserScan>(end);
@@ -1580,7 +1729,6 @@ struct CompressedImageBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  CompressedImageBuilder &operator=(const CompressedImageBuilder &);
   flatbuffers::Offset<CompressedImage> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<CompressedImage>(end);
@@ -1692,7 +1840,6 @@ struct PointBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  PointBuilder &operator=(const PointBuilder &);
   flatbuffers::Offset<Point> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Point>(end);
@@ -1794,7 +1941,6 @@ struct QuaternionBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  QuaternionBuilder &operator=(const QuaternionBuilder &);
   flatbuffers::Offset<Quaternion> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Quaternion>(end);
@@ -1878,7 +2024,6 @@ struct PoseBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  PoseBuilder &operator=(const PoseBuilder &);
   flatbuffers::Offset<Pose> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Pose>(end);
@@ -1958,7 +2103,6 @@ struct PoseWithCovarianceBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  PoseWithCovarianceBuilder &operator=(const PoseWithCovarianceBuilder &);
   flatbuffers::Offset<PoseWithCovariance> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<PoseWithCovariance>(end);
@@ -2061,7 +2205,6 @@ struct Vector3Builder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  Vector3Builder &operator=(const Vector3Builder &);
   flatbuffers::Offset<Vector3> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Vector3>(end);
@@ -2143,7 +2286,6 @@ struct TwistBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  TwistBuilder &operator=(const TwistBuilder &);
   flatbuffers::Offset<Twist> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Twist>(end);
@@ -2223,7 +2365,6 @@ struct TwistWithCovarianceBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  TwistWithCovarianceBuilder &operator=(const TwistWithCovarianceBuilder &);
   flatbuffers::Offset<TwistWithCovariance> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<TwistWithCovariance>(end);
@@ -2340,7 +2481,6 @@ struct OdometryBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  OdometryBuilder &operator=(const OdometryBuilder &);
   flatbuffers::Offset<Odometry> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Odometry>(end);
@@ -2478,6 +2618,38 @@ inline flatbuffers::Offset<RobofleetStatus> CreateRobofleetStatus(flatbuffers::F
       _is_ok,
       _battery_level,
       _location);
+}
+
+inline RobofleetSubscriptionT *RobofleetSubscription::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  std::unique_ptr<fb::amrl_msgs::RobofleetSubscriptionT> _o = std::unique_ptr<fb::amrl_msgs::RobofleetSubscriptionT>(new RobofleetSubscriptionT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void RobofleetSubscription::UnPackTo(RobofleetSubscriptionT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = __metadata(); if (_e) _o->__metadata = std::unique_ptr<fb::MsgMetadataT>(_e->UnPack(_resolver)); }
+  { auto _e = topic_regex(); if (_e) _o->topic_regex = _e->str(); }
+  { auto _e = action(); _o->action = _e; }
+}
+
+inline flatbuffers::Offset<RobofleetSubscription> RobofleetSubscription::Pack(flatbuffers::FlatBufferBuilder &_fbb, const RobofleetSubscriptionT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateRobofleetSubscription(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<RobofleetSubscription> CreateRobofleetSubscription(flatbuffers::FlatBufferBuilder &_fbb, const RobofleetSubscriptionT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const RobofleetSubscriptionT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto ___metadata = _o->__metadata ? CreateMsgMetadata(_fbb, _o->__metadata.get(), _rehasher) : 0;
+  auto _topic_regex = _o->topic_regex.empty() ? 0 : _fbb.CreateString(_o->topic_regex);
+  auto _action = _o->action;
+  return fb::amrl_msgs::CreateRobofleetSubscription(
+      _fbb,
+      ___metadata,
+      _topic_regex,
+      _action);
 }
 
 }  // namespace amrl_msgs
