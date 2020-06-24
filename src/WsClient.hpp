@@ -50,6 +50,9 @@ class WsClient : public QObject {
   }
 
   void send_message(const QByteArray& data) {
+    // don't buffer more bytes if we are still waiting on send
+    if (ws.bytesToWrite() > 0)
+      return;
     ws.sendBinaryMessage(data);
   }
 
