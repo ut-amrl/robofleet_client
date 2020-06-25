@@ -69,14 +69,16 @@ class WsClient : public QObject {
 
  public:
   WsClient(const QUrl& url) : url(url) {
+    typedef void (QWebSocket:: *errorSignal)(const QAbstractSocket::SocketError);
+    typedef void (QWebSocket:: *sslErrorsSignal)(const QList<QSslError> &);
     QObject::connect(
         &ws,
-        QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
+        static_cast<errorSignal>(&QWebSocket::error),
         this,
         &WsClient::on_error);
     QObject::connect(
         &ws,
-        QOverload<const QList<QSslError>&>::of(&QWebSocket::sslErrors),
+        static_cast<sslErrorsSignal>(&QWebSocket::sslErrors),
         this,
         &WsClient::on_ssl_errors);
     QObject::connect(
