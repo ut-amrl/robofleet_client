@@ -39,8 +39,6 @@ class RosClientNode : public QObject {
   void encode_ros_msg(
       const T& msg, const std::string& msg_type,
       const std::string& to_topic) {
-    std::cerr << "encoding " << msg_type << " message to " << to_topic
-              << std::endl;
 
     flatbuffers::FlatBufferBuilder fbb;
     encode<T>(fbb, msg, msg_type, to_topic);
