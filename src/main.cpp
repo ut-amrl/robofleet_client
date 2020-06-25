@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
   QObject::connect(
       &recon_timer, &QTimer::timeout, &ws_client, &WsClient::reconnect);
   QObject::connect(&ws_client, &WsClient::disconnected, [&]() {
-    recon_timer.start(std::chrono::seconds(2));
+    recon_timer.start(std::chrono::milliseconds(2000).count());
   });
 
   return a.exec();
