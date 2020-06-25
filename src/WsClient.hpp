@@ -10,6 +10,7 @@ class WsClient : public QObject {
 
   QUrl url;
   QWebSocket ws;
+  qint64 bytes_buffered = 0;
 
  public Q_SLOTS:
   void on_error(QAbstractSocket::SocketError error) {
@@ -43,6 +44,10 @@ class WsClient : public QObject {
     Q_EMIT message_received(data);
   }
 
+  void on_bytes_written(qint64 bytes) {
+    bytes_buffered -= bytes;
+  }
+
   void reconnect() {
     std::cerr << "Websocket connecting to: " << url.toString().toStdString()
               << std::endl;
@@ -51,9 +56,10 @@ class WsClient : public QObject {
 
   void send_message(const QByteArray& data) {
     // don't buffer more bytes if we are still waiting on send
-    if (ws.bytesToWrite() > 0)
+    if (bytes_buffered > 0)
       return;
-    ws.sendBinaryMessage(data);
+
+    bytes_buffered = ws.sendBinaryMessage(data);
   }
 
  Q_SIGNALS:
@@ -82,6 +88,8 @@ class WsClient : public QObject {
         &QWebSocket::binaryMessageReceived,
         this,
         &WsClient::on_binary_message);
+    QObject::connect(
+        &ws, &QWebSocket::bytesWritten, this, &WsClient::on_bytes_written);
     reconnect();
   }
 };
