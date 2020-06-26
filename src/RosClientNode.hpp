@@ -37,9 +37,7 @@ class RosClientNode : public QObject {
    */
   template <typename T>
   void encode_ros_msg(
-      const T& msg, const std::string& msg_type,
-      const std::string& to_topic) {
-
+      const T& msg, const std::string& msg_type, const std::string& to_topic) {
     flatbuffers::FlatBufferBuilder fbb;
     encode<T>(fbb, msg, msg_type, to_topic);
     Q_EMIT ros_message_encoded(QByteArray(
@@ -97,7 +95,8 @@ class RosClientNode : public QObject {
    * @param to_topic the topic to publish to the server
    */
   template <typename T>
-  void register_msg_type(const std::string& from_topic, const std::string& to_topic) {
+  void register_msg_type(
+      const std::string& from_topic, const std::string& to_topic) {
     // apply remapping to encode full topic name
     const std::string full_from_topic = ros::names::resolve(from_topic);
     const std::string full_to_topic = ros::names::resolve(to_topic);
@@ -110,7 +109,8 @@ class RosClientNode : public QObject {
     }
 
     std::cerr << "registering subscriber for " << msg_type << " on "
-              << full_from_topic << " and publishing on " << full_to_topic <<  std::endl;
+              << full_from_topic << " and publishing on " << full_to_topic
+              << std::endl;
 
     // create subscription
     // have to use boost function because of how roscpp is implemented
@@ -118,7 +118,8 @@ class RosClientNode : public QObject {
         [this, msg_type, full_to_topic](T msg) {
           encode_ros_msg<T>(msg, msg_type, full_to_topic);
         };
-    subs[full_from_topic] = n.subscribe<T>(full_from_topic, 1, subscriber_handler);
+    subs[full_from_topic] =
+        n.subscribe<T>(full_from_topic, 1, subscriber_handler);
 
     // create function that will decode and publish a T message to any topic
     if (pub_fns.count(msg_type) == 0) {
