@@ -33,3 +33,11 @@ add_custom_target(amrl_msgs
 )
 add_dependencies(client amrl_msgs)
 include_directories(client amrl_msgs/msg_gen/cpp/include)
+
+# gtest
+add_subdirectory(googletest)
+add_executable(test_client
+  test/decode.cpp
+)
+target_link_libraries(test_client gtest gtest_main)
+target_link_libraries(test_client ${roscpp_LIBRARIES})

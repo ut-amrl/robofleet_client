@@ -1,10 +1,19 @@
 #pragma once
 
+#include <amrl_msgs/ColoredArc2D.h>
+#include <amrl_msgs/ColoredLine2D.h>
+#include <amrl_msgs/ColoredPoint2D.h>
 #include <amrl_msgs/Localization2DMsg.h>
+#include <amrl_msgs/PathVisualization.h>
+#include <amrl_msgs/Point2D.h>
+#include <amrl_msgs/Pose2Df.h>
 #include <amrl_msgs/RobofleetStatus.h>
 #include <amrl_msgs/RobofleetSubscription.h>
+#include <amrl_msgs/VisualizationMsg.h>
 #include <flatbuffers/flatbuffers.h>
 #include <nav_msgs/Odometry.h>
+#include <ros/ros.h>
+#include <ros/time.h>
 #include <schema_generated.h>
 #include <sensor_msgs/CompressedImage.h>
 #include <sensor_msgs/LaserScan.h>
@@ -15,12 +24,48 @@ template <typename T>
 static T decode(const void* const data);
 
 // *** utility functions ***
+/**
+ * @brief Copy the ROS header from a flatbuffers Object API object src to a
+ * ROS class object dst.
+ *
+ * @tparam Tsrc a generated flatbuffers Object API type
+ * @tparam Tdst a ROS class type
+ * @param src source
+ * @param dst destination
+ */
 template <typename Tsrc, typename Tdst>
 static void decode_header(const Tsrc& src, Tdst& dst) {
   dst.header.frame_id = src->header()->frame_id()->str();
   dst.header.seq = src->header()->seq();
   dst.header.stamp = ros::Time(
       src->header()->stamp()->secs(), src->header()->stamp()->nsecs());
+}
+
+/**
+ * @brief Given a flatbuffers Object API object and a target ROS class type T,
+ * call the decode<T>() function on the object's data.
+ *
+ * @tparam T target ROS class type
+ * @tparam O a generated flatbuffers Object API type
+ * @param src the flatbuffers object to decode
+ * @return T the result of calling decode<T>() on src's data
+ */
+template <typename T, typename O>
+static T decode_obj(const O* const src) {
+  return decode<T>(flatbuffers::GetBufferStartFromRootPointer(src));
+}
+
+template <typename T, typename Vsrc, typename Vdst>
+static void decode_obj_vector(
+    const Vsrc* const src_vector_ptr, Vdst& dst_vector) {
+  auto src = src_vector_ptr->begin();
+  auto dst = dst_vector.begin();
+
+  while (src != src_vector_ptr->end()) {
+    *dst = decode_obj<T>(*src);
+    ++src;
+    ++dst;
+  }
 }
 
 // *** specializations below ***
@@ -44,6 +89,95 @@ amrl_msgs::RobofleetSubscription decode(const void* const data) {
   amrl_msgs::RobofleetSubscription dst;
   dst.action = src->action();
   dst.topic_regex = src->topic_regex()->str();
+  return dst;
+}
+
+template <>
+amrl_msgs::Point2D decode(const void* const data) {
+  const fb::amrl_msgs::Point2D* src =
+      flatbuffers::GetRoot<fb::amrl_msgs::Point2D>(data);
+  amrl_msgs::Point2D dst;
+
+  dst.x = src->x();
+  dst.y = src->y();
+  return dst;
+}
+
+template <>
+amrl_msgs::Pose2Df decode(const void* const data) {
+  const fb::amrl_msgs::Pose2Df* src =
+      flatbuffers::GetRoot<fb::amrl_msgs::Pose2Df>(data);
+  amrl_msgs::Pose2Df dst;
+
+  dst.theta = src->theta();
+  dst.x = src->x();
+  dst.y = src->y();
+  return dst;
+}
+
+template <>
+amrl_msgs::ColoredArc2D decode(const void* const data) {
+  const fb::amrl_msgs::ColoredArc2D* src =
+      flatbuffers::GetRoot<fb::amrl_msgs::ColoredArc2D>(data);
+  amrl_msgs::ColoredArc2D dst;
+
+  dst.center = decode_obj<amrl_msgs::Point2D>(src->center());
+  dst.color = src->color();
+  dst.end_angle = src->end_angle();
+  dst.radius = src->radius();
+  dst.start_angle = src->start_angle();
+  return dst;
+}
+
+template <>
+amrl_msgs::ColoredLine2D decode(const void* const data) {
+  const fb::amrl_msgs::ColoredLine2D* src =
+      flatbuffers::GetRoot<fb::amrl_msgs::ColoredLine2D>(data);
+  amrl_msgs::ColoredLine2D dst;
+
+  dst.color = src->color();
+  dst.p0 = decode_obj<amrl_msgs::Point2D>(src->p0());
+  dst.p1 = decode_obj<amrl_msgs::Point2D>(src->p1());
+  return dst;
+}
+
+template <>
+amrl_msgs::ColoredPoint2D decode(const void* const data) {
+  const fb::amrl_msgs::ColoredPoint2D* src =
+      flatbuffers::GetRoot<fb::amrl_msgs::ColoredPoint2D>(data);
+  amrl_msgs::ColoredPoint2D dst;
+
+  dst.color = src->color();
+  dst.point = decode_obj<amrl_msgs::Point2D>(src->point());
+  return dst;
+}
+
+template <>
+amrl_msgs::PathVisualization decode(const void* const data) {
+  const fb::amrl_msgs::PathVisualization* src =
+      flatbuffers::GetRoot<fb::amrl_msgs::PathVisualization>(data);
+  amrl_msgs::PathVisualization dst;
+
+  dst.clearance = src->clearance();
+  dst.curvature = src->curvature();
+  dst.distance = src->distance();
+  return dst;
+}
+
+template <>
+amrl_msgs::VisualizationMsg decode(const void* const data) {
+  const fb::amrl_msgs::VisualizationMsg* src =
+      flatbuffers::GetRoot<fb::amrl_msgs::VisualizationMsg>(data);
+  amrl_msgs::VisualizationMsg dst;
+  decode_header(src, dst);
+
+  dst.ns = src->ns()->str();
+  decode_obj_vector<amrl_msgs::ColoredArc2D>(src->arcs(), dst.arcs);
+  decode_obj_vector<amrl_msgs::ColoredLine2D>(src->lines(), dst.lines);
+  decode_obj_vector<amrl_msgs::PathVisualization>(
+      src->path_options(), dst.path_options);
+  decode_obj_vector<amrl_msgs::Pose2Df>(src->particles(), dst.particles);
+  decode_obj_vector<amrl_msgs::ColoredPoint2D>(src->points(), dst.points);
   return dst;
 }
 
@@ -138,5 +272,17 @@ sensor_msgs::CompressedImage decode(const void* const data) {
   decode_header(src, dst);
   std::copy(src->data()->begin(), src->data()->end(), dst.data.begin());
   dst.format = src->format()->str();
+  return dst;
+}
+
+template <>
+std_msgs::Header decode(const void* const data) {
+  const fb::std_msgs::Header* src =
+      flatbuffers::GetRoot<fb::std_msgs::Header>(data);
+  std_msgs::Header dst;
+
+  dst.frame_id = src->frame_id()->str();
+  dst.seq = src->seq();
+  dst.stamp = ros::Time(src->stamp()->secs(), src->stamp()->nsecs());
   return dst;
 }

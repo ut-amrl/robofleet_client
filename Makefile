@@ -7,6 +7,10 @@ all: build/client
 run: build/client
 	build/client
 
+.PHONY: test
+test: build/client
+	build/test_client
+
 .PHONY: clean
 clean:
 	-rm -rf build

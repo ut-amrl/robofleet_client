@@ -1,3 +1,6 @@
 [submodule "amrl_msgs"]
 	path = amrl_msgs
 	url = https://github.com/ut-amrl/amrl_msgs
+[submodule "googletest"]
+	path = googletest
+	url = https://github.com/google/googletest
