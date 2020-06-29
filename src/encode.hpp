@@ -77,6 +77,81 @@ flatbuffers::uoffset_t encode(
       .o;
 }
 
+// geometry_msgs/Point
+template <>
+flatbuffers::uoffset_t encode(
+    FBB& fbb, const geometry_msgs::Point& msg, const MetadataOffset& metadata) {
+  return fb::geometry_msgs::CreatePoint(fbb, metadata, msg.x, msg.y, msg.z).o;
+}
+
+// geometry_msgs/Quaternion
+template <>
+flatbuffers::uoffset_t encode(
+    FBB& fbb, const geometry_msgs::Quaternion& msg,
+    const MetadataOffset& metadata) {
+  return fb::geometry_msgs::CreateQuaternion(
+             fbb, metadata, msg.x, msg.y, msg.z, msg.w)
+      .o;
+}
+
+// geometry_msgs/Pose
+template <>
+flatbuffers::uoffset_t encode(
+    FBB& fbb, const geometry_msgs::Pose& msg, const MetadataOffset& metadata) {
+  return fb::geometry_msgs::CreatePose(
+             fbb,
+             metadata,
+             encode(fbb, msg.position, 0),
+             encode(fbb, msg.orientation, 0))
+      .o;
+}
+
+// geometry_msgs/PoseWithCovariance
+template <>
+flatbuffers::uoffset_t encode(
+    FBB& fbb, const geometry_msgs::PoseWithCovariance& msg,
+    const MetadataOffset& metadata) {
+  return fb::geometry_msgs::CreatePoseWithCovariance(
+             fbb,
+             metadata,
+             encode(fbb, msg.pose, 0),
+             fbb.CreateVector(msg.covariance.data(), msg.covariance.size()))
+      .o;
+}
+
+// geometry_msgs/Vector3
+template <>
+flatbuffers::uoffset_t encode(
+    FBB& fbb, const geometry_msgs::Vector3& msg,
+    const MetadataOffset& metadata) {
+  return fb::geometry_msgs::CreateVector3(fbb, metadata, msg.x, msg.y, msg.z).o;
+}
+
+// geometry_msgs/Twist
+template <>
+flatbuffers::uoffset_t encode(
+    FBB& fbb, const geometry_msgs::Twist& msg, const MetadataOffset& metadata) {
+  return fb::geometry_msgs::CreateTwist(
+             fbb,
+             metadata,
+             encode(fbb, msg.linear, 0),
+             encode(fbb, msg.angular, 0))
+      .o;
+}
+
+// geometry_msgs/TwistWithCovariance
+template <>
+flatbuffers::uoffset_t encode(
+    FBB& fbb, const geometry_msgs::TwistWithCovariance& msg,
+    const MetadataOffset& metadata) {
+  return fb::geometry_msgs::CreateTwistWithCovariance(
+             fbb,
+             metadata,
+             encode(fbb, msg.twist, 0),
+             fbb.CreateVector(msg.covariance.data(), msg.covariance.size()))
+      .o;
+}
+
 // amrl_msgs/RobofleetStatus
 template <>
 flatbuffers::uoffset_t encode(
@@ -171,6 +246,7 @@ flatbuffers::uoffset_t encode(
       .o;
 }
 
+// amrl_msgs/ColoredPoint2D
 template <>
 flatbuffers::uoffset_t encode(
     FBB& fbb, const amrl_msgs::ColoredPoint2D& msg,
@@ -185,26 +261,17 @@ template <>
 flatbuffers::uoffset_t encode(
     FBB& fbb, const amrl_msgs::VisualizationMsg& msg,
     const MetadataOffset& metadata) {
-  auto header = encode(fbb, msg.header, 0);
-  auto ns = fbb.CreateString(msg.ns);
-  auto arcs = encode_vector<fb::amrl_msgs::ColoredArc2D>(fbb, 0, msg.arcs);
-  auto lines = encode_vector<fb::amrl_msgs::ColoredLine2D>(fbb, 0, msg.lines);
-  auto particles = encode_vector<fb::amrl_msgs::Pose2Df>(fbb, 0, msg.particles);
-  auto path_options =
-      encode_vector<fb::amrl_msgs::PathVisualization>(fbb, 0, msg.path_options);
-  auto points =
-      encode_vector<fb::amrl_msgs::ColoredPoint2D>(fbb, 0, msg.points);
-
   return fb::amrl_msgs::CreateVisualizationMsg(
              fbb,
              metadata,
-             header,
-             ns,
-             particles,
-             path_options,
-             points,
-             lines,
-             arcs)
+             encode(fbb, msg.header, 0),
+             fbb.CreateString(msg.ns),
+             encode_vector<fb::amrl_msgs::Pose2Df>(fbb, 0, msg.particles),
+             encode_vector<fb::amrl_msgs::PathVisualization>(
+                 fbb, 0, msg.path_options),
+             encode_vector<fb::amrl_msgs::ColoredPoint2D>(fbb, 0, msg.points),
+             encode_vector<fb::amrl_msgs::ColoredLine2D>(fbb, 0, msg.lines),
+             encode_vector<fb::amrl_msgs::ColoredArc2D>(fbb, 0, msg.arcs))
       .o;
 }
 
@@ -212,59 +279,13 @@ flatbuffers::uoffset_t encode(
 template <>
 flatbuffers::uoffset_t encode(
     FBB& fbb, const nav_msgs::Odometry& msg, const MetadataOffset& metadata) {
-  auto header = encode(fbb, msg.header, 0);
-
-  // pose
-  auto pose_position = fb::geometry_msgs::CreatePoint(
-      fbb,
-      0,
-      msg.pose.pose.position.x,
-      msg.pose.pose.position.y,
-      msg.pose.pose.position.z);
-  auto pose_orientation = fb::geometry_msgs::CreateQuaternion(
-      fbb,
-      0,
-      msg.pose.pose.orientation.x,
-      msg.pose.pose.orientation.y,
-      msg.pose.pose.orientation.z,
-      msg.pose.pose.orientation.w);
-  auto pose =
-      fb::geometry_msgs::CreatePose(fbb, 0, pose_position, pose_orientation);
-  auto pose_with_cov = fb::geometry_msgs::CreatePoseWithCovariance(
-      fbb,
-      0,
-      pose,
-      fbb.CreateVector(msg.pose.covariance.data(), msg.pose.covariance.size()));
-
-  // twist
-  auto twist_linear = fb::geometry_msgs::CreateVector3(
-      fbb,
-      0,
-      msg.twist.twist.linear.x,
-      msg.twist.twist.linear.y,
-      msg.twist.twist.linear.z);
-  auto twist_angular = fb::geometry_msgs::CreateVector3(
-      fbb,
-      0,
-      msg.twist.twist.angular.x,
-      msg.twist.twist.angular.y,
-      msg.twist.twist.angular.z);
-  auto twist =
-      fb::geometry_msgs::CreateTwist(fbb, 0, twist_linear, twist_angular);
-  auto twist_with_cov = fb::geometry_msgs::CreateTwistWithCovariance(
-      fbb,
-      0,
-      twist,
-      fbb.CreateVector(
-          msg.twist.covariance.data(), msg.twist.covariance.size()));
-
   return fb::nav_msgs::CreateOdometryDirect(
              fbb,
              metadata,
-             header,
+             encode(fbb, msg.header, 0),
              msg.child_frame_id.c_str(),
-             pose_with_cov,
-             twist_with_cov)
+             encode(fbb, msg.pose, 0),
+             encode(fbb, msg.twist, 0))
       .o;
 }
 
