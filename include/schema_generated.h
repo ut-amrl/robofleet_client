@@ -754,11 +754,11 @@ struct RobofleetStatus FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT___METADATA) &&
            verifier.VerifyTable(__metadata()) &&
-           VerifyOffset(verifier, VT_STATUS) &&
+           VerifyOffsetRequired(verifier, VT_STATUS) &&
            verifier.VerifyString(status()) &&
            VerifyField<uint8_t>(verifier, VT_IS_OK) &&
            VerifyField<float>(verifier, VT_BATTERY_LEVEL) &&
-           VerifyOffset(verifier, VT_LOCATION) &&
+           VerifyOffsetRequired(verifier, VT_LOCATION) &&
            verifier.VerifyString(location()) &&
            verifier.EndTable();
   }
@@ -793,6 +793,8 @@ struct RobofleetStatusBuilder {
   flatbuffers::Offset<RobofleetStatus> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<RobofleetStatus>(end);
+    fbb_.Required(o, RobofleetStatus::VT_STATUS);
+    fbb_.Required(o, RobofleetStatus::VT_LOCATION);
     return o;
   }
 };
@@ -864,7 +866,7 @@ struct RobofleetSubscription FLATBUFFERS_FINAL_CLASS : private flatbuffers::Tabl
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT___METADATA) &&
            verifier.VerifyTable(__metadata()) &&
-           VerifyOffset(verifier, VT_TOPIC_REGEX) &&
+           VerifyOffsetRequired(verifier, VT_TOPIC_REGEX) &&
            verifier.VerifyString(topic_regex()) &&
            VerifyField<uint8_t>(verifier, VT_ACTION) &&
            verifier.EndTable();
@@ -894,6 +896,7 @@ struct RobofleetSubscriptionBuilder {
   flatbuffers::Offset<RobofleetSubscription> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<RobofleetSubscription>(end);
+    fbb_.Required(o, RobofleetSubscription::VT_TOPIC_REGEX);
     return o;
   }
 };
@@ -966,8 +969,8 @@ struct Header FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyOffset(verifier, VT___METADATA) &&
            verifier.VerifyTable(__metadata()) &&
            VerifyField<uint32_t>(verifier, VT_SEQ) &&
-           VerifyField<fb::RosTime>(verifier, VT_STAMP) &&
-           VerifyOffset(verifier, VT_FRAME_ID) &&
+           VerifyFieldRequired<fb::RosTime>(verifier, VT_STAMP) &&
+           VerifyOffsetRequired(verifier, VT_FRAME_ID) &&
            verifier.VerifyString(frame_id()) &&
            verifier.EndTable();
   }
@@ -999,6 +1002,8 @@ struct HeaderBuilder {
   flatbuffers::Offset<Header> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Header>(end);
+    fbb_.Required(o, Header::VT_STAMP);
+    fbb_.Required(o, Header::VT_FRAME_ID);
     return o;
   }
 };
@@ -1164,11 +1169,11 @@ struct Localization2DMsg FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT___METADATA) &&
            verifier.VerifyTable(__metadata()) &&
-           VerifyOffset(verifier, VT_HEADER) &&
+           VerifyOffsetRequired(verifier, VT_HEADER) &&
            verifier.VerifyTable(header()) &&
-           VerifyOffset(verifier, VT_POSE) &&
+           VerifyOffsetRequired(verifier, VT_POSE) &&
            verifier.VerifyTable(pose()) &&
-           VerifyOffset(verifier, VT_MAP) &&
+           VerifyOffsetRequired(verifier, VT_MAP) &&
            verifier.VerifyString(map()) &&
            verifier.EndTable();
   }
@@ -1200,6 +1205,9 @@ struct Localization2DMsgBuilder {
   flatbuffers::Offset<Localization2DMsg> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Localization2DMsg>(end);
+    fbb_.Required(o, Localization2DMsg::VT_HEADER);
+    fbb_.Required(o, Localization2DMsg::VT_POSE);
+    fbb_.Required(o, Localization2DMsg::VT_MAP);
     return o;
   }
 };
@@ -1436,7 +1444,7 @@ struct ColoredPoint2D FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT___METADATA) &&
            verifier.VerifyTable(__metadata()) &&
-           VerifyOffset(verifier, VT_POINT) &&
+           VerifyOffsetRequired(verifier, VT_POINT) &&
            verifier.VerifyTable(point()) &&
            VerifyField<uint32_t>(verifier, VT_COLOR) &&
            verifier.EndTable();
@@ -1466,6 +1474,7 @@ struct ColoredPoint2DBuilder {
   flatbuffers::Offset<ColoredPoint2D> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<ColoredPoint2D>(end);
+    fbb_.Required(o, ColoredPoint2D::VT_POINT);
     return o;
   }
 };
@@ -1520,9 +1529,9 @@ struct ColoredLine2D FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT___METADATA) &&
            verifier.VerifyTable(__metadata()) &&
-           VerifyOffset(verifier, VT_P0) &&
+           VerifyOffsetRequired(verifier, VT_P0) &&
            verifier.VerifyTable(p0()) &&
-           VerifyOffset(verifier, VT_P1) &&
+           VerifyOffsetRequired(verifier, VT_P1) &&
            verifier.VerifyTable(p1()) &&
            VerifyField<uint32_t>(verifier, VT_COLOR) &&
            verifier.EndTable();
@@ -1555,6 +1564,8 @@ struct ColoredLine2DBuilder {
   flatbuffers::Offset<ColoredLine2D> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<ColoredLine2D>(end);
+    fbb_.Required(o, ColoredLine2D::VT_P0);
+    fbb_.Required(o, ColoredLine2D::VT_P1);
     return o;
   }
 };
@@ -1624,7 +1635,7 @@ struct ColoredArc2D FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT___METADATA) &&
            verifier.VerifyTable(__metadata()) &&
-           VerifyOffset(verifier, VT_CENTER) &&
+           VerifyOffsetRequired(verifier, VT_CENTER) &&
            verifier.VerifyTable(center()) &&
            VerifyField<float>(verifier, VT_RADIUS) &&
            VerifyField<float>(verifier, VT_START_ANGLE) &&
@@ -1666,6 +1677,7 @@ struct ColoredArc2DBuilder {
   flatbuffers::Offset<ColoredArc2D> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<ColoredArc2D>(end);
+    fbb_.Required(o, ColoredArc2D::VT_CENTER);
     return o;
   }
 };
@@ -1745,23 +1757,23 @@ struct VisualizationMsg FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT___METADATA) &&
            verifier.VerifyTable(__metadata()) &&
-           VerifyOffset(verifier, VT_HEADER) &&
+           VerifyOffsetRequired(verifier, VT_HEADER) &&
            verifier.VerifyTable(header()) &&
-           VerifyOffset(verifier, VT_NS) &&
+           VerifyOffsetRequired(verifier, VT_NS) &&
            verifier.VerifyString(ns()) &&
-           VerifyOffset(verifier, VT_PARTICLES) &&
+           VerifyOffsetRequired(verifier, VT_PARTICLES) &&
            verifier.VerifyVector(particles()) &&
            verifier.VerifyVectorOfTables(particles()) &&
-           VerifyOffset(verifier, VT_PATH_OPTIONS) &&
+           VerifyOffsetRequired(verifier, VT_PATH_OPTIONS) &&
            verifier.VerifyVector(path_options()) &&
            verifier.VerifyVectorOfTables(path_options()) &&
-           VerifyOffset(verifier, VT_POINTS) &&
+           VerifyOffsetRequired(verifier, VT_POINTS) &&
            verifier.VerifyVector(points()) &&
            verifier.VerifyVectorOfTables(points()) &&
-           VerifyOffset(verifier, VT_LINES) &&
+           VerifyOffsetRequired(verifier, VT_LINES) &&
            verifier.VerifyVector(lines()) &&
            verifier.VerifyVectorOfTables(lines()) &&
-           VerifyOffset(verifier, VT_ARCS) &&
+           VerifyOffsetRequired(verifier, VT_ARCS) &&
            verifier.VerifyVector(arcs()) &&
            verifier.VerifyVectorOfTables(arcs()) &&
            verifier.EndTable();
@@ -1806,6 +1818,13 @@ struct VisualizationMsgBuilder {
   flatbuffers::Offset<VisualizationMsg> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<VisualizationMsg>(end);
+    fbb_.Required(o, VisualizationMsg::VT_HEADER);
+    fbb_.Required(o, VisualizationMsg::VT_NS);
+    fbb_.Required(o, VisualizationMsg::VT_PARTICLES);
+    fbb_.Required(o, VisualizationMsg::VT_PATH_OPTIONS);
+    fbb_.Required(o, VisualizationMsg::VT_POINTS);
+    fbb_.Required(o, VisualizationMsg::VT_LINES);
+    fbb_.Required(o, VisualizationMsg::VT_ARCS);
     return o;
   }
 };
@@ -2004,14 +2023,14 @@ struct NavSatFix FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT___METADATA) &&
            verifier.VerifyTable(__metadata()) &&
-           VerifyOffset(verifier, VT_HEADER) &&
+           VerifyOffsetRequired(verifier, VT_HEADER) &&
            verifier.VerifyTable(header()) &&
-           VerifyOffset(verifier, VT_STATUS) &&
+           VerifyOffsetRequired(verifier, VT_STATUS) &&
            verifier.VerifyTable(status()) &&
            VerifyField<double>(verifier, VT_LATITUDE) &&
            VerifyField<double>(verifier, VT_LONGITUDE) &&
            VerifyField<double>(verifier, VT_ALTITUDE) &&
-           VerifyOffset(verifier, VT_POSITION_COVARIANCE) &&
+           VerifyOffsetRequired(verifier, VT_POSITION_COVARIANCE) &&
            verifier.VerifyVector(position_covariance()) &&
            VerifyField<uint8_t>(verifier, VT_POSITION_COVARIANCE_TYPE) &&
            verifier.EndTable();
@@ -2056,6 +2075,9 @@ struct NavSatFixBuilder {
   flatbuffers::Offset<NavSatFix> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<NavSatFix>(end);
+    fbb_.Required(o, NavSatFix::VT_HEADER);
+    fbb_.Required(o, NavSatFix::VT_STATUS);
+    fbb_.Required(o, NavSatFix::VT_POSITION_COVARIANCE);
     return o;
   }
 };
@@ -2184,7 +2206,7 @@ struct LaserScan FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT___METADATA) &&
            verifier.VerifyTable(__metadata()) &&
-           VerifyOffset(verifier, VT_HEADER) &&
+           VerifyOffsetRequired(verifier, VT_HEADER) &&
            verifier.VerifyTable(header()) &&
            VerifyField<float>(verifier, VT_ANGLE_MIN) &&
            VerifyField<float>(verifier, VT_ANGLE_MAX) &&
@@ -2193,9 +2215,9 @@ struct LaserScan FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<float>(verifier, VT_SCAN_TIME) &&
            VerifyField<float>(verifier, VT_RANGE_MIN) &&
            VerifyField<float>(verifier, VT_RANGE_MAX) &&
-           VerifyOffset(verifier, VT_RANGES) &&
+           VerifyOffsetRequired(verifier, VT_RANGES) &&
            verifier.VerifyVector(ranges()) &&
-           VerifyOffset(verifier, VT_INTENSITIES) &&
+           VerifyOffsetRequired(verifier, VT_INTENSITIES) &&
            verifier.VerifyVector(intensities()) &&
            verifier.EndTable();
   }
@@ -2248,6 +2270,9 @@ struct LaserScanBuilder {
   flatbuffers::Offset<LaserScan> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<LaserScan>(end);
+    fbb_.Required(o, LaserScan::VT_HEADER);
+    fbb_.Required(o, LaserScan::VT_RANGES);
+    fbb_.Required(o, LaserScan::VT_INTENSITIES);
     return o;
   }
 };
@@ -2347,11 +2372,11 @@ struct CompressedImage FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT___METADATA) &&
            verifier.VerifyTable(__metadata()) &&
-           VerifyOffset(verifier, VT_HEADER) &&
+           VerifyOffsetRequired(verifier, VT_HEADER) &&
            verifier.VerifyTable(header()) &&
-           VerifyOffset(verifier, VT_FORMAT) &&
+           VerifyOffsetRequired(verifier, VT_FORMAT) &&
            verifier.VerifyString(format()) &&
-           VerifyOffset(verifier, VT_DATA) &&
+           VerifyOffsetRequired(verifier, VT_DATA) &&
            verifier.VerifyVector(data()) &&
            verifier.EndTable();
   }
@@ -2383,6 +2408,9 @@ struct CompressedImageBuilder {
   flatbuffers::Offset<CompressedImage> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<CompressedImage>(end);
+    fbb_.Required(o, CompressedImage::VT_HEADER);
+    fbb_.Required(o, CompressedImage::VT_FORMAT);
+    fbb_.Required(o, CompressedImage::VT_DATA);
     return o;
   }
 };
@@ -2647,9 +2675,9 @@ struct Pose FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT___METADATA) &&
            verifier.VerifyTable(__metadata()) &&
-           VerifyOffset(verifier, VT_POSITION) &&
+           VerifyOffsetRequired(verifier, VT_POSITION) &&
            verifier.VerifyTable(position()) &&
-           VerifyOffset(verifier, VT_ORIENTATION) &&
+           VerifyOffsetRequired(verifier, VT_ORIENTATION) &&
            verifier.VerifyTable(orientation()) &&
            verifier.EndTable();
   }
@@ -2678,6 +2706,8 @@ struct PoseBuilder {
   flatbuffers::Offset<Pose> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Pose>(end);
+    fbb_.Required(o, Pose::VT_POSITION);
+    fbb_.Required(o, Pose::VT_ORIENTATION);
     return o;
   }
 };
@@ -2726,9 +2756,9 @@ struct PoseWithCovariance FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT___METADATA) &&
            verifier.VerifyTable(__metadata()) &&
-           VerifyOffset(verifier, VT_POSE) &&
+           VerifyOffsetRequired(verifier, VT_POSE) &&
            verifier.VerifyTable(pose()) &&
-           VerifyOffset(verifier, VT_COVARIANCE) &&
+           VerifyOffsetRequired(verifier, VT_COVARIANCE) &&
            verifier.VerifyVector(covariance()) &&
            verifier.EndTable();
   }
@@ -2757,6 +2787,8 @@ struct PoseWithCovarianceBuilder {
   flatbuffers::Offset<PoseWithCovariance> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<PoseWithCovariance>(end);
+    fbb_.Required(o, PoseWithCovariance::VT_POSE);
+    fbb_.Required(o, PoseWithCovariance::VT_COVARIANCE);
     return o;
   }
 };
@@ -2909,9 +2941,9 @@ struct Twist FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT___METADATA) &&
            verifier.VerifyTable(__metadata()) &&
-           VerifyOffset(verifier, VT_LINEAR) &&
+           VerifyOffsetRequired(verifier, VT_LINEAR) &&
            verifier.VerifyTable(linear()) &&
-           VerifyOffset(verifier, VT_ANGULAR) &&
+           VerifyOffsetRequired(verifier, VT_ANGULAR) &&
            verifier.VerifyTable(angular()) &&
            verifier.EndTable();
   }
@@ -2940,6 +2972,8 @@ struct TwistBuilder {
   flatbuffers::Offset<Twist> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Twist>(end);
+    fbb_.Required(o, Twist::VT_LINEAR);
+    fbb_.Required(o, Twist::VT_ANGULAR);
     return o;
   }
 };
@@ -2988,9 +3022,9 @@ struct TwistWithCovariance FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table 
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT___METADATA) &&
            verifier.VerifyTable(__metadata()) &&
-           VerifyOffset(verifier, VT_TWIST) &&
+           VerifyOffsetRequired(verifier, VT_TWIST) &&
            verifier.VerifyTable(twist()) &&
-           VerifyOffset(verifier, VT_COVARIANCE) &&
+           VerifyOffsetRequired(verifier, VT_COVARIANCE) &&
            verifier.VerifyVector(covariance()) &&
            verifier.EndTable();
   }
@@ -3019,6 +3053,8 @@ struct TwistWithCovarianceBuilder {
   flatbuffers::Offset<TwistWithCovariance> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<TwistWithCovariance>(end);
+    fbb_.Required(o, TwistWithCovariance::VT_TWIST);
+    fbb_.Required(o, TwistWithCovariance::VT_COVARIANCE);
     return o;
   }
 };
@@ -3094,13 +3130,13 @@ struct Odometry FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT___METADATA) &&
            verifier.VerifyTable(__metadata()) &&
-           VerifyOffset(verifier, VT_HEADER) &&
+           VerifyOffsetRequired(verifier, VT_HEADER) &&
            verifier.VerifyTable(header()) &&
-           VerifyOffset(verifier, VT_CHILD_FRAME_ID) &&
+           VerifyOffsetRequired(verifier, VT_CHILD_FRAME_ID) &&
            verifier.VerifyString(child_frame_id()) &&
-           VerifyOffset(verifier, VT_POSE) &&
+           VerifyOffsetRequired(verifier, VT_POSE) &&
            verifier.VerifyTable(pose()) &&
-           VerifyOffset(verifier, VT_TWIST) &&
+           VerifyOffsetRequired(verifier, VT_TWIST) &&
            verifier.VerifyTable(twist()) &&
            verifier.EndTable();
   }
@@ -3135,6 +3171,10 @@ struct OdometryBuilder {
   flatbuffers::Offset<Odometry> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Odometry>(end);
+    fbb_.Required(o, Odometry::VT_HEADER);
+    fbb_.Required(o, Odometry::VT_CHILD_FRAME_ID);
+    fbb_.Required(o, Odometry::VT_POSE);
+    fbb_.Required(o, Odometry::VT_TWIST);
     return o;
   }
 };
@@ -3258,10 +3298,10 @@ inline flatbuffers::Offset<RobofleetStatus> CreateRobofleetStatus(flatbuffers::F
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const RobofleetStatusT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto ___metadata = _o->__metadata ? CreateMsgMetadata(_fbb, _o->__metadata.get(), _rehasher) : 0;
-  auto _status = _o->status.empty() ? 0 : _fbb.CreateString(_o->status);
+  auto _status = _fbb.CreateString(_o->status);
   auto _is_ok = _o->is_ok;
   auto _battery_level = _o->battery_level;
-  auto _location = _o->location.empty() ? 0 : _fbb.CreateString(_o->location);
+  auto _location = _fbb.CreateString(_o->location);
   return fb::amrl_msgs::CreateRobofleetStatus(
       _fbb,
       ___metadata,
@@ -3294,7 +3334,7 @@ inline flatbuffers::Offset<RobofleetSubscription> CreateRobofleetSubscription(fl
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const RobofleetSubscriptionT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto ___metadata = _o->__metadata ? CreateMsgMetadata(_fbb, _o->__metadata.get(), _rehasher) : 0;
-  auto _topic_regex = _o->topic_regex.empty() ? 0 : _fbb.CreateString(_o->topic_regex);
+  auto _topic_regex = _fbb.CreateString(_o->topic_regex);
   auto _action = _o->action;
   return fb::amrl_msgs::CreateRobofleetSubscription(
       _fbb,
@@ -3333,7 +3373,7 @@ inline flatbuffers::Offset<Header> CreateHeader(flatbuffers::FlatBufferBuilder &
   auto ___metadata = _o->__metadata ? CreateMsgMetadata(_fbb, _o->__metadata.get(), _rehasher) : 0;
   auto _seq = _o->seq;
   auto _stamp = _o->stamp ? _o->stamp.get() : 0;
-  auto _frame_id = _o->frame_id.empty() ? 0 : _fbb.CreateString(_o->frame_id);
+  auto _frame_id = _fbb.CreateString(_o->frame_id);
   return fb::std_msgs::CreateHeader(
       _fbb,
       ___metadata,
@@ -3407,7 +3447,7 @@ inline flatbuffers::Offset<Localization2DMsg> CreateLocalization2DMsg(flatbuffer
   auto ___metadata = _o->__metadata ? CreateMsgMetadata(_fbb, _o->__metadata.get(), _rehasher) : 0;
   auto _header = _o->header ? CreateHeader(_fbb, _o->header.get(), _rehasher) : 0;
   auto _pose = _o->pose ? CreatePose2Df(_fbb, _o->pose.get(), _rehasher) : 0;
-  auto _map = _o->map.empty() ? 0 : _fbb.CreateString(_o->map);
+  auto _map = _fbb.CreateString(_o->map);
   return fb::amrl_msgs::CreateLocalization2DMsg(
       _fbb,
       ___metadata,
@@ -3620,12 +3660,12 @@ inline flatbuffers::Offset<VisualizationMsg> CreateVisualizationMsg(flatbuffers:
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const VisualizationMsgT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto ___metadata = _o->__metadata ? CreateMsgMetadata(_fbb, _o->__metadata.get(), _rehasher) : 0;
   auto _header = _o->header ? CreateHeader(_fbb, _o->header.get(), _rehasher) : 0;
-  auto _ns = _o->ns.empty() ? 0 : _fbb.CreateString(_o->ns);
-  auto _particles = _o->particles.size() ? _fbb.CreateVector<flatbuffers::Offset<fb::amrl_msgs::Pose2Df>> (_o->particles.size(), [](size_t i, _VectorArgs *__va) { return CreatePose2Df(*__va->__fbb, __va->__o->particles[i].get(), __va->__rehasher); }, &_va ) : 0;
-  auto _path_options = _o->path_options.size() ? _fbb.CreateVector<flatbuffers::Offset<fb::amrl_msgs::PathVisualization>> (_o->path_options.size(), [](size_t i, _VectorArgs *__va) { return CreatePathVisualization(*__va->__fbb, __va->__o->path_options[i].get(), __va->__rehasher); }, &_va ) : 0;
-  auto _points = _o->points.size() ? _fbb.CreateVector<flatbuffers::Offset<fb::amrl_msgs::ColoredPoint2D>> (_o->points.size(), [](size_t i, _VectorArgs *__va) { return CreateColoredPoint2D(*__va->__fbb, __va->__o->points[i].get(), __va->__rehasher); }, &_va ) : 0;
-  auto _lines = _o->lines.size() ? _fbb.CreateVector<flatbuffers::Offset<fb::amrl_msgs::ColoredLine2D>> (_o->lines.size(), [](size_t i, _VectorArgs *__va) { return CreateColoredLine2D(*__va->__fbb, __va->__o->lines[i].get(), __va->__rehasher); }, &_va ) : 0;
-  auto _arcs = _o->arcs.size() ? _fbb.CreateVector<flatbuffers::Offset<fb::amrl_msgs::ColoredArc2D>> (_o->arcs.size(), [](size_t i, _VectorArgs *__va) { return CreateColoredArc2D(*__va->__fbb, __va->__o->arcs[i].get(), __va->__rehasher); }, &_va ) : 0;
+  auto _ns = _fbb.CreateString(_o->ns);
+  auto _particles = _fbb.CreateVector<flatbuffers::Offset<fb::amrl_msgs::Pose2Df>> (_o->particles.size(), [](size_t i, _VectorArgs *__va) { return CreatePose2Df(*__va->__fbb, __va->__o->particles[i].get(), __va->__rehasher); }, &_va );
+  auto _path_options = _fbb.CreateVector<flatbuffers::Offset<fb::amrl_msgs::PathVisualization>> (_o->path_options.size(), [](size_t i, _VectorArgs *__va) { return CreatePathVisualization(*__va->__fbb, __va->__o->path_options[i].get(), __va->__rehasher); }, &_va );
+  auto _points = _fbb.CreateVector<flatbuffers::Offset<fb::amrl_msgs::ColoredPoint2D>> (_o->points.size(), [](size_t i, _VectorArgs *__va) { return CreateColoredPoint2D(*__va->__fbb, __va->__o->points[i].get(), __va->__rehasher); }, &_va );
+  auto _lines = _fbb.CreateVector<flatbuffers::Offset<fb::amrl_msgs::ColoredLine2D>> (_o->lines.size(), [](size_t i, _VectorArgs *__va) { return CreateColoredLine2D(*__va->__fbb, __va->__o->lines[i].get(), __va->__rehasher); }, &_va );
+  auto _arcs = _fbb.CreateVector<flatbuffers::Offset<fb::amrl_msgs::ColoredArc2D>> (_o->arcs.size(), [](size_t i, _VectorArgs *__va) { return CreateColoredArc2D(*__va->__fbb, __va->__o->arcs[i].get(), __va->__rehasher); }, &_va );
   return fb::amrl_msgs::CreateVisualizationMsg(
       _fbb,
       ___metadata,
@@ -3707,7 +3747,7 @@ inline flatbuffers::Offset<NavSatFix> CreateNavSatFix(flatbuffers::FlatBufferBui
   auto _latitude = _o->latitude;
   auto _longitude = _o->longitude;
   auto _altitude = _o->altitude;
-  auto _position_covariance = _o->position_covariance.size() ? _fbb.CreateVector(_o->position_covariance) : 0;
+  auto _position_covariance = _fbb.CreateVector(_o->position_covariance);
   auto _position_covariance_type = _o->position_covariance_type;
   return fb::sensor_msgs::CreateNavSatFix(
       _fbb,
@@ -3760,8 +3800,8 @@ inline flatbuffers::Offset<LaserScan> CreateLaserScan(flatbuffers::FlatBufferBui
   auto _scan_time = _o->scan_time;
   auto _range_min = _o->range_min;
   auto _range_max = _o->range_max;
-  auto _ranges = _o->ranges.size() ? _fbb.CreateVector(_o->ranges) : 0;
-  auto _intensities = _o->intensities.size() ? _fbb.CreateVector(_o->intensities) : 0;
+  auto _ranges = _fbb.CreateVector(_o->ranges);
+  auto _intensities = _fbb.CreateVector(_o->intensities);
   return fb::sensor_msgs::CreateLaserScan(
       _fbb,
       ___metadata,
@@ -3802,8 +3842,8 @@ inline flatbuffers::Offset<CompressedImage> CreateCompressedImage(flatbuffers::F
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const CompressedImageT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto ___metadata = _o->__metadata ? CreateMsgMetadata(_fbb, _o->__metadata.get(), _rehasher) : 0;
   auto _header = _o->header ? CreateHeader(_fbb, _o->header.get(), _rehasher) : 0;
-  auto _format = _o->format.empty() ? 0 : _fbb.CreateString(_o->format);
-  auto _data = _o->data.size() ? _fbb.CreateVector(_o->data) : 0;
+  auto _format = _fbb.CreateString(_o->format);
+  auto _data = _fbb.CreateVector(_o->data);
   return fb::sensor_msgs::CreateCompressedImage(
       _fbb,
       ___metadata,
@@ -3945,7 +3985,7 @@ inline flatbuffers::Offset<PoseWithCovariance> CreatePoseWithCovariance(flatbuff
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const PoseWithCovarianceT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto ___metadata = _o->__metadata ? CreateMsgMetadata(_fbb, _o->__metadata.get(), _rehasher) : 0;
   auto _pose = _o->pose ? CreatePose(_fbb, _o->pose.get(), _rehasher) : 0;
-  auto _covariance = _o->covariance.size() ? _fbb.CreateVector(_o->covariance) : 0;
+  auto _covariance = _fbb.CreateVector(_o->covariance);
   return fb::geometry_msgs::CreatePoseWithCovariance(
       _fbb,
       ___metadata,
@@ -4044,7 +4084,7 @@ inline flatbuffers::Offset<TwistWithCovariance> CreateTwistWithCovariance(flatbu
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const TwistWithCovarianceT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto ___metadata = _o->__metadata ? CreateMsgMetadata(_fbb, _o->__metadata.get(), _rehasher) : 0;
   auto _twist = _o->twist ? CreateTwist(_fbb, _o->twist.get(), _rehasher) : 0;
-  auto _covariance = _o->covariance.size() ? _fbb.CreateVector(_o->covariance) : 0;
+  auto _covariance = _fbb.CreateVector(_o->covariance);
   return fb::geometry_msgs::CreateTwistWithCovariance(
       _fbb,
       ___metadata,
@@ -4082,7 +4122,7 @@ inline flatbuffers::Offset<Odometry> CreateOdometry(flatbuffers::FlatBufferBuild
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const OdometryT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto ___metadata = _o->__metadata ? CreateMsgMetadata(_fbb, _o->__metadata.get(), _rehasher) : 0;
   auto _header = _o->header ? CreateHeader(_fbb, _o->header.get(), _rehasher) : 0;
-  auto _child_frame_id = _o->child_frame_id.empty() ? 0 : _fbb.CreateString(_o->child_frame_id);
+  auto _child_frame_id = _fbb.CreateString(_o->child_frame_id);
   auto _pose = _o->pose ? CreatePoseWithCovariance(_fbb, _o->pose.get(), _rehasher) : 0;
   auto _twist = _o->twist ? CreateTwistWithCovariance(_fbb, _o->twist.get(), _rehasher) : 0;
   return fb::nav_msgs::CreateOdometry(
