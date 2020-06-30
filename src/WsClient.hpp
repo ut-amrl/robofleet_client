@@ -4,12 +4,15 @@
 #include <QtWebSockets/QtWebSockets>
 #include <cstdint>
 #include <iostream>
+#include "config.hpp"
 
 class WsClient : public QObject {
   Q_OBJECT;
 
   QUrl url;
   QWebSocket ws;
+
+  bool waiting_for_send = false;
   qint64 bytes_buffered = 0;
 
  public Q_SLOTS:
@@ -46,6 +49,10 @@ class WsClient : public QObject {
 
   void on_bytes_written(qint64 bytes) {
     bytes_buffered -= bytes;
+
+    // once buffer is empty, stop waiting
+    if (bytes_buffered <= 0)
+      waiting_for_send = false;
   }
 
   void reconnect() {
@@ -56,10 +63,14 @@ class WsClient : public QObject {
 
   void send_message(const QByteArray& data) {
     // don't buffer more bytes if we are still waiting on send
-    if (bytes_buffered > 0)
+    if (waiting_for_send)
       return;
 
-    bytes_buffered = ws.sendBinaryMessage(data);
+    bytes_buffered += ws.sendBinaryMessage(data);
+
+    // once we hit maximum buffer size, wait for it to empty
+    if (bytes_buffered > config::max_send_buffer_bytes)
+      waiting_for_send = true;
   }
 
  Q_SIGNALS:

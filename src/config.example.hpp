@@ -18,6 +18,9 @@ static const std::string host_url = "ws://localhost:8080";
 // static const std::string host_url = "ws://10.0.0.1:8080";
 static const std::string ros_node_name = "robofleet_client";
 
+// how many bytes to buffer for sending before dropping messages
+static const qint64 max_send_buffer_bytes = 64000;
+
 /**
  * Configure all message types with which the client will interact.
  *
