@@ -110,8 +110,8 @@ class RosClientNode : public QObject {
           "unique.");
     }
 
-    std::cerr << "registering subscriber for " << msg_type << " on "
-              << full_from_topic << " and publishing on " << full_to_topic
+    std::cerr << "registering " << msg_type << ": subscribing to "
+              << full_from_topic << " and sending as " << full_to_topic
               << std::endl;
 
     // create subscription

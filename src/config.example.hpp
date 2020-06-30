@@ -13,42 +13,65 @@
 #include "WebVizConstants.hpp"
 
 namespace config {
-static const std::string host_url =
-    "ws://localhost:8080";  // wss://10.0.0.1:8080
+static const std::string host_url = "ws://localhost:8080";
+// AMRL Robofleet server URL
+// static const std::string host_url = "ws://10.0.0.1:8080";
 static const std::string ros_node_name = "robofleet_client";
 
-// Edit the configuration here to provide the correct topic names.
-// Reminder: Adding a leading `/` will make these topics absolute, meaning they
-// won't be prepended the current ROS_NAMESPACE
-static const std::string status_topic = "status";
-static const std::string subscription_topic = "subscriptions";
-static const std::string localization_topic = "localization";
-static const std::string odometry_topic = "odometry/raw";
-static const std::string lidar_2d_topic = "velodyne_2dscan";
-static const std::string left_image_topic = "stereo/left/image_raw/compressed";
-static const std::string right_image_topic =
-    "stereo/right/image_raw/compressed";
-
-// All message types and subscribed topics must be enumerated here.
-// Specializations must also be provided in encode.hpp and decode.hpp
-
+/**
+ * Configure all message types with which the client will interact.
+ *
+ * Each call to register_msg_type subscribes to the local ROS topic given as the
+ * first argument and sends each message to the server with the new topic name
+ * given as the second argument. You may call register_msg_type multiple times
+ * for a given message type to send multiple topics. Calling it once is
+ * sufficient to receive that message type from the server on any topic. Exactly
+ * which messages you receive is controlled by your Robofleet subcriptions.
+ *
+ * Topic names beginning with a "/" are absolute ROS names; they will not be
+ * prefixed with the current ROS namespace (robot name). To properly integrate
+ * with Robofleet, you need to run this client with a ROS namespace representing
+ * the robot's name. Most topics must be relative when sent to the server to
+ * avoid name collisions between different robots.
+ *
+ * Here are some common use cases:
+ * - To subscribe to a topic that is not namespaced, provide an absolute topic
+ * name (beginning with "/").
+ * - To subscribe to a namespaced topic, provide a relative topic name (not
+ * beginning with "/").
+ * - To send to a special webviz topic, make use of webviz_constants.
+ * - To send to a custom topic, you should almost ALWAYS send to a relative
+ * topic name to avoid name collisions.
+ *
+ */
 static void configure_msg_types(RosClientNode& cn) {
-  // These topics are used by webviz. Do not modify this section of the config
-  // The output topics are relative, and so will always be namespaced
+  // Read all of the above documentation before modifying
+
+  // must send to status topic to list robot in webviz
   cn.register_msg_type<amrl_msgs::RobofleetStatus>(
-      status_topic, webviz_constants::status_topic);
+      "/status", webviz_constants::status_topic);
+
+  // must send to subscriptions topic to receive messages from other robots
   cn.register_msg_type<amrl_msgs::RobofleetSubscription>(
-      subscription_topic, webviz_constants::subscription_topic);
+      "/subscriptions", webviz_constants::subscriptions_topic);
+
   cn.register_msg_type<amrl_msgs::Localization2DMsg>(
-      localization_topic, webviz_constants::localization_topic);
+      "/localization", webviz_constants::localization_topic);
+
   cn.register_msg_type<nav_msgs::Odometry>(
-      odometry_topic, webviz_constants::odometry_topic);
+      "/odometry/raw", webviz_constants::odometry_topic);
+
   cn.register_msg_type<sensor_msgs::LaserScan>(
-      lidar_2d_topic, webviz_constants::lidar_2d_topic);
+      "/velodyne_2dscan", webviz_constants::lidar_2d_topic);
+
   cn.register_msg_type<sensor_msgs::CompressedImage>(
-      left_image_topic, webviz_constants::left_image_topic);
+      "/stereo/left/image_raw/compressed", webviz_constants::left_image_topic);
   cn.register_msg_type<sensor_msgs::CompressedImage>(
-      right_image_topic, webviz_constants::right_image_topic);
+      "/stereo/right/image_raw/compressed",
+      webviz_constants::right_image_topic);
+
+  cn.register_msg_type<amrl_msgs::VisualizationMsg>(
+      "/visualization", webviz_constants::visualization_topic);
 
   // Add additional topics to subscribe and publish here.
 }
