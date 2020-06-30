@@ -56,7 +56,7 @@ static flatbuffers::Offset<fb::MsgMetadata> encode_metadata(
 template <typename TEncoded, typename T>
 static flatbuffers::uoffset_t encode_vector(
     FBB& fbb, const MetadataOffset& metadata, std::vector<T> src) {
-  std::vector<flatbuffers::Offset<TEncoded>> dst;
+  std::vector<flatbuffers::Offset<TEncoded>> dst(src.size());
   std::transform(
       src.begin(), src.end(), dst.begin(), [&fbb, &metadata](const T& item) {
         return encode<T>(fbb, item, metadata);
