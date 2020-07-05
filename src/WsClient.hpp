@@ -1,9 +1,11 @@
 #pragma once
 
 #include <QObject>
+#include <QTimer>
 #include <QtWebSockets/QtWebSockets>
 #include <cstdint>
 #include <iostream>
+
 #include "config.hpp"
 
 class WsClient : public QObject {
@@ -11,6 +13,7 @@ class WsClient : public QObject {
 
   QUrl url;
   QWebSocket ws;
+  QTimer recon_timer;
 
   bool waiting_for_send = false;
   qint64 bytes_buffered = 0;
@@ -104,5 +107,28 @@ class WsClient : public QObject {
     QObject::connect(
         &ws, &QWebSocket::bytesWritten, this, &WsClient::on_bytes_written);
     reconnect();
+  }
+
+  void connect_ros_node(const RosClientNode& ros_node) {
+    // send
+    QObject::connect(
+        &ros_node,
+        &RosClientNode::ros_message_encoded,
+        this,
+        &WsClient::send_message);
+    // receive
+    QObject::connect(
+        this,
+        &WsClient::message_received,
+        &ros_node,
+        &RosClientNode::decode_net_message);
+
+    // auto reconnect
+    recon_timer.setSingleShot(true);
+    QObject::connect(
+        &recon_timer, &QTimer::timeout, this, &WsClient::reconnect);
+    QObject::connect(this, &WsClient::disconnected, [&]() {
+      recon_timer.start(std::chrono::milliseconds(2000).count());
+    });
   }
 };
