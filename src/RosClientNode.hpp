@@ -47,14 +47,15 @@ class RosClientNode : public QObject {
   }
 
   template <typename T>
-  void publish_ros_msg(const T& msg, const std::string& topic) {
-    if (pubs.count(topic) == 0) {
+  void publish_ros_msg(const T& msg, const std::string& msg_type, const std::string& to_topic) {
+    if (pubs.count(msg_type) == 0) {
       // gotcha: it's important that we only publish one type T for any given
-      // topic! register_msg_type() handles this by checking for duplicate topic
+      // msg_type! register_msg_type() handles this by checking for duplicate msg_type
       // registrations.
-      pubs[topic] = n.advertise<T>(topic, 1);
+      pubs[msg_type] = n.advertise<T>(to_topic, 1);
     }
-    pubs[topic].publish(msg);
+    printf("PUBLISHING %s\n", to_topic.c_str());
+    pubs[msg_type].publish(msg);
   }
 
  Q_SIGNALS:
@@ -95,8 +96,6 @@ class RosClientNode : public QObject {
    *
    * Creates a subscriber to the given topic, and emits ros_message_encoded()
    * signals for each message received.
-   * Internally prepares to publish any message of type T from within the
-   * decode_net_message() slot.
    * @tparam T the ROS message type
    * @param from_topic the topic to subscribe to
    * @param to_topic the topic to publish to the server
@@ -127,22 +126,13 @@ class RosClientNode : public QObject {
         };
     subs[full_from_topic] =
         n.subscribe<T>(full_from_topic, 1, subscriber_handler);
-
-    // create function that will decode and publish a T message to any topic
-    if (pub_fns.count(msg_type) == 0) {
-      pub_fns[msg_type] =
-          [this](const QByteArray& data, const std::string& topic) {
-            const T msg = decode<T>(data.data());
-            publish_ros_msg<T>(msg, topic);
-          };
-    }
   }
 
   /**
    * @brief Set up pub/sub for a particular message type and topic.
    *
    * Sets up the client to publish to `to_topic` whenever it
-   * recieves a message of type `from_topic` from the remote server
+   * recieves a message of type `from_topic` from the remote server.
    * @tparam T the ROS message type
    * @param from_topic the remote topic to expect
    * @param to_topic the local topic to publish to
@@ -167,9 +157,9 @@ class RosClientNode : public QObject {
     // create function that will decode and publish a T message to any topic
     if (pub_fns.count(msg_type) == 0) {
       pub_fns[msg_type] =
-          [this, full_to_topic](const QByteArray& data, const std::string& topic) {
+          [this, full_to_topic](const QByteArray& data, const std::string& msg_type) {
             const T msg = decode<T>(data.data());
-            publish_ros_msg<T>(msg, full_to_topic);
+            publish_ros_msg<T>(msg, msg_type, full_to_topic);
           };
     }
   }
