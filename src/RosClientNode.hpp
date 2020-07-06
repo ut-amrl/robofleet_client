@@ -54,7 +54,7 @@ class RosClientNode : public QObject {
       // registrations.
       pubs[msg_type] = n.advertise<T>(to_topic, 1);
     }
-    printf("PUBLISHING %s\n", to_topic.c_str());
+
     pubs[msg_type].publish(msg);
   }
 
