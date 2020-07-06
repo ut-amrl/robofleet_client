@@ -22,7 +22,7 @@ By default, the Robofleet robot client runs a WebSocket client, which connects t
 
 Direct mode does not have features such as authentication or subscriptions, nor does it currently support secure WebSockets. It simply broadcasts each incoming message to all other clients, as well as sending messages from local ROS topics as usual.
 
-To switch to direct mode, set the `direct_mode` flag in `src/config.hpp` and make sure to choose a `direct_mode_port`.
+To switch to direct mode, set the `direct_mode` flag in `src/config.hpp` and make sure to choose a `direct_mode_port`. You may need to tune `direct_mode_bytes_per_sec`, increasing it to prevent dropped messages or decreasing it to prevent time lag when large amounts of message data are sent.
 
 ## Building
 
