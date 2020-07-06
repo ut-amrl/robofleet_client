@@ -13,13 +13,21 @@
 #include "WebVizConstants.hpp"
 
 namespace config {
+// URL of robofleet_server instance (ignored in direct mode)
 static const std::string host_url = "ws://localhost:8080";
 // AMRL Robofleet server URL
 // static const std::string host_url = "ws://10.0.0.1:8080";
-static const std::string ros_node_name = "robofleet_client";
+
+// whether to run a Websocket server instead of a client, to bypass the need
+// for a centralized instance of robofleet_server.
+static const bool direct_mode = false;
+// what port to serve on in direct mode
+static const quint16 direct_mode_port = 8080;
 
 // how many bytes to buffer for sending before dropping messages
 static const qint64 max_send_buffer_bytes = 64000;
+
+static const std::string ros_node_name = "robofleet_client";
 
 /**
  * Configure all message types with which the client will interact.
