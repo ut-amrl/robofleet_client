@@ -24,8 +24,11 @@ static const bool direct_mode = false;
 // what port to serve on in direct mode
 static const quint16 direct_mode_port = 8080;
 
-// how many bytes to buffer for sending before dropping messages
-static const qint64 max_send_buffer_bytes = 64000;
+// rate limiting:
+// in normal mode, how many bytes to buffer for sending before dropping messages
+static const qint64 max_send_buffer_bytes = 128000;
+// in direct mode, maximum upload speed
+static const quint64 direct_mode_bytes_per_sec = 2048000;
 
 static const std::string ros_node_name = "robofleet_client";
 

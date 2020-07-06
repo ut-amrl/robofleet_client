@@ -8,11 +8,21 @@
 #include <unordered_set>
 
 #include "RosClientNode.hpp"
+#include "config.hpp"
 
 class WsServer : public QObject {
   Q_OBJECT;
   QWebSocketServer* server;
   std::unordered_set<QWebSocket*> clients;
+
+  // for rate limiting
+  // this is an alternative method to that of the client since we can't use the
+  // bytesWritten() signal for the server.
+  const static quint64 timeslice_ms = 100;
+  const static quint64 bytes_per_timeslice =
+      (config::direct_mode_bytes_per_sec * timeslice_ms) / 1000;
+  QTimer timeslice_timer;
+  quint64 timeslice_bytes_written = 0;
 
  public Q_SLOTS:
   void on_new_connection() {
@@ -51,10 +61,24 @@ class WsServer : public QObject {
 
   void broadcast_message(
       const QByteArray& message, const QWebSocket* const ws_sender = nullptr) {
+    // we assume that upload bandwidth is limited on our side. This makes it
+    // fairly reasonable to lump together all send buffer sizes.
+
+    // don't buffer more bytes if we've reached the limit per timeslice
+    if (timeslice_bytes_written > bytes_per_timeslice) {
+      return;
+    }
+
+    // broadcast
     for (QWebSocket* const client : clients) {
       if (client != ws_sender) {
-        client->sendBinaryMessage(message);
+        timeslice_bytes_written += client->sendBinaryMessage(message);
       }
+    }
+
+    if (timeslice_bytes_written > bytes_per_timeslice) {
+      std::cerr << "Throttled send rate with "
+                << timeslice_timer.remainingTime() << "ms left." << std::endl;
     }
   }
 
@@ -80,6 +104,12 @@ class WsServer : public QObject {
 
     QObject::connect(
         server, &QWebSocketServer::closed, this, &WsServer::closed);
+
+    // setup rate limiting
+    QObject::connect(&timeslice_timer, &QTimer::timeout, [=]() {
+      this->timeslice_bytes_written = 0;
+    });
+    timeslice_timer.start(timeslice_ms);
 
     std::cerr << "WebSocket server listening on ws://*:" << server->serverPort()
               << std::endl;
