@@ -62,30 +62,39 @@ static void configure_msg_types(RosClientNode& cn) {
   // Read all of the above documentation before modifying
 
   // must send to status topic to list robot in webviz
-  cn.register_msg_type<amrl_msgs::RobofleetStatus>(
+  cn.register_local_msg_type<amrl_msgs::RobofleetStatus>(
       "/status", webviz_constants::status_topic);
 
   // must send to subscriptions topic to receive messages from other robots
-  cn.register_msg_type<amrl_msgs::RobofleetSubscription>(
+  cn.register_local_msg_type<amrl_msgs::RobofleetSubscription>(
       "/subscriptions", webviz_constants::subscriptions_topic);
 
-  cn.register_msg_type<amrl_msgs::Localization2DMsg>(
+ // Set up listeners for local messages for webviz
+  cn.register_local_msg_type<amrl_msgs::Localization2DMsg>(
       "/localization", webviz_constants::localization_topic);
 
-  cn.register_msg_type<nav_msgs::Odometry>(
+  cn.register_local_msg_type<nav_msgs::Odometry>(
       "/odometry/raw", webviz_constants::odometry_topic);
 
-  cn.register_msg_type<sensor_msgs::LaserScan>(
+  cn.register_local_msg_type<sensor_msgs::LaserScan>(
       "/velodyne_2dscan", webviz_constants::lidar_2d_topic);
 
-  cn.register_msg_type<sensor_msgs::CompressedImage>(
+  cn.register_local_msg_type<sensor_msgs::CompressedImage>(
       "/stereo/left/image_raw/compressed", webviz_constants::left_image_topic);
-  cn.register_msg_type<sensor_msgs::CompressedImage>(
+  cn.register_local_msg_type<sensor_msgs::CompressedImage>(
       "/stereo/right/image_raw/compressed",
       webviz_constants::right_image_topic);
 
-  cn.register_msg_type<amrl_msgs::VisualizationMsg>(
+  cn.register_local_msg_type<amrl_msgs::VisualizationMsg>(
       "/visualization", webviz_constants::visualization_topic);
+
+  // Set up listeners for remote messages
+  cn.register_remote_msg_type<amrl_msgs::Pose2Df>(
+      "move_base_simple/goal", "/move_base_simple/goal"
+  );
+  cn.register_remote_msg_type<amrl_msgs::Localization2DMsg>(
+      "initialpose", "/initialpose"
+  );
 
   // Add additional topics to subscribe and publish here.
 }

@@ -102,7 +102,7 @@ class RosClientNode : public QObject {
    * @param to_topic the topic to publish to the server
    */
   template <typename T>
-  void register_msg_type(
+  void register_local_msg_type(
       const std::string& from_topic, const std::string& to_topic) {
     // apply remapping to encode full topic name
     const std::string full_from_topic = ros::names::resolve(from_topic);
@@ -134,6 +134,42 @@ class RosClientNode : public QObject {
           [this](const QByteArray& data, const std::string& topic) {
             const T msg = decode<T>(data.data());
             publish_ros_msg<T>(msg, topic);
+          };
+    }
+  }
+
+  /**
+   * @brief Set up pub/sub for a particular message type and topic.
+   *
+   * Sets up the client to publish to `to_topic` whenever it
+   * recieves a message of type `from_topic` from the remote server
+   * @tparam T the ROS message type
+   * @param from_topic the remote topic to expect
+   * @param to_topic the local topic to publish to
+   */
+  template <typename T>
+  void register_remote_msg_type(
+      const std::string& from_topic, const std::string& to_topic) {
+    // apply remapping to encode full topic name
+    const std::string full_from_topic = ros::names::resolve(from_topic);
+    const std::string full_to_topic = ros::names::resolve(to_topic);
+    const std::string& msg_type = ros::message_traits::DataType<T>().value();
+
+    if (subs.count(full_to_topic) > 0) {
+      throw std::runtime_error(
+          "Trying to publish to a topic that is registered as a subscription. This can create infinite feedback loops and is not allowed.");
+    }
+
+    std::cerr << "listening for remote topics of type " << msg_type << " on topic "
+              << full_from_topic << " and publishing as " << full_to_topic
+              << std::endl;
+
+    // create function that will decode and publish a T message to any topic
+    if (pub_fns.count(msg_type) == 0) {
+      pub_fns[msg_type] =
+          [this, full_to_topic](const QByteArray& data, const std::string& topic) {
+            const T msg = decode<T>(data.data());
+            publish_ros_msg<T>(msg, full_to_topic);
           };
     }
   }
