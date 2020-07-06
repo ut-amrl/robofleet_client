@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <iostream>
 
+#include "RosClientNode.hpp"
 #include "config.hpp"
 
 class WsClient : public QObject {

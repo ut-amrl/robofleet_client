@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
   if (config::direct_mode) {
     // Websocket server
     WsServer ws_server{config::direct_mode_port};
-
+    ws_server.connect_ros_node(ros_node);
     return a.exec();
   } else {
     // Websocket client
