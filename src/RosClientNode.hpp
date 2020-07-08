@@ -8,7 +8,6 @@
 #include <QObject>
 #include <thread>
 #include <unordered_map>
-#include <regex>
 
 #include "decode.hpp"
 #include "encode.hpp"
@@ -100,13 +99,10 @@ class RosClientNode : public QObject {
    */
   void subscribe_remote_msgs() {
     for(auto topic : pub_remote_topics) {
-      printf("ENCODING TOPIC %s\n", topic.c_str());
       // Now, subscribe to the appropriate remote message
       amrl_msgs::RobofleetSubscription sub_msg;
       sub_msg.action = amrl_msgs::RobofleetSubscription::ACTION_SUBSCRIBE;
-      std::string topic_regex = topic;
-      // std::regex_replace(topic_regex, std::regex("/"), "\\/");;
-      sub_msg.topic_regex = topic_regex;
+      sub_msg.topic_regex = topic;
       encode_ros_msg<amrl_msgs::RobofleetSubscription>(sub_msg, ros::message_traits::DataType<amrl_msgs::RobofleetSubscription>().value(), "/subscriptions");
     }
   }
