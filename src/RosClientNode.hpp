@@ -93,10 +93,9 @@ class RosClientNode : public QObject {
   }
 
   /**
-   * @brief Attempt to decode an publish message data.
-   *
-   * Must call register_msg_type<T> before a message of type T can be decoded.
-   * @param data the Flatbuffer-encoded message data
+   * @brief subscribe to remote messages that were specified in the config by
+   * calling register_remote_msg_type. This function should run once a websocket
+   * connection has been established
    */
   void subscribe_remote_msgs() {
     for (auto topic : pub_remote_topics) {
@@ -151,7 +150,8 @@ class RosClientNode : public QObject {
   }
 
   /**
-   * @brief Set up pub/sub for a particular message type and topic.
+   * @brief Set up remote publishing for a particular message type and topic
+   * sent from the server.
    *
    * Sets up the client to publish to `to_topic` whenever it
    * recieves a message of type `from_topic` from the remote server.
