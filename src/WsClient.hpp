@@ -124,6 +124,13 @@ class WsClient : public QObject {
         &ros_node,
         &RosClientNode::decode_net_message);
 
+    // startup
+    QObject::connect(
+        this,
+        &WsClient::connected,
+        &ros_node,
+        &RosClientNode::subscribe_remote_msgs);
+
     // auto reconnect
     recon_timer.setSingleShot(true);
     QObject::connect(
