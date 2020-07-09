@@ -8,6 +8,5 @@ BinPackArguments: false
 AllowShortBlocksOnASingleLine: false
 AllowShortFunctionsOnASingleLine: false
 AllowShortIfStatementsOnASingleLine: false
-AllowShortLambdasOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
 ---

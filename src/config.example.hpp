@@ -69,7 +69,7 @@ static void configure_msg_types(RosClientNode& cn) {
   cn.register_local_msg_type<amrl_msgs::RobofleetSubscription>(
       "/subscriptions", webviz_constants::subscriptions_topic);
 
- // Set up listeners for local messages for webviz
+  // Set up listeners for local messages for webviz
   cn.register_local_msg_type<amrl_msgs::Localization2DMsg>(
       "/localization", webviz_constants::localization_topic);
 
@@ -90,11 +90,9 @@ static void configure_msg_types(RosClientNode& cn) {
 
   // Set up listeners for remote messages
   cn.register_remote_msg_type<amrl_msgs::Pose2Df>(
-      "move_base_simple/goal", "/move_base_simple/goal"
-  );
+      "move_base_simple/goal", "/move_base_simple/goal");
   cn.register_remote_msg_type<amrl_msgs::Localization2DMsg>(
-      "initialpose", "/initialpose"
-  );
+      "initialpose", "/initialpose");
 
   // Add additional topics to subscribe and publish here.
 }
