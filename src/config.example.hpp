@@ -74,16 +74,16 @@ static void configure_msg_types(RosClientNode& cn) {
       "/localization", webviz_constants::localization_topic, 10);
 
   cn.register_local_msg_type<nav_msgs::Odometry>(
-      "/odometry/raw", webviz_constants::odometry_topic, 10);
+      "/odometry/raw", webviz_constants::odometry_topic, 15);
 
   cn.register_local_msg_type<sensor_msgs::LaserScan>(
-      "/velodyne_2dscan", webviz_constants::lidar_2d_topic, 5);
+      "/velodyne_2dscan", webviz_constants::lidar_2d_topic, 15);
 
   cn.register_local_msg_type<sensor_msgs::CompressedImage>(
-      "/stereo/left/image_raw/compressed", webviz_constants::left_image_topic, 5);
+      "/stereo/left/image_raw/compressed", webviz_constants::left_image_topic, 10);
   cn.register_local_msg_type<sensor_msgs::CompressedImage>(
       "/stereo/right/image_raw/compressed",
-      webviz_constants::right_image_topic, 5);
+      webviz_constants::right_image_topic, 10);
 
   cn.register_local_msg_type<amrl_msgs::VisualizationMsg>(
       "/visualization", webviz_constants::visualization_topic, 10);
