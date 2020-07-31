@@ -63,7 +63,7 @@ static void configure_msg_types(RosClientNode& cn) {
 
   // must send to status topic to list robot in webviz
   cn.register_local_msg_type<amrl_msgs::RobofleetStatus>(
-      "/status", webviz_constants::status_topic);
+      "/status", webviz_constants::status_topic, 1);
 
   // must send to subscriptions topic to receive messages from other robots
   cn.register_local_msg_type<amrl_msgs::RobofleetSubscription>(
@@ -71,22 +71,22 @@ static void configure_msg_types(RosClientNode& cn) {
 
   // Set up listeners for local messages for webviz
   cn.register_local_msg_type<amrl_msgs::Localization2DMsg>(
-      "/localization", webviz_constants::localization_topic);
+      "/localization", webviz_constants::localization_topic, 10);
 
   cn.register_local_msg_type<nav_msgs::Odometry>(
-      "/odometry/raw", webviz_constants::odometry_topic);
+      "/odometry/raw", webviz_constants::odometry_topic, 10);
 
   cn.register_local_msg_type<sensor_msgs::LaserScan>(
-      "/velodyne_2dscan", webviz_constants::lidar_2d_topic);
+      "/velodyne_2dscan", webviz_constants::lidar_2d_topic, 5);
 
   cn.register_local_msg_type<sensor_msgs::CompressedImage>(
-      "/stereo/left/image_raw/compressed", webviz_constants::left_image_topic);
+      "/stereo/left/image_raw/compressed", webviz_constants::left_image_topic, 5);
   cn.register_local_msg_type<sensor_msgs::CompressedImage>(
       "/stereo/right/image_raw/compressed",
-      webviz_constants::right_image_topic);
+      webviz_constants::right_image_topic, 5);
 
   cn.register_local_msg_type<amrl_msgs::VisualizationMsg>(
-      "/visualization", webviz_constants::visualization_topic);
+      "/visualization", webviz_constants::visualization_topic, 10);
 
   // Set up listeners for remote messages
   cn.register_remote_msg_type<amrl_msgs::Pose2Df>(
