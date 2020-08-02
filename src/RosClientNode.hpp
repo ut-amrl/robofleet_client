@@ -24,6 +24,7 @@ class RosClientNode : public QObject {
   std::vector<TopicString> pub_remote_topics;
   std::unordered_map<TopicString, ros::Subscriber> subs;
   std::unordered_map<TopicString, ros::Publisher> pubs;
+  // Map from topic name to pair of <last publication time, publication interval?(sec)>
   std::unordered_map<TopicString, std::pair<std::chrono::time_point<std::chrono::high_resolution_clock>, double>> rate_limits;
   std::unordered_map<
       MsgTypeString, std::function<void(const QByteArray&, const TopicString&)>>
@@ -42,11 +43,11 @@ class RosClientNode : public QObject {
   void encode_ros_msg(
       const T& msg, const std::string& msg_type, const std::string& to_topic) {
     auto& rate_info = rate_limits[to_topic];
-    auto curr_time = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(curr_time - rate_info.first);
-    double elapsed = duration.count() / 1000.0;
+    const auto curr_time = std::chrono::high_resolution_clock::now();
+    const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(curr_time - rate_info.first);
+    const double elapsed_sec = duration.count() / 1000.0;
 
-    if (elapsed > rate_info.second) {
+    if (elapsed_sec > rate_info.second) {
       rate_info.first = curr_time;
       flatbuffers::FlatBufferBuilder fbb;
       auto metadata = encode_metadata(fbb, msg_type, to_topic);
@@ -141,7 +142,7 @@ class RosClientNode : public QObject {
     const std::string& msg_type = ros::message_traits::DataType<T>().value();
 
     // Compute publish interval in seconds
-    double publish_interval = 1.0 / max_publish_rate;
+    double publish_interval_sec = 1.0 / max_publish_rate;
 
     if (subs.count(full_from_topic) > 0) {
       throw std::runtime_error(
@@ -153,7 +154,7 @@ class RosClientNode : public QObject {
               << full_from_topic << " and sending as " << full_to_topic
               << std::endl;
 
-    rate_limits[full_to_topic] = std::make_pair(std::chrono::high_resolution_clock::now(), publish_interval);
+    rate_limits[full_to_topic] = std::make_pair(std::chrono::high_resolution_clock::now(), publish_interval_sec);
 
     // create subscription
     // have to use boost function because of how roscpp is implemented
