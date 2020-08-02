@@ -131,18 +131,18 @@ class RosClientNode : public QObject {
    * @tparam T the ROS message type
    * @param from_topic the topic to subscribe to
    * @param to_topic the topic to publish to the server
-   * @param max_publish_rate the maximum number of messages per second
+   * @param max_publish_rate_hz the maximum number of messages per second to publish on this topic
    */
   template <typename T>
   void register_local_msg_type(
-      const std::string& from_topic, const std::string& to_topic, uint8_t max_publish_rate=10) {
+      const std::string& from_topic, const std::string& to_topic, uint8_t max_publish_rate_hz=10) {
     // apply remapping to encode full topic name
     const std::string full_from_topic = ros::names::resolve(from_topic);
     const std::string full_to_topic = ros::names::resolve(to_topic);
     const std::string& msg_type = ros::message_traits::DataType<T>().value();
 
     // Compute publish interval in seconds
-    double publish_interval_sec = 1.0 / max_publish_rate;
+    double publish_interval_sec = 1.0 / max_publish_rate_hz;
 
     if (subs.count(full_from_topic) > 0) {
       throw std::runtime_error(
