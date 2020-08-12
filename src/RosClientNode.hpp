@@ -110,6 +110,8 @@ class RosClientNode : public QObject {
    */
   void subscribe_remote_msgs() {
     for (auto topic : pub_remote_topics) {
+      sleep(1); // to avoid rate limiting issues. This only happens upon connection to the server so this time delay is no issue
+      printf("Registering for remote subscription to topic %s\n", topic.c_str());
       // Now, subscribe to the appropriate remote message
       amrl_msgs::RobofleetSubscription sub_msg;
       sub_msg.action = amrl_msgs::RobofleetSubscription::ACTION_SUBSCRIBE;
