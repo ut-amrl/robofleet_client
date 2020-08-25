@@ -66,6 +66,7 @@ class RosClientNode : public QObject {
       // msg_type! register_msg_type() handles this by checking for duplicate
       // msg_type registrations.
       pubs[msg_type] = n.advertise<T>(to_topic, 1);
+      sleep(1); // we need to wait after setting up the publisher, or the first message gets dropped
     }
 
     pubs[msg_type].publish(msg);
@@ -195,7 +196,7 @@ class RosClientNode : public QObject {
     std::cerr << "listening for remote topics of type " << msg_type
               << " on topic " << full_from_topic << " and publishing as "
               << full_to_topic << std::endl;
-
+    
     // create function that will decode and publish a T message to any topic
     if (pub_fns.count(msg_type) == 0) {
       pub_fns[msg_type] = [this, full_to_topic](
