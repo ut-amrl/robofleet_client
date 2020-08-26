@@ -61,14 +61,6 @@ class RosClientNode : public QObject {
   template <typename T>
   void publish_ros_msg(
       const T& msg, const std::string& msg_type, const std::string& to_topic) {
-    if (pubs.count(msg_type) == 0) {
-      // gotcha: it's important that we only publish one type T for any given
-      // msg_type! register_msg_type() handles this by checking for duplicate
-      // msg_type registrations.
-      pubs[msg_type] = n.advertise<T>(to_topic, 1);
-      sleep(1); // we need to wait after setting up the publisher, or the first message gets dropped
-    }
-
     pubs[msg_type].publish(msg);
   }
 
@@ -205,6 +197,11 @@ class RosClientNode : public QObject {
         const T msg = decode<T>(data.data());
         publish_ros_msg<T>(msg, msg_type, full_to_topic);
       };
+    }
+
+    // Set up publishers for these remote messages
+    if (pubs.count(full_from_topic) == 0) {
+      pubs[full_from_topic] = n.advertise<T>(full_to_topic, 1); 
     }
 
     pub_remote_topics.push_back(full_from_topic);
