@@ -10,6 +10,7 @@
 #include <sensor_msgs/CompressedImage.h>
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/NavSatFix.h>
+#include <geometry_msgs/PoseStamped.h>
 
 #include <algorithm>
 
@@ -103,6 +104,18 @@ flatbuffers::uoffset_t encode(
              metadata,
              encode(fbb, msg.position, 0),
              encode(fbb, msg.orientation, 0))
+      .o;
+}
+
+// geometry_msgs/PoseStamped
+template <>
+flatbuffers::uoffset_t encode(
+    FBB& fbb, const geometry_msgs::PoseStamped& msg, const MetadataOffset& metadata) {
+  return fb::geometry_msgs::CreatePoseStamped(
+             fbb,
+             metadata,
+             encode(fbb, msg.header, 0),
+             encode(fbb, msg.pose, 0))
       .o;
 }
 

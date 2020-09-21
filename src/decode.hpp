@@ -18,6 +18,7 @@
 #include <sensor_msgs/CompressedImage.h>
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/NavSatFix.h>
+#include <geometry_msgs/PoseStamped.h>
 
 // to add a new message type, specialize this template to decode the message
 template <typename T>
@@ -193,6 +194,26 @@ amrl_msgs::Localization2DMsg decode(const void* const data) {
   dst.pose.theta = src->pose()->theta();
   return dst;
 }
+
+template <>
+geometry_msgs::PoseStamped decode(const void* const data) {
+  const fb::geometry_msgs::PoseStamped* src =
+      flatbuffers::GetRoot<fb::geometry_msgs::PoseStamped>(data);
+  geometry_msgs::PoseStamped dst;
+  
+  decode_header(src, dst);
+
+  dst.pose.orientation.x = src->pose()->orientation()->x();
+  dst.pose.orientation.y = src->pose()->orientation()->y();
+  dst.pose.orientation.z = src->pose()->orientation()->z();
+  dst.pose.orientation.w = src->pose()->orientation()->w();
+  dst.pose.position.x = src->pose()->position()->x();
+  dst.pose.position.y = src->pose()->position()->y();
+  dst.pose.position.z = src->pose()->position()->z();
+
+  return dst;
+}
+
 
 template <>
 nav_msgs::Odometry decode(const void* const data) {
