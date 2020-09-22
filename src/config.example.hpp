@@ -89,7 +89,7 @@ static void configure_msg_types(RosClientNode& cn) {
       "/visualization", webviz_constants::visualization_topic, 10);
 
   // Set up listeners for remote messages
-  cn.register_remote_msg_type<amrl_msgs::Pose2Df>(
+  cn.register_remote_msg_type<geometry_msgs::PoseStamped>(
       "move_base_simple/goal", "/move_base_simple/goal");
   cn.register_remote_msg_type<amrl_msgs::Localization2DMsg>(
       "initialpose", "/initialpose");
