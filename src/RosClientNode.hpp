@@ -130,7 +130,7 @@ class RosClientNode : public QObject {
    */
   template <typename T>
   void register_local_msg_type(
-      const std::string& from_topic, const std::string& to_topic, uint8_t max_publish_rate_hz=10) {
+      const std::string& from_topic, const std::string& to_topic, double max_publish_rate_hz=10) {
     // apply remapping to encode full topic name
     const std::string full_from_topic = ros::names::resolve(from_topic);
     const std::string full_to_topic = ros::names::resolve(to_topic);
