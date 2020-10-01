@@ -1,0 +1,11 @@
+name: test
+on: push
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - run: scripts/ci-test.sh 
