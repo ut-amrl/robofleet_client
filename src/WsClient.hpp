@@ -15,6 +15,7 @@ class WsClient : public QObject {
   QUrl url;
   QWebSocket ws;
   QTimer recon_timer;
+  QTimer ping_timer;
 
   // used to track which messages the server has received
   uint64_t last_ponged_index = 0;
@@ -53,13 +54,22 @@ class WsClient : public QObject {
   }
 
   void on_pong(qint64 elapsed_time, const QByteArray& payload) {
-    last_ponged_index = *reinterpret_cast<const uint64_t*>(payload.data());
+    uint64_t ponged_index = *reinterpret_cast<const uint64_t*>(payload.data());
+    last_ponged_index = std::max(last_ponged_index, ponged_index);
   }
 
   void reconnect() {
     std::cerr << "Websocket connecting to: " << url.toString().toStdString()
               << std::endl;
     ws.open(url);
+  }
+
+  void send_ping() {
+    // reinterprets msg_index as a byte array;
+    // endianness is not important since this data is just echoed back as is.
+    const QByteArray msg_index_payload{
+        reinterpret_cast<char*>(&msg_index), sizeof(msg_index)};
+    ws.ping(msg_index_payload);
   }
 
   void send_message(const QByteArray& data) {
@@ -70,11 +80,7 @@ class WsClient : public QObject {
 
     ws.sendBinaryMessage(data);
 
-    // reinterprets msg_index as a byte array;
-    // endianness is not important since this data is just echoed back as is.
-    const QByteArray msg_index_payload{
-        reinterpret_cast<char*>(&msg_index), sizeof(msg_index)};
-    ws.ping(msg_index_payload);
+    send_ping();
     ++msg_index;
   }
 
@@ -138,5 +144,10 @@ class WsClient : public QObject {
     QObject::connect(this, &WsClient::disconnected, [&]() {
       recon_timer.start(std::chrono::milliseconds(2000).count());
     });
+
+    // occasionally resend ping in case of network unreliability
+    QObject::connect(
+        &ping_timer, &QTimer::timeout, [&]() { this->send_ping(); });
+    ping_timer.start(std::chrono::milliseconds(2000).count());
   }
 };
