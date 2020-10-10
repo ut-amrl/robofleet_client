@@ -25,7 +25,7 @@ def main(ns):
     rospy.init_node("basic_status", anonymous=True)
 
     rate = rospy.Rate(5)
-    status_pub = rospy.Publisher("robofleet_status", RobofleetStatus, queue_size=1)
+    status_pub = rospy.Publisher("status", RobofleetStatus, queue_size=1)
     while not rospy.is_shutdown():
         status = RobofleetStatus()
         status.battery_level = ns.battery_level
