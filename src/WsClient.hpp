@@ -64,14 +64,16 @@ class WsClient : public QObject {
 
   void send_message(const QByteArray& data) {
     // don't buffer more data if we're waiting for old messages to be ACK'd
-    if (config::wait_for_pongs && msg_index - last_ponged_index > config::max_queue_before_waiting)
+    if (config::wait_for_pongs &&
+        msg_index - last_ponged_index > config::max_queue_before_waiting)
       return;
 
     ws.sendBinaryMessage(data);
 
-    // reinterprets msg_index as a byte array; 
+    // reinterprets msg_index as a byte array;
     // endianness is not important since this data is just echoed back as is.
-    const QByteArray msg_index_payload{reinterpret_cast<char*>(&msg_index), sizeof(msg_index)};
+    const QByteArray msg_index_payload{
+        reinterpret_cast<char*>(&msg_index), sizeof(msg_index)};
     ws.ping(msg_index_payload);
     ++msg_index;
   }
@@ -104,8 +106,7 @@ class WsClient : public QObject {
         &QWebSocket::binaryMessageReceived,
         this,
         &WsClient::on_binary_message);
-    QObject::connect(
-        &ws, &QWebSocket::pong, this, &WsClient::on_pong);
+    QObject::connect(&ws, &QWebSocket::pong, this, &WsClient::on_pong);
     reconnect();
   }
 

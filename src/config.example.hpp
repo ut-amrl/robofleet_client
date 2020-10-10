@@ -17,20 +17,21 @@ static const std::string ros_node_name = "robofleet_client";
 
 // URL of robofleet_server instance (ignored in direct mode)
 static const std::string host_url = "ws://localhost:8080";
-// static const std::string host_url = "ws://10.0.0.1:8080"; // AMRL Robofleet server URL
+// AMRL Robofleet server URL
+// static const std::string host_url = "ws://10.0.0.1:8080";
 
 /**
  * Anti-backpressure for normal mode.
- * Uses Websocket PING/PONG protocol to gauge when server has actually received a message.
- * If true, wait for PONGs before sending more messages.
+ * Uses Websocket PING/PONG protocol to gauge when server has actually received
+ * a message. If true, wait for PONGs before sending more messages.
  */
 static const bool wait_for_pongs = true;
 
 /**
- * If wait_for_acks, how many more messages to send before waiting for first PONG?
- * This can be set to a value greater than 0 to compensate for network latency and
- * fully saturate available bandwidth, but if it is set too high, it could cause 
- * message lag.
+ * If wait_for_acks, how many more messages to send before waiting for first
+ * PONG? This can be set to a value greater than 0 to compensate for network
+ * latency and fully saturate available bandwidth, but if it is set too high, it
+ * could cause message lag.
  */
 static const uint64_t max_queue_before_waiting = 1;
 
@@ -94,10 +95,13 @@ static void configure_msg_types(RosClientNode& cn) {
       "/velodyne_2dscan", webviz_constants::lidar_2d_topic, 15);
 
   cn.register_local_msg_type<sensor_msgs::CompressedImage>(
-      "/stereo/left/image_raw/compressed", webviz_constants::left_image_topic, 10);
+      "/stereo/left/image_raw/compressed",
+      webviz_constants::left_image_topic,
+      10);
   cn.register_local_msg_type<sensor_msgs::CompressedImage>(
       "/stereo/right/image_raw/compressed",
-      webviz_constants::right_image_topic, 10);
+      webviz_constants::right_image_topic,
+      10);
 
   cn.register_local_msg_type<amrl_msgs::VisualizationMsg>(
       "/visualization", webviz_constants::visualization_topic, 10);
