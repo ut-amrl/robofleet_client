@@ -19,7 +19,7 @@ class WsClient : public QObject {
 
   // used to track which messages the server has received
   uint64_t last_ponged_index = 0;
-  uint64_t msg_index = 1;
+  uint64_t msg_index = 0;
 
  public Q_SLOTS:
   void on_error(QAbstractSocket::SocketError error) {
@@ -78,10 +78,9 @@ class WsClient : public QObject {
         msg_index - last_ponged_index > config::max_queue_before_waiting)
       return;
 
-    ws.sendBinaryMessage(data);
-
-    send_ping();
     ++msg_index;
+    ws.sendBinaryMessage(data);
+    send_ping();
   }
 
  Q_SIGNALS:
