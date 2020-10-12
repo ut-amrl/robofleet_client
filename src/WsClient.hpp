@@ -15,9 +15,11 @@ class WsClient : public QObject {
   QUrl url;
   QWebSocket ws;
   QTimer recon_timer;
+  QTimer ping_timer;
 
-  bool waiting_for_send = false;
-  qint64 bytes_buffered = 0;
+  // used to track which messages the server has received
+  uint64_t last_ponged_index = 0;
+  uint64_t msg_index = 0;
 
  public Q_SLOTS:
   void on_error(QAbstractSocket::SocketError error) {
@@ -51,12 +53,9 @@ class WsClient : public QObject {
     Q_EMIT message_received(data);
   }
 
-  void on_bytes_written(qint64 bytes) {
-    bytes_buffered -= bytes;
-
-    // once buffer is empty, stop waiting
-    if (bytes_buffered <= 0)
-      waiting_for_send = false;
+  void on_pong(qint64 elapsed_time, const QByteArray& payload) {
+    uint64_t ponged_index = *reinterpret_cast<const uint64_t*>(payload.data());
+    last_ponged_index = std::max(last_ponged_index, ponged_index);
   }
 
   void reconnect() {
@@ -65,16 +64,23 @@ class WsClient : public QObject {
     ws.open(url);
   }
 
+  void send_ping() {
+    // reinterprets msg_index as a byte array;
+    // endianness is not important since this data is just echoed back as is.
+    const QByteArray msg_index_payload{
+        reinterpret_cast<char*>(&msg_index), sizeof(msg_index)};
+    ws.ping(msg_index_payload);
+  }
+
   void send_message(const QByteArray& data) {
-    // don't buffer more bytes if we are still waiting on send
-    if (waiting_for_send)
+    // don't buffer more data if we're waiting for old messages to be ACK'd
+    if (config::wait_for_pongs &&
+        msg_index - last_ponged_index > config::max_queue_before_waiting)
       return;
 
-    bytes_buffered += ws.sendBinaryMessage(data);
-
-    // once we hit maximum buffer size, wait for it to empty
-    if (bytes_buffered > config::max_send_buffer_bytes)
-      waiting_for_send = true;
+    ++msg_index;
+    ws.sendBinaryMessage(data);
+    send_ping();
   }
 
  Q_SIGNALS:
@@ -105,8 +111,7 @@ class WsClient : public QObject {
         &QWebSocket::binaryMessageReceived,
         this,
         &WsClient::on_binary_message);
-    QObject::connect(
-        &ws, &QWebSocket::bytesWritten, this, &WsClient::on_bytes_written);
+    QObject::connect(&ws, &QWebSocket::pong, this, &WsClient::on_pong);
     reconnect();
   }
 
@@ -138,5 +143,10 @@ class WsClient : public QObject {
     QObject::connect(this, &WsClient::disconnected, [&]() {
       recon_timer.start(std::chrono::milliseconds(2000).count());
     });
+
+    // occasionally resend ping in case of network unreliability
+    QObject::connect(
+        &ping_timer, &QTimer::timeout, [&]() { this->send_ping(); });
+    ping_timer.start(std::chrono::milliseconds(2000).count());
   }
 };

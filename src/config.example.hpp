@@ -13,24 +13,39 @@
 #include "WebVizConstants.hpp"
 
 namespace config {
+static const std::string ros_node_name = "robofleet_client";
+
 // URL of robofleet_server instance (ignored in direct mode)
 static const std::string host_url = "ws://localhost:8080";
 // AMRL Robofleet server URL
 // static const std::string host_url = "ws://10.0.0.1:8080";
 
-// whether to run a Websocket server instead of a client, to bypass the need
-// for a centralized instance of robofleet_server.
+/**
+ * Anti-backpressure for normal mode.
+ * Uses Websocket PING/PONG protocol to gauge when server has actually received
+ * a message. If true, wait for PONGs before sending more messages.
+ */
+static const bool wait_for_pongs = true;
+
+/**
+ * If wait_for_acks, how many more messages to send before waiting for first
+ * PONG? This can be set to a value greater than 0 to compensate for network
+ * latency and fully saturate available bandwidth, but if it is set too high, it
+ * could cause message lag.
+ */
+static const uint64_t max_queue_before_waiting = 1;
+
+/**
+ * Whether to run a Websocket server instead of a client, to bypass the need
+ * for a centralized instance of robofleet_server.
+ */
 static const bool direct_mode = false;
+
 // what port to serve on in direct mode
 static const quint16 direct_mode_port = 8080;
 
-// rate limiting:
-// in normal mode, how many bytes to buffer for sending before dropping messages
-static const qint64 max_send_buffer_bytes = 128000;
-// in direct mode, maximum upload speed
+// avoid network backpressure in direct mode: sets maximum upload speed
 static const quint64 direct_mode_bytes_per_sec = 2048000;
-
-static const std::string ros_node_name = "robofleet_client";
 
 /**
  * Configure all message types with which the client will interact.
@@ -80,10 +95,13 @@ static void configure_msg_types(RosClientNode& cn) {
       "/velodyne_2dscan", webviz_constants::lidar_2d_topic, 15);
 
   cn.register_local_msg_type<sensor_msgs::CompressedImage>(
-      "/stereo/left/image_raw/compressed", webviz_constants::left_image_topic, 10);
+      "/stereo/left/image_raw/compressed",
+      webviz_constants::left_image_topic,
+      10);
   cn.register_local_msg_type<sensor_msgs::CompressedImage>(
       "/stereo/right/image_raw/compressed",
-      webviz_constants::right_image_topic, 10);
+      webviz_constants::right_image_topic,
+      10);
 
   cn.register_local_msg_type<amrl_msgs::VisualizationMsg>(
       "/visualization", webviz_constants::visualization_topic, 10);
