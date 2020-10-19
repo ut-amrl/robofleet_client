@@ -12,6 +12,7 @@
 
 #include "decode.hpp"
 #include "encode.hpp"
+#include "TopicConfig.hpp"
 
 class RosClientNode : public QObject {
   Q_OBJECT
@@ -205,6 +206,26 @@ class RosClientNode : public QObject {
     }
 
     pub_remote_topics.push_back(full_from_topic);
+  }
+
+  /**
+   * @brief Register new listeners based on the given topic configuration.
+   * 
+   * Depending on the source set in config, this will either listen to messages
+   * on a local topic, or listen to messages on a remote topic. If a remote 
+   * topic is specified, we will subscribe to it by default.
+   * 
+   * @tparam T the ROS message type
+   * @param config
+   */
+  template <typename T>
+  void configure(const TopicConfig<T>& config) {
+    config.assert_valid();
+    if (config.source == MessageSource::local) {
+      register_local_msg_type<T>(config.from, config.to, config.rate_limit_hz);
+    } else {
+      register_remote_msg_type<T>(config.from, config.to);
+    }
   }
 
   RosClientNode() {

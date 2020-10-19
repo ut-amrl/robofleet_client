@@ -10,6 +10,7 @@
 #include <string>
 
 #include "RosClientNode.hpp"
+#include "TopicConfig.hpp"
 #include "WebVizConstants.hpp"
 
 namespace config {
@@ -40,28 +41,17 @@ static const uint64_t max_queue_before_waiting = 1;
  * for a centralized instance of robofleet_server.
  */
 static const bool direct_mode = false;
-
-// what port to serve on in direct mode
-static const quint16 direct_mode_port = 8080;
-
-// avoid network backpressure in direct mode: sets maximum upload speed
-static const quint64 direct_mode_bytes_per_sec = 2048000;
+static const quint16 direct_mode_port = 8080; // what port to serve on in direct mode
+static const quint64 direct_mode_bytes_per_sec = 2048000; // avoid network backpressure in direct mode: sets maximum upload speed
 
 /**
  * Configure all message types with which the client will interact.
  *
- * Each call to register_msg_type subscribes to the local ROS topic given as the
- * first argument and sends each message to the server with the new topic name
- * given as the second argument. You may call register_msg_type multiple times
- * for a given message type to send multiple topics. Calling it once is
- * sufficient to receive that message type from the server on any topic. Exactly
- * which messages you receive is controlled by your Robofleet subcriptions.
- *
  * Topic names beginning with a "/" are absolute ROS names; they will not be
  * prefixed with the current ROS namespace (robot name). To properly integrate
  * with Robofleet, you need to run this client with a ROS namespace representing
- * the robot's name. Most topics must be relative when sent to the server to
- * avoid name collisions between different robots.
+ * the robot's name. Most topics must be relative (not beginning with "/") when
+ * sent to the server to avoid name collisions between different robots.
  *
  * Here are some common use cases:
  * - To subscribe to a topic that is not namespaced, provide an absolute topic
@@ -77,40 +67,66 @@ static void configure_msg_types(RosClientNode& cn) {
   // Read all of the above documentation before modifying
 
   // must send to status topic to list robot in webviz
-  cn.register_local_msg_type<amrl_msgs::RobofleetStatus>(
-      "/status", webviz_constants::status_topic, 1);
+  cn.configure(TopicConfig<amrl_msgs::RobofleetStatus>()
+    .source(MessageSource::local)
+    .from("/status")
+    .to(webviz_constants::status_topic)
+    .rate_limit_hz(1));
 
   // must send to subscriptions topic to receive messages from other robots
-  cn.register_local_msg_type<amrl_msgs::RobofleetSubscription>(
-      "/subscriptions", webviz_constants::subscriptions_topic);
+  // don't rate limit this topic.
+  cn.configure(TopicConfig<amrl_msgs::RobofleetSubscription>()
+    .source(MessageSource::local)
+    .from("/subscriptions")
+    .to(webviz_constants::subscriptions_topic)
+    .rate_limit_hz(1));
 
-  // Set up listeners for local messages for webviz
-  cn.register_local_msg_type<amrl_msgs::Localization2DMsg>(
-      "/localization", webviz_constants::localization_topic, 10);
+  // send messages for webviz
+  cn.configure(TopicConfig<amrl_msgs::Localization2DMsg>()
+    .source(MessageSource::local)
+    .from("/localization")
+    .to(webviz_constants::localization_topic)
+    .rate_limit_hz(10));
 
-  cn.register_local_msg_type<nav_msgs::Odometry>(
-      "/odometry/raw", webviz_constants::odometry_topic, 15);
+  cn.configure(TopicConfig<nav_msgs::Odometry>()
+    .source(MessageSource::local)
+    .from("/odometry/raw")
+    .to(webviz_constants::odometry_topic)
+    .rate_limit_hz(15));
 
-  cn.register_local_msg_type<sensor_msgs::LaserScan>(
-      "/velodyne_2dscan", webviz_constants::lidar_2d_topic, 15);
+  cn.configure(TopicConfig<sensor_msgs::LaserScan>()
+    .source(MessageSource::local)
+    .from("/velodyne_2dscan")
+    .to(webviz_constants::lidar_2d_topic)
+    .rate_limit_hz(15));
 
-  cn.register_local_msg_type<sensor_msgs::CompressedImage>(
-      "/stereo/left/image_raw/compressed",
-      webviz_constants::left_image_topic,
-      10);
-  cn.register_local_msg_type<sensor_msgs::CompressedImage>(
-      "/stereo/right/image_raw/compressed",
-      webviz_constants::right_image_topic,
-      10);
+  cn.configure(TopicConfig<sensor_msgs::CompressedImage>()
+    .source(MessageSource::local)
+    .from("/stereo/left/image_raw/compressed")
+    .to(webviz_constants::left_image_topic)
+    .rate_limit_hz(10));
+  cn.configure(TopicConfig<sensor_msgs::CompressedImage>()
+    .source(MessageSource::local)
+    .from("/stereo/right/image_raw/compressed")
+    .to(webviz_constants::right_image_topic)
+    .rate_limit_hz(10));
 
-  cn.register_local_msg_type<amrl_msgs::VisualizationMsg>(
-      "/visualization", webviz_constants::visualization_topic, 10);
+  cn.configure(TopicConfig<amrl_msgs::VisualizationMsg>()
+    .source(MessageSource::local)
+    .from("/visualization")
+    .to(webviz_constants::visualization_topic)
+    .rate_limit_hz(10));
 
-  // Set up listeners for remote messages
-  cn.register_remote_msg_type<geometry_msgs::PoseStamped>(
-      "move_base_simple/goal", "/move_base_simple/goal");
-  cn.register_remote_msg_type<amrl_msgs::Localization2DMsg>(
-      "initialpose", "/initialpose");
+  // receive remote commands
+  cn.configure(TopicConfig<geometry_msgs::PoseStamped>()
+    .source(MessageSource::remote)
+    .from("move_base_simple/goal")
+    .to("/move_base_simple/goal"));
+
+  cn.configure(TopicConfig<amrl_msgs::Localization2DMsg>()
+    .source(MessageSource::remote)
+    .from("initialpose")
+    .to("/initialpose"));
 
   // Add additional topics to subscribe and publish here.
 }
