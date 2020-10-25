@@ -7,4 +7,5 @@ PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/WsServer.hpp
     ${CMAKE_CURRENT_LIST_DIR}/WebVizConstants.hpp
     ${CMAKE_CURRENT_LIST_DIR}/RosClientNode.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/MessageScheduler.hpp
 )

@@ -57,6 +57,9 @@ enum class MessageSource { local, remote };
 
 template <typename RosType>
 struct TopicConfig {
+  /**
+   * @brief Whether the message is received from the local ROS master or the network.
+   */
   BuilderProp<TopicConfig, MessageSource> source{*this};
   BuilderProp<TopicConfig, std::string> from{*this};
   BuilderProp<TopicConfig, std::string> to{*this};

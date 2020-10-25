@@ -13,6 +13,7 @@
 #include "decode.hpp"
 #include "encode.hpp"
 #include "TopicConfig.hpp"
+#include "MessageScheduler.hpp"
 
 class RosClientNode : public QObject {
   Q_OBJECT
@@ -54,7 +55,7 @@ class RosClientNode : public QObject {
       auto metadata = encode_metadata(fbb, msg_type, to_topic);
       auto root_offset = encode<T>(fbb, msg, metadata);
       fbb.Finish(flatbuffers::Offset<void>(root_offset));
-      Q_EMIT ros_message_encoded(QByteArray(
+      Q_EMIT ros_message_encoded(QString::fromStdString(to_topic), QByteArray(
           reinterpret_cast<const char*>(fbb.GetBufferPointer()), fbb.GetSize()));
     }
   }
@@ -66,7 +67,7 @@ class RosClientNode : public QObject {
   }
 
  Q_SIGNALS:
-  void ros_message_encoded(const QByteArray& data);
+  void ros_message_encoded(const QString& topic, const QByteArray& data);
 
  public Q_SLOTS:
   /**

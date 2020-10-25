@@ -5,12 +5,15 @@
 #include <QtWebSockets/QtWebSockets>
 #include <cstdint>
 #include <iostream>
+#include <unordered_map>
+#include <chrono>
 
-#include "RosClientNode.hpp"
 #include "config.hpp"
 
 class WsClient : public QObject {
   Q_OBJECT;
+  using Clock = std::chrono::high_resolution_clock;
+  using TimePoint = Clock::time_point;
 
   QUrl url;
   QWebSocket ws;
@@ -20,6 +23,11 @@ class WsClient : public QObject {
   // used to track which messages the server has received
   uint64_t last_ponged_index = 0;
   uint64_t msg_index = 0;
+  std::unordered_map<uint64_t, int> size_by_index;
+  std::unordered_map<uint64_t, TimePoint> time_by_index;
+
+  double estimated_bytes_per_sec = 0;
+  double estimate_alpha = 0.5; // how fast bps changes [0, 1]
 
  public Q_SLOTS:
   void on_error(QAbstractSocket::SocketError error) {
@@ -53,9 +61,31 @@ class WsClient : public QObject {
     Q_EMIT message_received(data);
   }
 
-  void on_pong(qint64 elapsed_time, const QByteArray& payload) {
+  void on_pong(qint64 _bad_elapsed_time, const QByteArray& payload) {
+    // the elapsed_time argument doesn't seem to be very accurate.
     uint64_t ponged_index = *reinterpret_cast<const uint64_t*>(payload.data());
     last_ponged_index = std::max(last_ponged_index, ponged_index);
+
+    std::cout << "PONG " << ponged_index << " on " << msg_index << std::endl;
+
+    // estimate bandwidth
+    if (size_by_index.count(ponged_index)) {
+      const double bytes = static_cast<double>(size_by_index[ponged_index]);
+      const double elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - time_by_index[ponged_index]).count();
+      const double instant_bytes_per_sec = bytes / (std::max(1.0, elapsed_ms) / 1000.0);
+
+      
+      estimated_bytes_per_sec = estimated_bytes_per_sec * (1.0 - estimate_alpha) + instant_bytes_per_sec * estimate_alpha;
+      std::cout << "  elapsed sec " << (elapsed_ms / 1000.0) << std::endl;
+      std::cout << "  est kBps    " << (estimated_bytes_per_sec / 1000.0) << std::endl;
+      Q_EMIT bandwidth_estimated(estimated_bytes_per_sec);
+
+      size_by_index.erase(ponged_index);
+      time_by_index.erase(ponged_index);
+    }
+    if (msg_index - last_ponged_index < 2) {
+      Q_EMIT network_unblocked();
+    }
   }
 
   void reconnect() {
@@ -73,13 +103,10 @@ class WsClient : public QObject {
   }
 
   void send_message(const QByteArray& data) {
-    // don't buffer more data if we're waiting for old messages to be ACK'd
-    if (config::wait_for_pongs &&
-        msg_index - last_ponged_index > config::max_queue_before_waiting)
-      return;
-
     ++msg_index;
     ws.sendBinaryMessage(data);
+    size_by_index[msg_index] = data.size();
+    time_by_index[msg_index] = Clock::now();
     send_ping();
   }
 
@@ -87,6 +114,8 @@ class WsClient : public QObject {
   void connected();
   void disconnected();
   void message_received(const QByteArray& data);
+  void bandwidth_estimated(double approx_bytes_per_sec);
+  void network_unblocked();
 
  public:
   WsClient(const QUrl& url) : url(url) {
@@ -113,28 +142,6 @@ class WsClient : public QObject {
         &WsClient::on_binary_message);
     QObject::connect(&ws, &QWebSocket::pong, this, &WsClient::on_pong);
     reconnect();
-  }
-
-  void connect_ros_node(const RosClientNode& ros_node) {
-    // send
-    QObject::connect(
-        &ros_node,
-        &RosClientNode::ros_message_encoded,
-        this,
-        &WsClient::send_message);
-    // receive
-    QObject::connect(
-        this,
-        &WsClient::message_received,
-        &ros_node,
-        &RosClientNode::decode_net_message);
-
-    // startup
-    QObject::connect(
-        this,
-        &WsClient::connected,
-        &ros_node,
-        &RosClientNode::subscribe_remote_msgs);
 
     // auto reconnect
     recon_timer.setSingleShot(true);
