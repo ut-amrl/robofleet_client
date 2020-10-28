@@ -65,7 +65,7 @@ void connect_client(WsClient& ws_client, RosClientNode& ros_node, MessageSchedul
   QObject::connect(
     &scheduler,
     &MessageScheduler::scheduled,
-    [&ws_client](const QString& topic, const QByteArray& data){ws_client.send_message(data);}
+    [&ws_client](const QByteArray& data){ws_client.send_message(data);}
   );
 
   // receive

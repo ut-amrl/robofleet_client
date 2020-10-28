@@ -6,9 +6,18 @@
 #include <cstdint>
 #include <unordered_map>
 #include <deque>
+#include <map>
 #include <string>
 #include <chrono>
 
+struct PrioritizedTopic {
+  QString topic;
+  int priority;
+
+  friend bool operator<(const PrioritizedTopic& a, const PrioritizedTopic& b) {
+    return a.priority > b.priority || a.topic < b.topic;
+  }
+};
 
 /**
  * @brief Queues messages and schedules them on demand.
@@ -29,13 +38,14 @@ class MessageScheduler : public QObject {
   const double bucket_max_size_sec = 0.5; // how many sec worth of bandwidth can the bucket store? 
   TimePoint last_timestamp = Clock::now(); // when bandwidth was last generated
 
-  std::deque<std::tuple<QString, QByteArray>> queue;
+  std::deque<QByteArray> no_drop_queue;
+  std::map<PrioritizedTopic, QByteArray> topic_queue;
 
   void update_bucket() {
     const TimePoint now = Clock::now();
     const double elapsed_sec = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_timestamp).count() / 1000.0;
     const double bytes_per_sec = std::max(min_bytes_per_sec, approx_bytes_per_sec);
-    const double bucket_max_size = bucket_max_size_sec * bytes_per_sec;
+    const double bucket_max_size = 500000; //bucket_max_size_sec * bytes_per_sec;
 
     bandwidth_bucket += elapsed_sec * bytes_per_sec * target_saturation;
     bandwidth_bucket = std::min(bandwidth_bucket, bucket_max_size);
@@ -43,8 +53,8 @@ class MessageScheduler : public QObject {
     last_timestamp = now;
   }
 
-  bool consume_bandwidth(int bytes) {
-    if (bandwidth_bucket <= 0) {
+  bool consume_bandwidth(int bytes, bool allow_deficit=false) {
+    if (!allow_deficit && bandwidth_bucket < bytes) {
       return false;
     }
     bandwidth_bucket -= bytes;
@@ -55,7 +65,7 @@ public:
   MessageScheduler() {}
 
   Q_SIGNALS:
-  void scheduled(const QString& topic, const QByteArray& data);
+  void scheduled(const QByteArray& data);
 
 public Q_SLOTS:
   /**
@@ -66,28 +76,59 @@ public Q_SLOTS:
     approx_bytes_per_sec = bytes_per_sec;
   }
 
-  void enqueue(const QString& topic, const QByteArray& data) {
-    if (queue.size() > 2) {
-      queue.pop_front();
+  void enqueue(const QString& topic, const QByteArray& data, int priority, bool no_drop) {
+    if (no_drop) {
+      no_drop_queue.push_back(data);
+      if (no_drop_queue.size() > 2) {
+        no_drop_queue.pop_front();
+      }
+    } else {
+      PrioritizedTopic key;
+      key.topic = topic;
+      key.priority = priority;
+      topic_queue[key] = data;
     }
-    queue.push_back(std::make_tuple(topic, data));
     schedule();
   }
 
   /**
    * @brief Schedule messages now.
+   * Messages flagged as no_drop are sent first, in FIFO fashion.
+   * Then, messages are sent by topic priority. Any messages on topics with 
+   * the same priority will be sent together, temporarily ignoring throttling.
    */
   void schedule() {
     update_bucket();
-    while (!queue.empty()) {
-      const auto next = queue.front();
-      const auto next_size_bytes = std::get<1>(next).size();
-      if (consume_bandwidth(next_size_bytes)) {
-        queue.pop_front();
-        Q_EMIT scheduled(std::get<0>(next), std::get<1>(next));
-        qDebug() << "\x1b[31mscheduled\x1b[0m";
+
+    qDebug() << "tqs " << topic_queue.size() << "ndqs: " << no_drop_queue.size();
+
+    while (!no_drop_queue.empty()) {
+      const auto& next = no_drop_queue.front();
+      qDebug() << "ndq item size" << next.size();
+      if (consume_bandwidth(next.size())) {
+        qDebug() << "\x1b[31mscheduled\x1b[0m nodrop";
+        Q_EMIT scheduled(next);
+        no_drop_queue.pop_front();
       } else {
-        break;
+        return;
+      }
+    }
+    
+    bool first_item = true;
+    int prev_priority = 0;
+    auto it = topic_queue.begin();
+    while (it != topic_queue.end()) {
+      const auto& key = it->first;
+      const auto& data = it->second;
+      const bool allow_deficit = !first_item && key.priority == prev_priority;
+      prev_priority = key.priority;
+      if (consume_bandwidth(data.size(), allow_deficit)) {
+        qDebug() << "\x1b[32mscheduled\x1b[0m" << key.topic;
+        Q_EMIT scheduled(data);
+        it = topic_queue.erase(it);
+        first_item = false;
+      } else {
+        return;
       }
     }
   }

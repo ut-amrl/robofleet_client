@@ -10,6 +10,8 @@
 
 #include "config.hpp"
 
+const static int ws_msg_overhead_bytes = 14;
+
 class WsClient : public QObject {
   Q_OBJECT;
   using Clock = std::chrono::high_resolution_clock;
@@ -27,7 +29,7 @@ class WsClient : public QObject {
   std::unordered_map<uint64_t, TimePoint> time_by_index;
 
   double estimated_bytes_per_sec = 0;
-  double estimate_alpha = 0.5; // how fast bps changes [0, 1]
+  double estimate_alpha = 0.1; // how fast bps changes [0, 1]
 
  public Q_SLOTS:
   void on_error(QAbstractSocket::SocketError error) {
@@ -61,8 +63,7 @@ class WsClient : public QObject {
     Q_EMIT message_received(data);
   }
 
-  void on_pong(qint64 _bad_elapsed_time, const QByteArray& payload) {
-    // the elapsed_time argument doesn't seem to be very accurate.
+  void on_pong(qint64 _elapsed_time, const QByteArray& payload) {
     uint64_t ponged_index = *reinterpret_cast<const uint64_t*>(payload.data());
     last_ponged_index = std::max(last_ponged_index, ponged_index);
 
@@ -70,10 +71,10 @@ class WsClient : public QObject {
 
     // estimate bandwidth
     if (size_by_index.count(ponged_index)) {
-      const double bytes = static_cast<double>(size_by_index[ponged_index]);
-      const double elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - time_by_index[ponged_index]).count();
+      const double bytes = size_by_index[ponged_index];
+      const double clock_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - time_by_index[ponged_index]).count();
+      const double elapsed_ms = clock_elapsed - 40;
       const double instant_bytes_per_sec = bytes / (std::max(1.0, elapsed_ms) / 1000.0);
-
       
       estimated_bytes_per_sec = estimated_bytes_per_sec * (1.0 - estimate_alpha) + instant_bytes_per_sec * estimate_alpha;
       std::cout << "  elapsed sec " << (elapsed_ms / 1000.0) << std::endl;
