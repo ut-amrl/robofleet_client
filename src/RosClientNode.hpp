@@ -46,13 +46,14 @@ class RosClientNode : public QObject {
    * @param msg_type type of the message; can be obtained using
    * ros::message_traits::DataType
    * @param from_topic topic on which message was received
+   * @param to_topic remote topic to send to
    */
   template <typename T>
   void encode_ros_msg(
-      const T& msg, const std::string& msg_type, const std::string& to_topic) {
+      const T& msg, const std::string& msg_type, const std::string& from_topic, const std::string& to_topic) {
     // check rate limits
-    if (rate_limits.count(to_topic)) {
-      auto& rate_info = rate_limits[to_topic];
+    if (rate_limits.count(from_topic)) {
+      auto& rate_info = rate_limits[from_topic];
       const auto curr_time = std::chrono::high_resolution_clock::now();
       const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(curr_time - rate_info.first);
       const double elapsed_sec = duration.count() / 1000.0;
@@ -70,7 +71,7 @@ class RosClientNode : public QObject {
     auto root_offset = encode<T>(fbb, msg, metadata);
     fbb.Finish(flatbuffers::Offset<void>(root_offset));
     const QByteArray data{reinterpret_cast<const char*>(fbb.GetBufferPointer()), static_cast<int>(fbb.GetSize())};
-    const TopicParams& params = topic_params[to_topic];
+    const TopicParams& params = topic_params[from_topic];
     Q_EMIT ros_message_encoded(QString::fromStdString(to_topic), data, params.priority, params.no_drop);
   }
 
@@ -117,8 +118,8 @@ class RosClientNode : public QObject {
     // create subscription
     // have to use boost function because of how roscpp is implemented
     boost::function<void(T)> subscriber_handler =
-        [this, msg_type, full_to_topic](T msg) {
-          encode_ros_msg<T>(msg, msg_type, full_to_topic);
+        [this, msg_type, full_from_topic, full_to_topic](T msg) {
+          encode_ros_msg<T>(msg, msg_type, full_from_topic, full_to_topic);
         };
     subs[full_from_topic] =
         n.subscribe<T>(full_from_topic, 1, subscriber_handler);
@@ -174,6 +175,7 @@ class RosClientNode : public QObject {
           sub_msg,
           ros::message_traits::DataType<amrl_msgs::RobofleetSubscription>()
               .value(),
+          "/subscriptions",
           "/subscriptions");
     }
   }
@@ -247,27 +249,25 @@ class RosClientNode : public QObject {
 
   /**
    * @brief Register new listeners based on the given topic configuration.
-   * 
-   * Depending on the source set in config, this will either listen to messages
-   * on a local topic, or listen to messages on a remote topic. If a remote 
-   * topic is specified, we will subscribe to it by default.
-   * 
-   * @tparam T the ROS message type
-   * @param config
    */
+  template <typename Config>
+  void configure(const Config& config);
+  
   template <typename T>
-  void configure(const TopicConfig<T>& config) {
+  void configure(const SendLocalTopic<T>& config) {
     config.assert_valid();
-    if (config.source == MessageSource::local) {
-      register_local_msg_type<T>(config.from, config.to);
-      if (config.rate_limit_hz.is_set()) {
-        set_rate_limit(config.from, config.rate_limit_hz);
-      }
-      const std::string full_from_topic = ros::names::resolve(config.from);
-      topic_params[full_from_topic] = TopicParams{config.priority, config.no_drop};
-    } else {
-      register_remote_msg_type<T>(config.from, config.to);
+    register_local_msg_type<T>(config.from, config.to);
+    if (config.rate_limit_hz.is_set()) {
+      set_rate_limit(config.from, config.rate_limit_hz);
     }
+    const std::string full_from_topic = ros::names::resolve(config.from);
+    topic_params[full_from_topic] = TopicParams{config.priority, config.no_drop};
+  }
+
+  template <typename T>
+  void configure(const ReceiveRemoteTopic<T>& config) {
+    config.assert_valid();
+    register_remote_msg_type<T>(config.from, config.to);
   }
 
   RosClientNode() {
