@@ -86,6 +86,7 @@ public Q_SLOTS:
         const auto& next = no_drop_queue.front();
         Q_EMIT scheduled(next);
         no_drop_queue.pop_front();
+        qDebug() << "\x1b[33mnodrop\x1b[0m";
       }
       return;
     }

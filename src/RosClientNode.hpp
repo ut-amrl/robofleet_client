@@ -18,6 +18,11 @@
 class RosClientNode : public QObject {
   Q_OBJECT
 
+  struct TopicParams {
+    int priority;
+    bool no_drop;
+  };
+
   ros::AsyncSpinner spinner = ros::AsyncSpinner(1);
   ros::NodeHandle n;
 
@@ -28,6 +33,7 @@ class RosClientNode : public QObject {
   std::unordered_map<TopicString, ros::Publisher> pubs;
   // Map from topic name to pair of <last publication time, publication interval?(sec)>
   std::unordered_map<TopicString, std::pair<std::chrono::time_point<std::chrono::high_resolution_clock>, double>> rate_limits;
+  std::unordered_map<TopicString, TopicParams> topic_params;
   std::unordered_map<
       MsgTypeString, std::function<void(const QByteArray&, const TopicString&)>>
       pub_fns;
@@ -44,26 +50,78 @@ class RosClientNode : public QObject {
   template <typename T>
   void encode_ros_msg(
       const T& msg, const std::string& msg_type, const std::string& to_topic) {
-    auto& rate_info = rate_limits[to_topic];
-    const auto curr_time = std::chrono::high_resolution_clock::now();
-    const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(curr_time - rate_info.first);
-    const double elapsed_sec = duration.count() / 1000.0;
+    // check rate limits
+    if (rate_limits.count(to_topic)) {
+      auto& rate_info = rate_limits[to_topic];
+      const auto curr_time = std::chrono::high_resolution_clock::now();
+      const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(curr_time - rate_info.first);
+      const double elapsed_sec = duration.count() / 1000.0;
 
-    if (elapsed_sec > rate_info.second) {
-      rate_info.first = curr_time;
-      flatbuffers::FlatBufferBuilder fbb;
-      auto metadata = encode_metadata(fbb, msg_type, to_topic);
-      auto root_offset = encode<T>(fbb, msg, metadata);
-      fbb.Finish(flatbuffers::Offset<void>(root_offset));
-      const QByteArray data{reinterpret_cast<const char*>(fbb.GetBufferPointer()), fbb.GetSize()};
-      Q_EMIT ros_message_encoded(QString::fromStdString(to_topic), data, 1, false);
+      if (elapsed_sec > rate_info.second) {
+        rate_info.first = curr_time;
+      } else {
+        return;
+      }
     }
+
+    // encode message
+    flatbuffers::FlatBufferBuilder fbb;
+    auto metadata = encode_metadata(fbb, msg_type, to_topic);
+    auto root_offset = encode<T>(fbb, msg, metadata);
+    fbb.Finish(flatbuffers::Offset<void>(root_offset));
+    const QByteArray data{reinterpret_cast<const char*>(fbb.GetBufferPointer()), fbb.GetSize()};
+    const TopicParams& params = topic_params[to_topic];
+    Q_EMIT ros_message_encoded(QString::fromStdString(to_topic), data, params.priority, params.no_drop);
   }
 
   template <typename T>
   void publish_ros_msg(
       const T& msg, const std::string& msg_type, const std::string& to_topic) {
     pubs[msg_type].publish(msg);
+  }
+
+  void set_rate_limit(const std::string& from_topic, double rate_limit_hz) {
+    const std::string full_from_topic = ros::names::resolve(from_topic);
+    double publish_interval_sec = 1.0 / rate_limit_hz;
+    rate_limits[full_from_topic] = std::make_pair(std::chrono::high_resolution_clock::now(), publish_interval_sec);
+  }
+
+  /**
+   * @brief Set up pub/sub for a particular message type and topic.
+   *
+   * Creates a subscriber to the given topic, and emits ros_message_encoded()
+   * signals for each message received.
+   * @tparam T the ROS message type
+   * @param from_topic the topic to subscribe to
+   * @param to_topic the topic to publish to the server
+   * @param max_publish_rate_hz the maximum number of messages per second to publish on this topic
+   */
+  template <typename T>
+  void register_local_msg_type(
+      const std::string& from_topic, const std::string& to_topic) {
+    // apply remapping to encode full topic name
+    const std::string full_from_topic = ros::names::resolve(from_topic);
+    const std::string full_to_topic = ros::names::resolve(to_topic);
+    const std::string& msg_type = ros::message_traits::DataType<T>().value();
+
+    if (subs.count(full_from_topic) > 0) {
+      throw std::runtime_error(
+          "Trying to register topic that is already registered. Topics must be "
+          "unique.");
+    }
+
+    std::cerr << "registering " << msg_type << ": subscribing to "
+              << full_from_topic << " and sending as " << full_to_topic
+              << std::endl;
+
+    // create subscription
+    // have to use boost function because of how roscpp is implemented
+    boost::function<void(T)> subscriber_handler =
+        [this, msg_type, full_to_topic](T msg) {
+          encode_ros_msg<T>(msg, msg_type, full_to_topic);
+        };
+    subs[full_from_topic] =
+        n.subscribe<T>(full_from_topic, 1, subscriber_handler);
   }
 
  Q_SIGNALS:
@@ -98,6 +156,8 @@ class RosClientNode : public QObject {
     pub_fns[msg_type](data, topic);
   }
 
+
+ public:
   /**
    * @brief subscribe to remote messages that were specified in the config by
    * calling register_remote_msg_type. This function should run once a websocket
@@ -105,7 +165,6 @@ class RosClientNode : public QObject {
    */
   void subscribe_remote_msgs() {
     for (auto topic : pub_remote_topics) {
-      sleep(1); // to avoid rate limiting issues. This only happens upon connection to the server so this time delay is no issue
       printf("Registering for remote subscription to topic %s\n", topic.c_str());
       // Now, subscribe to the appropriate remote message
       amrl_msgs::RobofleetSubscription sub_msg;
@@ -119,51 +178,9 @@ class RosClientNode : public QObject {
     }
   }
 
- public:
   /**
-   * @brief Set up pub/sub for a particular message type and topic.
-   *
-   * Creates a subscriber to the given topic, and emits ros_message_encoded()
-   * signals for each message received.
-   * @tparam T the ROS message type
-   * @param from_topic the topic to subscribe to
-   * @param to_topic the topic to publish to the server
-   * @param max_publish_rate_hz the maximum number of messages per second to publish on this topic
-   */
-  template <typename T>
-  void register_local_msg_type(
-      const std::string& from_topic, const std::string& to_topic, double max_publish_rate_hz=10) {
-    // apply remapping to encode full topic name
-    const std::string full_from_topic = ros::names::resolve(from_topic);
-    const std::string full_to_topic = ros::names::resolve(to_topic);
-    const std::string& msg_type = ros::message_traits::DataType<T>().value();
-
-    // Compute publish interval in seconds
-    double publish_interval_sec = 1.0 / max_publish_rate_hz;
-
-    if (subs.count(full_from_topic) > 0) {
-      throw std::runtime_error(
-          "Trying to register topic that is already registered. Topics must be "
-          "unique.");
-    }
-
-    std::cerr << "registering " << msg_type << ": subscribing to "
-              << full_from_topic << " and sending as " << full_to_topic
-              << std::endl;
-
-    rate_limits[full_to_topic] = std::make_pair(std::chrono::high_resolution_clock::now(), publish_interval_sec);
-
-    // create subscription
-    // have to use boost function because of how roscpp is implemented
-    boost::function<void(T)> subscriber_handler =
-        [this, msg_type, full_to_topic](T msg) {
-          encode_ros_msg<T>(msg, msg_type, full_to_topic);
-        };
-    subs[full_from_topic] =
-        n.subscribe<T>(full_from_topic, 1, subscriber_handler);
-  }
-
-  /**
+   * @deprecated Use configure() instead. See config.example.hpp
+   * 
    * @brief Set up remote publishing for a particular message type and topic
    * sent from the server.
    *
@@ -210,6 +227,25 @@ class RosClientNode : public QObject {
   }
 
   /**
+   * @deprecated Use configure() instead. See config.example.hpp
+   * 
+   * @brief Set up pub/sub for a particular message type and topic.
+   *
+   * Creates a subscriber to the given topic, and emits ros_message_encoded()
+   * signals for each message received.
+   * @tparam T the ROS message type
+   * @param from_topic the topic to subscribe to
+   * @param to_topic the topic to publish to the server
+   * @param max_publish_rate_hz the maximum number of messages per second to publish on this topic
+   */
+  template <typename T>
+  void register_local_msg_type(
+      const std::string& from_topic, const std::string& to_topic, double max_publish_rate_hz) {
+    register_local_msg_type<T>(from_topic, to_topic);
+    set_rate_limit(from_topic, max_publish_rate_hz);
+  }
+
+  /**
    * @brief Register new listeners based on the given topic configuration.
    * 
    * Depending on the source set in config, this will either listen to messages
@@ -223,7 +259,12 @@ class RosClientNode : public QObject {
   void configure(const TopicConfig<T>& config) {
     config.assert_valid();
     if (config.source == MessageSource::local) {
-      register_local_msg_type<T>(config.from, config.to, config.rate_limit_hz);
+      register_local_msg_type<T>(config.from, config.to);
+      if (config.rate_limit_hz.is_set()) {
+        set_rate_limit(config.from, config.rate_limit_hz);
+      }
+      const std::string full_from_topic = ros::names::resolve(config.from);
+      topic_params[full_from_topic] = TopicParams{config.priority, config.no_drop};
     } else {
       register_remote_msg_type<T>(config.from, config.to);
     }

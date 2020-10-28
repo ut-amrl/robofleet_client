@@ -63,14 +63,18 @@ struct TopicConfig {
   BuilderProp<TopicConfig, MessageSource> source{*this};
   BuilderProp<TopicConfig, std::string> from{*this};
   BuilderProp<TopicConfig, std::string> to{*this};
-  BuilderProp<TopicConfig, double> rate_limit_hz{*this, 0};
-  BuilderProp<TopicConfig, int> priority{*this, 0};
+  BuilderProp<TopicConfig, double> rate_limit_hz{*this};
+  BuilderProp<TopicConfig, int> priority{*this, 1};
+  BuilderProp<TopicConfig, bool> no_drop{*this, false};
 
   void assert_valid() const {
     source.assert_set();
     from.assert_set();
     to.assert_set();
-    rate_limit_hz.assert_set();
     priority.assert_set();
+    if (priority <= 0) {
+      throw std::runtime_error("Priority must be greater than 0!");
+    }
+    no_drop.assert_set();
   }
 };

@@ -74,48 +74,54 @@ static void configure_msg_types(RosClientNode& cn) {
     .rate_limit_hz(1));
 
   // must send to subscriptions topic to receive messages from other robots
-  // don't rate limit this topic.
+  // don't drop or rate limit this topic.
   cn.configure(TopicConfig<amrl_msgs::RobofleetSubscription>()
     .source(MessageSource::local)
     .from("/subscriptions")
     .to(webviz_constants::subscriptions_topic)
-    .rate_limit_hz(1));
+    .no_drop(true));
 
   // send messages for webviz
   cn.configure(TopicConfig<amrl_msgs::Localization2DMsg>()
     .source(MessageSource::local)
     .from("/localization")
     .to(webviz_constants::localization_topic)
-    .rate_limit_hz(10));
+    .rate_limit_hz(10)
+    .priority(10));
 
   cn.configure(TopicConfig<nav_msgs::Odometry>()
     .source(MessageSource::local)
     .from("/odometry/raw")
     .to(webviz_constants::odometry_topic)
-    .rate_limit_hz(15));
+    .rate_limit_hz(15)
+    .priority(10));
 
   cn.configure(TopicConfig<sensor_msgs::LaserScan>()
     .source(MessageSource::local)
     .from("/velodyne_2dscan")
     .to(webviz_constants::lidar_2d_topic)
-    .rate_limit_hz(15));
+    .rate_limit_hz(15)
+    .priority(5));
 
   cn.configure(TopicConfig<sensor_msgs::CompressedImage>()
     .source(MessageSource::local)
     .from("/stereo/left/image_raw/compressed")
     .to(webviz_constants::left_image_topic)
-    .rate_limit_hz(10));
+    .rate_limit_hz(10)
+    .priority(1));
   cn.configure(TopicConfig<sensor_msgs::CompressedImage>()
     .source(MessageSource::local)
     .from("/stereo/right/image_raw/compressed")
     .to(webviz_constants::right_image_topic)
-    .rate_limit_hz(10));
+    .rate_limit_hz(10)
+    .priority(1));
 
   cn.configure(TopicConfig<amrl_msgs::VisualizationMsg>()
     .source(MessageSource::local)
     .from("/visualization")
     .to(webviz_constants::visualization_topic)
-    .rate_limit_hz(10));
+    .rate_limit_hz(10)
+    .priority(3));
 
   // receive remote commands
   cn.configure(TopicConfig<geometry_msgs::PoseStamped>()
