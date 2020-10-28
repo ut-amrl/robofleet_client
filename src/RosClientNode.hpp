@@ -56,7 +56,7 @@ class RosClientNode : public QObject {
       auto root_offset = encode<T>(fbb, msg, metadata);
       fbb.Finish(flatbuffers::Offset<void>(root_offset));
       const QByteArray data{reinterpret_cast<const char*>(fbb.GetBufferPointer()), fbb.GetSize()};
-      Q_EMIT ros_message_encoded(QString::fromStdString(to_topic), data, 0, true);
+      Q_EMIT ros_message_encoded(QString::fromStdString(to_topic), data, 1, false);
     }
   }
 

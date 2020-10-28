@@ -11,55 +11,39 @@
 #include <chrono>
 
 struct PrioritizedTopic {
-  QString topic;
-  int priority;
+  const QString topic;
+  const int priority;
 
-  friend bool operator<(const PrioritizedTopic& a, const PrioritizedTopic& b) {
-    return a.priority > b.priority || a.topic < b.topic;
+  friend bool operator==(const PrioritizedTopic& a, const PrioritizedTopic& b) {
+    return a.topic == b.topic && a.priority == b.priority;
   }
 };
+
+struct WaitingMessage {
+  QByteArray message;
+  int64_t total_wait = 0;
+};
+
+namespace std {
+  template<> struct hash<PrioritizedTopic> {
+    std::size_t operator()(const PrioritizedTopic& t) const noexcept {
+      return std::hash<QString>()(t.topic) ^ std::hash<int>()(t.priority);
+    }
+  };
+}; // namespace std
 
 /**
  * @brief Queues messages and schedules them on demand.
  * 
  * Messages are enqueued, and then later scheduled (via the scheduled signal)
- * when schedule() is called. The scheduling algorithm is approximately a token
- * bucket filter.
+ * when schedule() is called.
  */
 class MessageScheduler : public QObject {
   Q_OBJECT
-  using Clock = std::chrono::high_resolution_clock;
-  using TimePoint = Clock::time_point;
-
-  const double target_saturation = 0.7;
-  double approx_bytes_per_sec = 0; // rate at which to generate bandwidth
-  const double min_bytes_per_sec = 64; // assume at least this much bandwidth
-  double bandwidth_bucket = 0; // currently accumulated bandwidth
-  const double bucket_max_size_sec = 0.5; // how many sec worth of bandwidth can the bucket store? 
-  TimePoint last_timestamp = Clock::now(); // when bandwidth was last generated
+  bool is_network_unblocked = true;
 
   std::deque<QByteArray> no_drop_queue;
-  std::map<PrioritizedTopic, QByteArray> topic_queue;
-
-  void update_bucket() {
-    const TimePoint now = Clock::now();
-    const double elapsed_sec = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_timestamp).count() / 1000.0;
-    const double bytes_per_sec = std::max(min_bytes_per_sec, approx_bytes_per_sec);
-    const double bucket_max_size = 500000; //bucket_max_size_sec * bytes_per_sec;
-
-    bandwidth_bucket += elapsed_sec * bytes_per_sec * target_saturation;
-    bandwidth_bucket = std::min(bandwidth_bucket, bucket_max_size);
-    qDebug() << "BUCKET kB: " << (bandwidth_bucket / 1000.0);
-    last_timestamp = now;
-  }
-
-  bool consume_bandwidth(int bytes, bool allow_deficit=false) {
-    if (!allow_deficit && bandwidth_bucket < bytes) {
-      return false;
-    }
-    bandwidth_bucket -= bytes;
-    return true;
-  }
+  std::unordered_map<PrioritizedTopic, WaitingMessage> topic_queue;
 
 public:
   MessageScheduler() {}
@@ -73,63 +57,62 @@ public Q_SLOTS:
    * @param bytes_per_sec estimated network bandwidth
    */
   void set_bandwidth(double bytes_per_sec) {
-    approx_bytes_per_sec = bytes_per_sec;
   }
 
   void enqueue(const QString& topic, const QByteArray& data, int priority, bool no_drop) {
     if (no_drop) {
       no_drop_queue.push_back(data);
-      if (no_drop_queue.size() > 2) {
-        no_drop_queue.pop_front();
-      }
     } else {
-      PrioritizedTopic key;
-      key.topic = topic;
-      key.priority = priority;
-      topic_queue[key] = data;
+      topic_queue[PrioritizedTopic{topic, priority}].message = data;
     }
+    schedule();
+  }
+
+  /**
+   * @brief Fire this to indicate that the network is free
+   */
+  void network_unblocked() {
+    is_network_unblocked = true;
     schedule();
   }
 
   /**
    * @brief Schedule messages now.
    * Messages flagged as no_drop are sent first, in FIFO fashion.
-   * Then, messages are sent by topic priority. Any messages on topics with 
-   * the same priority will be sent together, temporarily ignoring throttling.
+   * Then, messages are sent by topic priority. 
    */
   void schedule() {
-    update_bucket();
+    if (!is_network_unblocked) {
+      return;
+    }
+    is_network_unblocked = false;
 
-    qDebug() << "tqs " << topic_queue.size() << "ndqs: " << no_drop_queue.size();
-
-    while (!no_drop_queue.empty()) {
-      const auto& next = no_drop_queue.front();
-      qDebug() << "ndq item size" << next.size();
-      if (consume_bandwidth(next.size())) {
-        qDebug() << "\x1b[31mscheduled\x1b[0m nodrop";
+    // flush no-drop queue
+    if (!no_drop_queue.empty()) {
+      while (!no_drop_queue.empty()) {
+        const auto& next = no_drop_queue.front();
         Q_EMIT scheduled(next);
         no_drop_queue.pop_front();
-      } else {
-        return;
+      }
+      return;
+    }
+
+    // select next regular message
+    if (topic_queue.empty()) {
+      return;
+    }
+    auto next_topic_pair = topic_queue.begin();
+    for (auto it = topic_queue.begin(); it != topic_queue.end(); ++it) {
+      auto& candidate_topic = it->first;
+      auto& waiting_message = it->second;
+      waiting_message.total_wait += candidate_topic.priority;
+      if (waiting_message.total_wait > next_topic_pair->second.total_wait) {
+        next_topic_pair = it;
       }
     }
-    
-    bool first_item = true;
-    int prev_priority = 0;
-    auto it = topic_queue.begin();
-    while (it != topic_queue.end()) {
-      const auto& key = it->first;
-      const auto& data = it->second;
-      const bool allow_deficit = !first_item && key.priority == prev_priority;
-      prev_priority = key.priority;
-      if (consume_bandwidth(data.size(), allow_deficit)) {
-        qDebug() << "\x1b[32mscheduled\x1b[0m" << key.topic;
-        Q_EMIT scheduled(data);
-        it = topic_queue.erase(it);
-        first_item = false;
-      } else {
-        return;
-      }
-    }
+    Q_EMIT scheduled(next_topic_pair->second.message);
+    qDebug() << "\x1b[31mscheduled\x1b[0m" << next_topic_pair->first.topic;
+    qDebug() << "\x1b[32mwait was\x1b[0m" << next_topic_pair->second.total_wait;
+    topic_queue.erase(next_topic_pair);
   }
 };

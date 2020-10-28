@@ -59,7 +59,7 @@ void connect_client(WsClient& ws_client, RosClientNode& ros_node, MessageSchedul
     &ws_client,
     &WsClient::network_unblocked,
     &scheduler,
-    &MessageScheduler::schedule
+    &MessageScheduler::network_unblocked
   );
   // send scheduled message
   QObject::connect(
