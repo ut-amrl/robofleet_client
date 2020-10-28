@@ -52,13 +52,6 @@ public:
   void scheduled(const QByteArray& data);
 
 public Q_SLOTS:
-  /**
-   * @brief Set the estimated bandwidth
-   * @param bytes_per_sec estimated network bandwidth
-   */
-  void set_bandwidth(double bytes_per_sec) {
-  }
-
   void enqueue(const QString& topic, const QByteArray& data, int priority, bool no_drop) {
     if (no_drop) {
       no_drop_queue.push_back(data);

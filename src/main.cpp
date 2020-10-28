@@ -47,13 +47,6 @@ void connect_client(WsClient& ws_client, RosClientNode& ros_node, MessageSchedul
       &RosClientNode::ros_message_encoded,
       &scheduler,
       &MessageScheduler::enqueue);
-  // update estimated bandwidth
-  QObject::connect(
-    &ws_client,
-    &WsClient::bandwidth_estimated,
-    &scheduler,
-    &MessageScheduler::set_bandwidth
-  );
   // run scheduler
   QObject::connect(
     &ws_client,

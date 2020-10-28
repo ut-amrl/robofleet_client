@@ -25,11 +25,6 @@ class WsClient : public QObject {
   // used to track which messages the server has received
   uint64_t last_ponged_index = 0;
   uint64_t msg_index = 0;
-  std::unordered_map<uint64_t, int> size_by_index;
-  std::unordered_map<uint64_t, TimePoint> time_by_index;
-
-  double estimated_bytes_per_sec = 0;
-  double estimate_alpha = 0.1; // how fast bps changes [0, 1]
 
  public Q_SLOTS:
   void on_error(QAbstractSocket::SocketError error) {
@@ -67,24 +62,7 @@ class WsClient : public QObject {
     uint64_t ponged_index = *reinterpret_cast<const uint64_t*>(payload.data());
     last_ponged_index = std::max(last_ponged_index, ponged_index);
 
-    std::cout << "PONG " << ponged_index << " on " << msg_index << std::endl;
-
-    // estimate bandwidth
-    if (size_by_index.count(ponged_index)) {
-      const double bytes = size_by_index[ponged_index];
-      const double clock_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - time_by_index[ponged_index]).count();
-      const double elapsed_ms = clock_elapsed - 40;
-      const double instant_bytes_per_sec = bytes / (std::max(1.0, elapsed_ms) / 1000.0);
-      
-      estimated_bytes_per_sec = estimated_bytes_per_sec * (1.0 - estimate_alpha) + instant_bytes_per_sec * estimate_alpha;
-      std::cout << "  elapsed sec " << (elapsed_ms / 1000.0) << std::endl;
-      std::cout << "  est kBps    " << (estimated_bytes_per_sec / 1000.0) << std::endl;
-      Q_EMIT bandwidth_estimated(estimated_bytes_per_sec);
-
-      size_by_index.erase(ponged_index);
-      time_by_index.erase(ponged_index);
-    }
-    if (msg_index - last_ponged_index < 2) {
+    if (msg_index - last_ponged_index < config::max_queue_before_waiting) {
       Q_EMIT network_unblocked();
     }
   }
@@ -106,8 +84,6 @@ class WsClient : public QObject {
   void send_message(const QByteArray& data) {
     ++msg_index;
     ws.sendBinaryMessage(data);
-    size_by_index[msg_index] = data.size();
-    time_by_index[msg_index] = Clock::now();
     send_ping();
   }
 
