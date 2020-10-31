@@ -3,10 +3,10 @@
 #include <QObject>
 #include <QTimer>
 #include <QtWebSockets/QtWebSockets>
+#include <chrono>
 #include <cstdint>
 #include <iostream>
 #include <unordered_map>
-#include <chrono>
 
 #include "config.hpp"
 

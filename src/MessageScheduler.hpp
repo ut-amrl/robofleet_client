@@ -1,14 +1,14 @@
 #pragma once
-#include <QObject>
-#include <QString>
 #include <QByteArray>
 #include <QDebug>
+#include <QObject>
+#include <QString>
+#include <chrono>
 #include <cstdint>
-#include <unordered_map>
 #include <deque>
 #include <map>
 #include <string>
-#include <chrono>
+#include <unordered_map>
 
 struct PrioritizedTopic {
   const QString topic;
@@ -24,23 +24,24 @@ struct WaitingMessage {
   QByteArray message;
 
   // is this message unsent and waiting?
-  bool is_waiting = false; 
+  bool is_waiting = false;
 
   // sum of priority times wall-clock wait time
   double total_prioritized_wait = 0;
 };
 
 namespace std {
-  template<> struct hash<PrioritizedTopic> {
-    std::size_t operator()(const PrioritizedTopic& t) const noexcept {
-      return std::hash<QString>()(t.topic) ^ std::hash<double>()(t.priority);
-    }
-  };
-}; // namespace std
+template <>
+struct hash<PrioritizedTopic> {
+  std::size_t operator()(const PrioritizedTopic& t) const noexcept {
+    return std::hash<QString>()(t.topic) ^ std::hash<double>()(t.priority);
+  }
+};
+};  // namespace std
 
 /**
  * @brief Queues messages and schedules them on demand.
- * 
+ *
  * Messages are enqueued, and then later scheduled (via the scheduled signal)
  * when schedule() is called.
  */
@@ -53,14 +54,17 @@ class MessageScheduler : public QObject {
   std::unordered_map<PrioritizedTopic, WaitingMessage> topic_queue;
   Clock::time_point last_schedule_time;
 
-public:
-  MessageScheduler() : last_schedule_time(Clock::now()) {}
+ public:
+  MessageScheduler() : last_schedule_time(Clock::now()) {
+  }
 
-  Q_SIGNALS:
+ Q_SIGNALS:
   void scheduled(const QByteArray& data);
 
-public Q_SLOTS:
-  void enqueue(const QString& topic, const QByteArray& data, double priority, bool no_drop) {
+ public Q_SLOTS:
+  void enqueue(
+      const QString& topic, const QByteArray& data, double priority,
+      bool no_drop) {
     if (no_drop) {
       no_drop_queue.push_back(data);
     } else {
@@ -82,7 +86,7 @@ public Q_SLOTS:
   /**
    * @brief Schedule messages now.
    * Messages flagged as no_drop are sent first, in FIFO fashion.
-   * Then, messages are sent by topic priority. 
+   * Then, messages are sent by topic priority.
    */
   void schedule() {
     if (!is_network_unblocked) {
@@ -91,7 +95,9 @@ public Q_SLOTS:
 
     // compute time since last schedule()
     const Clock::time_point now = Clock::now();
-    const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_schedule_time).count();
+    const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+                             now - last_schedule_time)
+                             .count();
     const double elapsed_s = elapsed / 1000.0;
     last_schedule_time = now;
 
@@ -116,9 +122,11 @@ public Q_SLOTS:
     for (auto it = topic_queue.begin(); it != topic_queue.end(); ++it) {
       const PrioritizedTopic& candidate_key = it->first;
       WaitingMessage& candidate_val = it->second;
-      candidate_val.total_prioritized_wait += candidate_key.priority * elapsed_s;
+      candidate_val.total_prioritized_wait +=
+          candidate_key.priority * elapsed_s;
 
-      if (candidate_val.total_prioritized_wait > next->second.total_prioritized_wait) {
+      if (candidate_val.total_prioritized_wait >
+          next->second.total_prioritized_wait) {
         next = it;
       }
     }

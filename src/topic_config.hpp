@@ -56,7 +56,7 @@ class BuilderProp {
 
 /**
  * @brief Config for sending messages from a local topic to Robofleet
- * 
+ *
  * This creates a ROS subscriber to bridge local messages to Robofleet.
  * @tparam RosType the ROS message class being sent on the topic
  */
@@ -81,7 +81,7 @@ struct SendLocalTopic {
 
 /**
  * @brief Config for receiving messages from a remote topic on Robofleet
- * 
+ *
  * This creates a ROS publisher to bridge remote messages to the robot.
  * @tparam RosType the ROS message class being sent on the topic
  */
@@ -95,4 +95,4 @@ struct ReceiveRemoteTopic {
     to.assert_set();
   }
 };
-};
+};  // namespace topic_config

@@ -10,8 +10,8 @@
 #include <string>
 
 #include "RosClientNode.hpp"
-#include "topic_config.hpp"
 #include "WebVizConstants.hpp"
+#include "topic_config.hpp"
 
 using namespace topic_config;
 
@@ -43,22 +43,25 @@ static const uint64_t max_queue_before_waiting = 1;
  * for a centralized instance of robofleet_server.
  */
 static const bool direct_mode = false;
-static const quint16 direct_mode_port = 8080; // what port to serve on in direct mode
-static const quint64 direct_mode_bytes_per_sec = 2048000; // avoid network backpressure in direct mode: sets maximum upload speed
+static const quint16 direct_mode_port =
+    8080;  // what port to serve on in direct mode
+static const quint64 direct_mode_bytes_per_sec =
+    2048000;  // avoid network backpressure in direct mode: sets maximum upload
+              // speed
 
 /**
  * @brief Configure which topics and types of messages the client will handle.
- * 
- * You should use the .configure() method on the RosClientNode, and supply 
+ *
+ * You should use the .configure() method on the RosClientNode, and supply
  * either a SendLocalTopic or a ReceiveRemoteTopic config.
- * 
- * To properly integrate with Robofleet, you need to run this client with a 
+ *
+ * To properly integrate with Robofleet, you need to run this client with a
  * ROS namespace representing the robot's name.
- * 
+ *
  * Absolute topic names begin with a "/"; they will not be prefixed with the
  * current ROS namespace (robot name). Many of your local ROS nodes may publish
  * on absolute-named topics.
- * Most topics must be relative (not begin with "/") on the server side to 
+ * Most topics must be relative (not begin with "/") on the server side to
  * avoid name collisions between robots.
  *
  * Tips:
@@ -73,61 +76,61 @@ static void configure_msg_types(RosClientNode& cn) {
 
   // must send to status topic to list robot in webviz
   cn.configure(SendLocalTopic<amrl_msgs::RobofleetStatus>()
-    .from("/status")
-    .to(webviz_constants::status_topic)
-    .rate_limit_hz(1));
+                   .from("/status")
+                   .to(webviz_constants::status_topic)
+                   .rate_limit_hz(1));
 
   // must send to subscriptions topic to receive messages from other robots
   // don't drop or rate limit this topic.
   cn.configure(SendLocalTopic<amrl_msgs::RobofleetSubscription>()
-    .from("/subscriptions")
-    .to(webviz_constants::subscriptions_topic)
-    .no_drop(true));
+                   .from("/subscriptions")
+                   .to(webviz_constants::subscriptions_topic)
+                   .no_drop(true));
 
   // send messages for webviz
   cn.configure(SendLocalTopic<amrl_msgs::Localization2DMsg>()
-    .from("/localization")
-    .to(webviz_constants::localization_topic)
-    .rate_limit_hz(10)
-    .priority(100));
+                   .from("/localization")
+                   .to(webviz_constants::localization_topic)
+                   .rate_limit_hz(10)
+                   .priority(100));
 
   cn.configure(SendLocalTopic<nav_msgs::Odometry>()
-    .from("/odometry/raw")
-    .to(webviz_constants::odometry_topic)
-    .rate_limit_hz(15)
-    .priority(100));
+                   .from("/odometry/raw")
+                   .to(webviz_constants::odometry_topic)
+                   .rate_limit_hz(15)
+                   .priority(100));
 
   cn.configure(SendLocalTopic<sensor_msgs::LaserScan>()
-    .from("/velodyne_2dscan")
-    .to(webviz_constants::lidar_2d_topic)
-    .rate_limit_hz(15)
-    .priority(5));
+                   .from("/velodyne_2dscan")
+                   .to(webviz_constants::lidar_2d_topic)
+                   .rate_limit_hz(15)
+                   .priority(5));
 
   cn.configure(SendLocalTopic<sensor_msgs::CompressedImage>()
-    .from("/stereo/left/image_raw/compressed")
-    .to(webviz_constants::left_image_topic)
-    .rate_limit_hz(10)
-    .priority(1));
+                   .from("/stereo/left/image_raw/compressed")
+                   .to(webviz_constants::left_image_topic)
+                   .rate_limit_hz(10)
+                   .priority(1));
   cn.configure(SendLocalTopic<sensor_msgs::CompressedImage>()
-    .from("/stereo/right/image_raw/compressed")
-    .to(webviz_constants::right_image_topic)
-    .rate_limit_hz(10)
-    .priority(1));
+                   .from("/stereo/right/image_raw/compressed")
+                   .to(webviz_constants::right_image_topic)
+                   .rate_limit_hz(10)
+                   .priority(1));
 
   cn.configure(SendLocalTopic<amrl_msgs::VisualizationMsg>()
-    .from("/visualization")
-    .to(webviz_constants::visualization_topic)
-    .rate_limit_hz(10)
-    .priority(3));
+                   .from("/visualization")
+                   .to(webviz_constants::visualization_topic)
+                   .rate_limit_hz(10)
+                   .priority(3));
 
   // receive remote commands
   cn.configure(ReceiveRemoteTopic<geometry_msgs::PoseStamped>()
-    .from("move_base_simple/goal")
-    .to("/move_base_simple/goal"));
+                   .from("move_base_simple/goal")
+                   .to("/move_base_simple/goal"));
 
   cn.configure(ReceiveRemoteTopic<amrl_msgs::Localization2DMsg>()
-    .from("initialpose")
-    .to("/initialpose"));
+                   .from("initialpose")
+                   .to("/initialpose"));
 
   // Add additional topics to subscribe and publish here.
 }

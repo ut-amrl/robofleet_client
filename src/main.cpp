@@ -1,20 +1,22 @@
 #include <ros/ros.h>
 
-#include <QtCore/QCoreApplication>
 #include <QObject>
+#include <QtCore/QCoreApplication>
 #include <chrono>
 #include <cstdint>
 #include <iostream>
 #include <string>
 
+#include "MessageScheduler.hpp"
 #include "RosClientNode.hpp"
 #include "WsClient.hpp"
 #include "WsServer.hpp"
-#include "MessageScheduler.hpp"
 #include "config.hpp"
 
-void connect_server(WsServer& ws_server, RosClientNode& ros_node, MessageScheduler& scheduler);
-void connect_client(WsClient& ws_client, RosClientNode& ros_node, MessageScheduler& scheduler);
+void connect_server(
+    WsServer& ws_server, RosClientNode& ros_node, MessageScheduler& scheduler);
+void connect_client(
+    WsClient& ws_client, RosClientNode& ros_node, MessageScheduler& scheduler);
 
 int main(int argc, char** argv) {
   QCoreApplication a(argc, argv);
@@ -40,7 +42,8 @@ int main(int argc, char** argv) {
   }
 }
 
-void connect_client(WsClient& ws_client, RosClientNode& ros_node, MessageScheduler& scheduler) {
+void connect_client(
+    WsClient& ws_client, RosClientNode& ros_node, MessageScheduler& scheduler) {
   // schedule messages
   QObject::connect(
       &ros_node,
@@ -49,17 +52,15 @@ void connect_client(WsClient& ws_client, RosClientNode& ros_node, MessageSchedul
       &MessageScheduler::enqueue);
   // run scheduler
   QObject::connect(
-    &ws_client,
-    &WsClient::network_unblocked,
-    &scheduler,
-    &MessageScheduler::network_unblocked
-  );
+      &ws_client,
+      &WsClient::network_unblocked,
+      &scheduler,
+      &MessageScheduler::network_unblocked);
   // send scheduled message
   QObject::connect(
-    &scheduler,
-    &MessageScheduler::scheduled,
-    [&ws_client](const QByteArray& data){ws_client.send_message(data);}
-  );
+      &scheduler,
+      &MessageScheduler::scheduled,
+      [&ws_client](const QByteArray& data) { ws_client.send_message(data); });
 
   // receive
   QObject::connect(
@@ -76,7 +77,8 @@ void connect_client(WsClient& ws_client, RosClientNode& ros_node, MessageSchedul
       &RosClientNode::subscribe_remote_msgs);
 }
 
-void connect_server(WsServer& ws_server, RosClientNode& ros_node, MessageScheduler& scheduler) {
+void connect_server(
+    WsServer& ws_server, RosClientNode& ros_node, MessageScheduler& scheduler) {
   // send
   // Need to use string-based connect to support default arg.
   // https://doc.qt.io/qt-5/signalsandslots-syntaxes.html
