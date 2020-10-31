@@ -76,7 +76,6 @@ public Q_SLOTS:
    */
   void network_unblocked() {
     is_network_unblocked = true;
-    qDebug() << "\x1b[35mUNBLOCKED\x1b[0m";
     schedule();
   }
 
@@ -95,7 +94,6 @@ public Q_SLOTS:
     const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_schedule_time).count();
     const double elapsed_s = elapsed / 1000.0;
     last_schedule_time = now;
-    qDebug() << elapsed_s << "elapsed";
 
     // flush no-drop queue
     if (!no_drop_queue.empty()) {
@@ -103,7 +101,6 @@ public Q_SLOTS:
         const auto& next = no_drop_queue.front();
         Q_EMIT scheduled(next);
         no_drop_queue.pop_front();
-        qDebug() << "\x1b[33mnodrop\x1b[0m";
       }
       is_network_unblocked = false;
       return;
@@ -121,7 +118,6 @@ public Q_SLOTS:
       WaitingMessage& candidate_val = it->second;
       candidate_val.total_prioritized_wait += candidate_key.priority * elapsed_s;
 
-      qDebug() << candidate_key.topic << "\x1b[32mwait was\x1b[0m" << candidate_val.total_prioritized_wait;
       if (candidate_val.total_prioritized_wait > next->second.total_prioritized_wait) {
         next = it;
       }
@@ -129,12 +125,9 @@ public Q_SLOTS:
 
     if (next->second.is_waiting) {
       Q_EMIT scheduled(next->second.message);
-      qDebug() << "\x1b[35mscheduled\x1b[0m" << next->first.topic;
       next->second.is_waiting = false;
       next->second.total_prioritized_wait = 0;
       is_network_unblocked = false;
-    } else {
-      qDebug() << "\x1b[31mwaiting\x1b[0m" << next->first.topic;
     }
   }
 };
