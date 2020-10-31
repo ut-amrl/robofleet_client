@@ -1,6 +1,7 @@
 #pragma once
 #include <QByteArray>
 #include <QDebug>
+#include <QHash>
 #include <QObject>
 #include <QString>
 #include <chrono>
@@ -34,7 +35,7 @@ namespace std {
 template <>
 struct hash<PrioritizedTopic> {
   std::size_t operator()(const PrioritizedTopic& t) const noexcept {
-    return std::hash<QString>()(t.topic) ^ std::hash<double>()(t.priority);
+    return qHash(t.topic) ^ std::hash<double>()(t.priority);
   }
 };
 };  // namespace std
