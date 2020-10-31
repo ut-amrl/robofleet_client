@@ -2,6 +2,7 @@
 #include <exception>
 #include <string>
 
+namespace topic_config {
 template <typename Builder, typename T>
 class BuilderProp {
   bool _set = false;
@@ -93,4 +94,5 @@ struct ReceiveRemoteTopic {
     from.assert_set();
     to.assert_set();
   }
+};
 };

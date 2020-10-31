@@ -10,8 +10,10 @@
 #include <string>
 
 #include "RosClientNode.hpp"
-#include "TopicConfig.hpp"
+#include "topic_config.hpp"
 #include "WebVizConstants.hpp"
+
+using namespace topic_config;
 
 namespace config {
 static const std::string ros_node_name = "robofleet_client";

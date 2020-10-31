@@ -12,7 +12,7 @@
 
 #include "decode.hpp"
 #include "encode.hpp"
-#include "TopicConfig.hpp"
+#include "topic_config.hpp"
 #include "MessageScheduler.hpp"
 
 class RosClientNode : public QObject {
@@ -254,7 +254,7 @@ class RosClientNode : public QObject {
   void configure(const Config& config);
   
   template <typename T>
-  void configure(const SendLocalTopic<T>& config) {
+  void configure(const topic_config::SendLocalTopic<T>& config) {
     config.assert_valid();
     register_local_msg_type<T>(config.from, config.to);
     if (config.rate_limit_hz.is_set()) {
@@ -265,7 +265,7 @@ class RosClientNode : public QObject {
   }
 
   template <typename T>
-  void configure(const ReceiveRemoteTopic<T>& config) {
+  void configure(const topic_config::ReceiveRemoteTopic<T>& config) {
     config.assert_valid();
     register_remote_msg_type<T>(config.from, config.to);
   }
