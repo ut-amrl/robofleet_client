@@ -20,8 +20,14 @@ struct PrioritizedTopic {
 };
 
 struct WaitingMessage {
+  // the message data
   QByteArray message;
-  int64_t total_wait = 0;
+
+  // is this message unsent and waiting?
+  bool is_waiting = false; 
+
+  // priority times number of times the message wasn't scheduled
+  double total_prioritized_wait = 0;
 };
 
 namespace std {
@@ -56,7 +62,9 @@ public Q_SLOTS:
     if (no_drop) {
       no_drop_queue.push_back(data);
     } else {
-      topic_queue[PrioritizedTopic{topic, priority}].message = data;
+      const auto key = PrioritizedTopic{topic, priority};
+      topic_queue[key].message = data;
+      topic_queue[key].is_waiting = true;
     }
     schedule();
   }
@@ -66,6 +74,7 @@ public Q_SLOTS:
    */
   void network_unblocked() {
     is_network_unblocked = true;
+    qDebug() << "\x1b[35mUNBLOCKED\x1b[0m";
     schedule();
   }
 
@@ -78,7 +87,6 @@ public Q_SLOTS:
     if (!is_network_unblocked) {
       return;
     }
-    is_network_unblocked = false;
 
     // flush no-drop queue
     if (!no_drop_queue.empty()) {
@@ -88,25 +96,36 @@ public Q_SLOTS:
         no_drop_queue.pop_front();
         qDebug() << "\x1b[33mnodrop\x1b[0m";
       }
+      is_network_unblocked = false;
       return;
     }
 
-    // select next regular message
     if (topic_queue.empty()) {
       return;
     }
-    auto next_topic_pair = topic_queue.begin();
+
+    // update wait times for waiting messages.
+    // select topic with the highest wait time.
+    auto next = topic_queue.begin();
     for (auto it = topic_queue.begin(); it != topic_queue.end(); ++it) {
-      auto& candidate_topic = it->first;
-      auto& waiting_message = it->second;
-      waiting_message.total_wait += candidate_topic.priority;
-      if (waiting_message.total_wait > next_topic_pair->second.total_wait) {
-        next_topic_pair = it;
+      const PrioritizedTopic& candidate_key = it->first;
+      WaitingMessage& candidate_val = it->second;
+      candidate_val.total_prioritized_wait += candidate_key.priority;
+
+      qDebug() << candidate_key.topic << "\x1b[32mwait was\x1b[0m" << candidate_val.total_prioritized_wait;
+      if (candidate_val.total_prioritized_wait > next->second.total_prioritized_wait) {
+        next = it;
       }
     }
-    Q_EMIT scheduled(next_topic_pair->second.message);
-    qDebug() << "\x1b[31mscheduled\x1b[0m" << next_topic_pair->first.topic;
-    qDebug() << "\x1b[32mwait was\x1b[0m" << next_topic_pair->second.total_wait;
-    topic_queue.erase(next_topic_pair);
+
+    if (next->second.is_waiting) {
+      Q_EMIT scheduled(next->second.message);
+      qDebug() << "\x1b[35mscheduled\x1b[0m" << next->first.topic;
+      next->second.is_waiting = false;
+      next->second.total_prioritized_wait = 0;
+      is_network_unblocked = false;
+    } else {
+      qDebug() << "\x1b[31mwaiting\x1b[0m" << next->first.topic;
+    }
   }
 };
