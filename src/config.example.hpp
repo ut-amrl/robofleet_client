@@ -87,13 +87,13 @@ static void configure_msg_types(RosClientNode& cn) {
     .from("/localization")
     .to(webviz_constants::localization_topic)
     .rate_limit_hz(10)
-    .priority(10));
+    .priority(100));
 
   cn.configure(SendLocalTopic<nav_msgs::Odometry>()
     .from("/odometry/raw")
     .to(webviz_constants::odometry_topic)
     .rate_limit_hz(15)
-    .priority(10));
+    .priority(100));
 
   cn.configure(SendLocalTopic<sensor_msgs::LaserScan>()
     .from("/velodyne_2dscan")

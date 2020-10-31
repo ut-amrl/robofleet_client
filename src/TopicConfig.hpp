@@ -64,7 +64,7 @@ struct SendLocalTopic {
   BuilderProp<SendLocalTopic, std::string> from{*this};
   BuilderProp<SendLocalTopic, std::string> to{*this};
   BuilderProp<SendLocalTopic, double> rate_limit_hz{*this};
-  BuilderProp<SendLocalTopic, int> priority{*this, 1};
+  BuilderProp<SendLocalTopic, double> priority{*this, 1};
   BuilderProp<SendLocalTopic, bool> no_drop{*this, false};
 
   void assert_valid() const {

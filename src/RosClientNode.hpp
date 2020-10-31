@@ -19,7 +19,7 @@ class RosClientNode : public QObject {
   Q_OBJECT
 
   struct TopicParams {
-    int priority;
+    double priority;
     bool no_drop;
   };
 
@@ -126,7 +126,7 @@ class RosClientNode : public QObject {
   }
 
  Q_SIGNALS:
-  void ros_message_encoded(const QString& topic, const QByteArray& data, int priority, bool no_drop);
+  void ros_message_encoded(const QString& topic, const QByteArray& data, double priority, bool no_drop);
 
  public Q_SLOTS:
   /**

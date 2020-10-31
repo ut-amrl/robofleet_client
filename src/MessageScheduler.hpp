@@ -12,7 +12,7 @@
 
 struct PrioritizedTopic {
   const QString topic;
-  const int priority;
+  const double priority;
 
   friend bool operator==(const PrioritizedTopic& a, const PrioritizedTopic& b) {
     return a.topic == b.topic && a.priority == b.priority;
@@ -26,14 +26,14 @@ struct WaitingMessage {
   // is this message unsent and waiting?
   bool is_waiting = false; 
 
-  // priority times number of times the message wasn't scheduled
+  // sum of priority times wall-clock wait time
   double total_prioritized_wait = 0;
 };
 
 namespace std {
   template<> struct hash<PrioritizedTopic> {
     std::size_t operator()(const PrioritizedTopic& t) const noexcept {
-      return std::hash<QString>()(t.topic) ^ std::hash<int>()(t.priority);
+      return std::hash<QString>()(t.topic) ^ std::hash<double>()(t.priority);
     }
   };
 }; // namespace std
@@ -46,19 +46,21 @@ namespace std {
  */
 class MessageScheduler : public QObject {
   Q_OBJECT
+  using Clock = std::chrono::high_resolution_clock;
   bool is_network_unblocked = true;
 
   std::deque<QByteArray> no_drop_queue;
   std::unordered_map<PrioritizedTopic, WaitingMessage> topic_queue;
+  Clock::time_point last_schedule_time;
 
 public:
-  MessageScheduler() {}
+  MessageScheduler() : last_schedule_time(Clock::now()) {}
 
   Q_SIGNALS:
   void scheduled(const QByteArray& data);
 
 public Q_SLOTS:
-  void enqueue(const QString& topic, const QByteArray& data, int priority, bool no_drop) {
+  void enqueue(const QString& topic, const QByteArray& data, double priority, bool no_drop) {
     if (no_drop) {
       no_drop_queue.push_back(data);
     } else {
@@ -88,6 +90,13 @@ public Q_SLOTS:
       return;
     }
 
+    // compute time since last schedule()
+    const Clock::time_point now = Clock::now();
+    const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_schedule_time).count();
+    const double elapsed_s = elapsed / 1000.0;
+    last_schedule_time = now;
+    qDebug() << elapsed_s << "elapsed";
+
     // flush no-drop queue
     if (!no_drop_queue.empty()) {
       while (!no_drop_queue.empty()) {
@@ -110,7 +119,7 @@ public Q_SLOTS:
     for (auto it = topic_queue.begin(); it != topic_queue.end(); ++it) {
       const PrioritizedTopic& candidate_key = it->first;
       WaitingMessage& candidate_val = it->second;
-      candidate_val.total_prioritized_wait += candidate_key.priority;
+      candidate_val.total_prioritized_wait += candidate_key.priority * elapsed_s;
 
       qDebug() << candidate_key.topic << "\x1b[32mwait was\x1b[0m" << candidate_val.total_prioritized_wait;
       if (candidate_val.total_prioritized_wait > next->second.total_prioritized_wait) {
