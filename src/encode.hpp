@@ -10,6 +10,7 @@
 #include <sensor_msgs/CompressedImage.h>
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/NavSatFix.h>
+#include <sensor_msgs/PointCloud2.h>
 #include <geometry_msgs/PoseStamped.h>
 
 #include <algorithm>
@@ -367,5 +368,33 @@ flatbuffers::uoffset_t encode(
 
   return fb::sensor_msgs::CreateCompressedImage(
              fbb, metadata, header, format, data)
+      .o;
+}
+
+// flatbuffers::Offset<flatbuffers::Vector<sensor_msgs::PointField_<std::allocator<void> > > >
+// flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<fb::sensor_msgs::PointField> > >
+// sensor_msgs/PointField
+template <>
+flatbuffers::uoffset_t encode(
+    FBB& fbb, const sensor_msgs::PointField& msg,
+    const MetadataOffset& metadata) {
+
+  auto name = fbb.CreateString(msg.name);
+
+  return fb::sensor_msgs::CreatePointField(fbb, metadata, name, msg.offset, msg.datatype, msg.count).o;
+}
+
+// sensor_msgs/LaserScan
+template <>
+flatbuffers::uoffset_t encode(
+    FBB& fbb, const sensor_msgs::PointCloud2& msg,
+    const MetadataOffset& metadata) {
+  auto header = encode(fbb, msg.header, 0);
+
+  auto fields = encode_vector<fb::sensor_msgs::PointField>(fbb, 0, msg.fields);
+  auto data = fbb.CreateVector(msg.data.data(), msg.data.size());
+
+  return fb::sensor_msgs::CreatePointCloud2(
+    fbb, metadata, header, msg.height, msg.width, fields, msg.is_bigendian, msg.point_step, msg.row_step, data, msg.is_dense)
       .o;
 }

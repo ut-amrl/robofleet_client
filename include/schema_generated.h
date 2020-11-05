@@ -94,6 +94,14 @@ struct CompressedImage;
 struct CompressedImageBuilder;
 struct CompressedImageT;
 
+struct PointField;
+struct PointFieldBuilder;
+struct PointFieldT;
+
+struct PointCloud2;
+struct PointCloud2Builder;
+struct PointCloud2T;
+
 }  // namespace sensor_msgs
 
 namespace geometry_msgs {
@@ -532,6 +540,226 @@ inline const char *EnumNamecovariance_type_known(covariance_type_known e) {
 }
 
 }  // namespace NavSatFixConstants
+
+namespace PointFieldConstants {
+
+enum int8 {
+  int8_value = 1,
+  int8_MIN = int8_value,
+  int8_MAX = int8_value
+};
+
+inline const int8 (&EnumValuesint8())[1] {
+  static const int8 values[] = {
+    int8_value
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesint8() {
+  static const char * const names[2] = {
+    "value",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameint8(int8 e) {
+  if (flatbuffers::IsOutRange(e, int8_value, int8_value)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(int8_value);
+  return EnumNamesint8()[index];
+}
+
+enum uint8 {
+  uint8_value = 2,
+  uint8_MIN = uint8_value,
+  uint8_MAX = uint8_value
+};
+
+inline const uint8 (&EnumValuesuint8())[1] {
+  static const uint8 values[] = {
+    uint8_value
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesuint8() {
+  static const char * const names[2] = {
+    "value",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameuint8(uint8 e) {
+  if (flatbuffers::IsOutRange(e, uint8_value, uint8_value)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(uint8_value);
+  return EnumNamesuint8()[index];
+}
+
+enum int16 {
+  int16_value = 3,
+  int16_MIN = int16_value,
+  int16_MAX = int16_value
+};
+
+inline const int16 (&EnumValuesint16())[1] {
+  static const int16 values[] = {
+    int16_value
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesint16() {
+  static const char * const names[2] = {
+    "value",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameint16(int16 e) {
+  if (flatbuffers::IsOutRange(e, int16_value, int16_value)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(int16_value);
+  return EnumNamesint16()[index];
+}
+
+enum uint16 {
+  uint16_value = 4,
+  uint16_MIN = uint16_value,
+  uint16_MAX = uint16_value
+};
+
+inline const uint16 (&EnumValuesuint16())[1] {
+  static const uint16 values[] = {
+    uint16_value
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesuint16() {
+  static const char * const names[2] = {
+    "value",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameuint16(uint16 e) {
+  if (flatbuffers::IsOutRange(e, uint16_value, uint16_value)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(uint16_value);
+  return EnumNamesuint16()[index];
+}
+
+enum int32 {
+  int32_value = 5,
+  int32_MIN = int32_value,
+  int32_MAX = int32_value
+};
+
+inline const int32 (&EnumValuesint32())[1] {
+  static const int32 values[] = {
+    int32_value
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesint32() {
+  static const char * const names[2] = {
+    "value",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameint32(int32 e) {
+  if (flatbuffers::IsOutRange(e, int32_value, int32_value)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(int32_value);
+  return EnumNamesint32()[index];
+}
+
+enum uint32 {
+  uint32_value = 6,
+  uint32_MIN = uint32_value,
+  uint32_MAX = uint32_value
+};
+
+inline const uint32 (&EnumValuesuint32())[1] {
+  static const uint32 values[] = {
+    uint32_value
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesuint32() {
+  static const char * const names[2] = {
+    "value",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameuint32(uint32 e) {
+  if (flatbuffers::IsOutRange(e, uint32_value, uint32_value)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(uint32_value);
+  return EnumNamesuint32()[index];
+}
+
+enum float32 {
+  float32_value = 7,
+  float32_MIN = float32_value,
+  float32_MAX = float32_value
+};
+
+inline const float32 (&EnumValuesfloat32())[1] {
+  static const float32 values[] = {
+    float32_value
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesfloat32() {
+  static const char * const names[2] = {
+    "value",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNamefloat32(float32 e) {
+  if (flatbuffers::IsOutRange(e, float32_value, float32_value)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(float32_value);
+  return EnumNamesfloat32()[index];
+}
+
+enum float64 {
+  float64_value = 8,
+  float64_MIN = float64_value,
+  float64_MAX = float64_value
+};
+
+inline const float64 (&EnumValuesfloat64())[1] {
+  static const float64 values[] = {
+    float64_value
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesfloat64() {
+  static const char * const names[2] = {
+    "value",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNamefloat64(float64 e) {
+  if (flatbuffers::IsOutRange(e, float64_value, float64_value)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(float64_value);
+  return EnumNamesfloat64()[index];
+}
+
+}  // namespace PointFieldConstants
 }  // namespace sensor_msgs
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) RosTime FLATBUFFERS_FINAL_CLASS {
@@ -2451,6 +2679,322 @@ inline flatbuffers::Offset<CompressedImage> CreateCompressedImageDirect(
 
 flatbuffers::Offset<CompressedImage> CreateCompressedImage(flatbuffers::FlatBufferBuilder &_fbb, const CompressedImageT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct PointFieldT : public flatbuffers::NativeTable {
+  typedef PointField TableType;
+  std::unique_ptr<fb::MsgMetadataT> __metadata;
+  std::string name;
+  uint32_t offset;
+  uint8_t datatype;
+  uint32_t count;
+  PointFieldT()
+      : offset(0),
+        datatype(0),
+        count(0) {
+  }
+};
+
+struct PointField FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef PointFieldT NativeTableType;
+  typedef PointFieldBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT___METADATA = 4,
+    VT_NAME = 6,
+    VT_OFFSET = 8,
+    VT_DATATYPE = 10,
+    VT_COUNT = 12
+  };
+  const fb::MsgMetadata *__metadata() const {
+    return GetPointer<const fb::MsgMetadata *>(VT___METADATA);
+  }
+  const flatbuffers::String *name() const {
+    return GetPointer<const flatbuffers::String *>(VT_NAME);
+  }
+  uint32_t offset() const {
+    return GetField<uint32_t>(VT_OFFSET, 0);
+  }
+  uint8_t datatype() const {
+    return GetField<uint8_t>(VT_DATATYPE, 0);
+  }
+  uint32_t count() const {
+    return GetField<uint32_t>(VT_COUNT, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT___METADATA) &&
+           verifier.VerifyTable(__metadata()) &&
+           VerifyOffsetRequired(verifier, VT_NAME) &&
+           verifier.VerifyString(name()) &&
+           VerifyField<uint32_t>(verifier, VT_OFFSET) &&
+           VerifyField<uint8_t>(verifier, VT_DATATYPE) &&
+           VerifyField<uint32_t>(verifier, VT_COUNT) &&
+           verifier.EndTable();
+  }
+  PointFieldT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(PointFieldT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<PointField> Pack(flatbuffers::FlatBufferBuilder &_fbb, const PointFieldT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct PointFieldBuilder {
+  typedef PointField Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add___metadata(flatbuffers::Offset<fb::MsgMetadata> __metadata) {
+    fbb_.AddOffset(PointField::VT___METADATA, __metadata);
+  }
+  void add_name(flatbuffers::Offset<flatbuffers::String> name) {
+    fbb_.AddOffset(PointField::VT_NAME, name);
+  }
+  void add_offset(uint32_t offset) {
+    fbb_.AddElement<uint32_t>(PointField::VT_OFFSET, offset, 0);
+  }
+  void add_datatype(uint8_t datatype) {
+    fbb_.AddElement<uint8_t>(PointField::VT_DATATYPE, datatype, 0);
+  }
+  void add_count(uint32_t count) {
+    fbb_.AddElement<uint32_t>(PointField::VT_COUNT, count, 0);
+  }
+  explicit PointFieldBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<PointField> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<PointField>(end);
+    fbb_.Required(o, PointField::VT_NAME);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<PointField> CreatePointField(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<fb::MsgMetadata> __metadata = 0,
+    flatbuffers::Offset<flatbuffers::String> name = 0,
+    uint32_t offset = 0,
+    uint8_t datatype = 0,
+    uint32_t count = 0) {
+  PointFieldBuilder builder_(_fbb);
+  builder_.add_count(count);
+  builder_.add_offset(offset);
+  builder_.add_name(name);
+  builder_.add___metadata(__metadata);
+  builder_.add_datatype(datatype);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<PointField> CreatePointFieldDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<fb::MsgMetadata> __metadata = 0,
+    const char *name = nullptr,
+    uint32_t offset = 0,
+    uint8_t datatype = 0,
+    uint32_t count = 0) {
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  return fb::sensor_msgs::CreatePointField(
+      _fbb,
+      __metadata,
+      name__,
+      offset,
+      datatype,
+      count);
+}
+
+flatbuffers::Offset<PointField> CreatePointField(flatbuffers::FlatBufferBuilder &_fbb, const PointFieldT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct PointCloud2T : public flatbuffers::NativeTable {
+  typedef PointCloud2 TableType;
+  std::unique_ptr<fb::MsgMetadataT> __metadata;
+  std::unique_ptr<fb::std_msgs::HeaderT> header;
+  uint32_t height;
+  uint32_t width;
+  std::vector<std::unique_ptr<fb::sensor_msgs::PointFieldT>> fields;
+  bool is_bigendian;
+  uint32_t point_step;
+  uint32_t row_step;
+  std::vector<uint8_t> data;
+  bool is_dense;
+  PointCloud2T()
+      : height(0),
+        width(0),
+        is_bigendian(false),
+        point_step(0),
+        row_step(0),
+        is_dense(false) {
+  }
+};
+
+struct PointCloud2 FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef PointCloud2T NativeTableType;
+  typedef PointCloud2Builder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT___METADATA = 4,
+    VT_HEADER = 6,
+    VT_HEIGHT = 8,
+    VT_WIDTH = 10,
+    VT_FIELDS = 12,
+    VT_IS_BIGENDIAN = 14,
+    VT_POINT_STEP = 16,
+    VT_ROW_STEP = 18,
+    VT_DATA = 20,
+    VT_IS_DENSE = 22
+  };
+  const fb::MsgMetadata *__metadata() const {
+    return GetPointer<const fb::MsgMetadata *>(VT___METADATA);
+  }
+  const fb::std_msgs::Header *header() const {
+    return GetPointer<const fb::std_msgs::Header *>(VT_HEADER);
+  }
+  uint32_t height() const {
+    return GetField<uint32_t>(VT_HEIGHT, 0);
+  }
+  uint32_t width() const {
+    return GetField<uint32_t>(VT_WIDTH, 0);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<fb::sensor_msgs::PointField>> *fields() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<fb::sensor_msgs::PointField>> *>(VT_FIELDS);
+  }
+  bool is_bigendian() const {
+    return GetField<uint8_t>(VT_IS_BIGENDIAN, 0) != 0;
+  }
+  uint32_t point_step() const {
+    return GetField<uint32_t>(VT_POINT_STEP, 0);
+  }
+  uint32_t row_step() const {
+    return GetField<uint32_t>(VT_ROW_STEP, 0);
+  }
+  const flatbuffers::Vector<uint8_t> *data() const {
+    return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_DATA);
+  }
+  bool is_dense() const {
+    return GetField<uint8_t>(VT_IS_DENSE, 0) != 0;
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT___METADATA) &&
+           verifier.VerifyTable(__metadata()) &&
+           VerifyOffsetRequired(verifier, VT_HEADER) &&
+           verifier.VerifyTable(header()) &&
+           VerifyField<uint32_t>(verifier, VT_HEIGHT) &&
+           VerifyField<uint32_t>(verifier, VT_WIDTH) &&
+           VerifyOffsetRequired(verifier, VT_FIELDS) &&
+           verifier.VerifyVector(fields()) &&
+           verifier.VerifyVectorOfTables(fields()) &&
+           VerifyField<uint8_t>(verifier, VT_IS_BIGENDIAN) &&
+           VerifyField<uint32_t>(verifier, VT_POINT_STEP) &&
+           VerifyField<uint32_t>(verifier, VT_ROW_STEP) &&
+           VerifyOffsetRequired(verifier, VT_DATA) &&
+           verifier.VerifyVector(data()) &&
+           VerifyField<uint8_t>(verifier, VT_IS_DENSE) &&
+           verifier.EndTable();
+  }
+  PointCloud2T *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(PointCloud2T *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<PointCloud2> Pack(flatbuffers::FlatBufferBuilder &_fbb, const PointCloud2T* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct PointCloud2Builder {
+  typedef PointCloud2 Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add___metadata(flatbuffers::Offset<fb::MsgMetadata> __metadata) {
+    fbb_.AddOffset(PointCloud2::VT___METADATA, __metadata);
+  }
+  void add_header(flatbuffers::Offset<fb::std_msgs::Header> header) {
+    fbb_.AddOffset(PointCloud2::VT_HEADER, header);
+  }
+  void add_height(uint32_t height) {
+    fbb_.AddElement<uint32_t>(PointCloud2::VT_HEIGHT, height, 0);
+  }
+  void add_width(uint32_t width) {
+    fbb_.AddElement<uint32_t>(PointCloud2::VT_WIDTH, width, 0);
+  }
+  void add_fields(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<fb::sensor_msgs::PointField>>> fields) {
+    fbb_.AddOffset(PointCloud2::VT_FIELDS, fields);
+  }
+  void add_is_bigendian(bool is_bigendian) {
+    fbb_.AddElement<uint8_t>(PointCloud2::VT_IS_BIGENDIAN, static_cast<uint8_t>(is_bigendian), 0);
+  }
+  void add_point_step(uint32_t point_step) {
+    fbb_.AddElement<uint32_t>(PointCloud2::VT_POINT_STEP, point_step, 0);
+  }
+  void add_row_step(uint32_t row_step) {
+    fbb_.AddElement<uint32_t>(PointCloud2::VT_ROW_STEP, row_step, 0);
+  }
+  void add_data(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> data) {
+    fbb_.AddOffset(PointCloud2::VT_DATA, data);
+  }
+  void add_is_dense(bool is_dense) {
+    fbb_.AddElement<uint8_t>(PointCloud2::VT_IS_DENSE, static_cast<uint8_t>(is_dense), 0);
+  }
+  explicit PointCloud2Builder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<PointCloud2> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<PointCloud2>(end);
+    fbb_.Required(o, PointCloud2::VT_HEADER);
+    fbb_.Required(o, PointCloud2::VT_FIELDS);
+    fbb_.Required(o, PointCloud2::VT_DATA);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<PointCloud2> CreatePointCloud2(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<fb::MsgMetadata> __metadata = 0,
+    flatbuffers::Offset<fb::std_msgs::Header> header = 0,
+    uint32_t height = 0,
+    uint32_t width = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<fb::sensor_msgs::PointField>>> fields = 0,
+    bool is_bigendian = false,
+    uint32_t point_step = 0,
+    uint32_t row_step = 0,
+    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> data = 0,
+    bool is_dense = false) {
+  PointCloud2Builder builder_(_fbb);
+  builder_.add_data(data);
+  builder_.add_row_step(row_step);
+  builder_.add_point_step(point_step);
+  builder_.add_fields(fields);
+  builder_.add_width(width);
+  builder_.add_height(height);
+  builder_.add_header(header);
+  builder_.add___metadata(__metadata);
+  builder_.add_is_dense(is_dense);
+  builder_.add_is_bigendian(is_bigendian);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<PointCloud2> CreatePointCloud2Direct(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<fb::MsgMetadata> __metadata = 0,
+    flatbuffers::Offset<fb::std_msgs::Header> header = 0,
+    uint32_t height = 0,
+    uint32_t width = 0,
+    const std::vector<flatbuffers::Offset<fb::sensor_msgs::PointField>> *fields = nullptr,
+    bool is_bigendian = false,
+    uint32_t point_step = 0,
+    uint32_t row_step = 0,
+    const std::vector<uint8_t> *data = nullptr,
+    bool is_dense = false) {
+  auto fields__ = fields ? _fbb.CreateVector<flatbuffers::Offset<fb::sensor_msgs::PointField>>(*fields) : 0;
+  auto data__ = data ? _fbb.CreateVector<uint8_t>(*data) : 0;
+  return fb::sensor_msgs::CreatePointCloud2(
+      _fbb,
+      __metadata,
+      header,
+      height,
+      width,
+      fields__,
+      is_bigendian,
+      point_step,
+      row_step,
+      data__,
+      is_dense);
+}
+
+flatbuffers::Offset<PointCloud2> CreatePointCloud2(flatbuffers::FlatBufferBuilder &_fbb, const PointCloud2T *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 }  // namespace sensor_msgs
 
 namespace geometry_msgs {
@@ -3935,6 +4479,97 @@ inline flatbuffers::Offset<CompressedImage> CreateCompressedImage(flatbuffers::F
       _header,
       _format,
       _data);
+}
+
+inline PointFieldT *PointField::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  std::unique_ptr<fb::sensor_msgs::PointFieldT> _o = std::unique_ptr<fb::sensor_msgs::PointFieldT>(new PointFieldT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void PointField::UnPackTo(PointFieldT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = __metadata(); if (_e) _o->__metadata = std::unique_ptr<fb::MsgMetadataT>(_e->UnPack(_resolver)); }
+  { auto _e = name(); if (_e) _o->name = _e->str(); }
+  { auto _e = offset(); _o->offset = _e; }
+  { auto _e = datatype(); _o->datatype = _e; }
+  { auto _e = count(); _o->count = _e; }
+}
+
+inline flatbuffers::Offset<PointField> PointField::Pack(flatbuffers::FlatBufferBuilder &_fbb, const PointFieldT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreatePointField(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<PointField> CreatePointField(flatbuffers::FlatBufferBuilder &_fbb, const PointFieldT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const PointFieldT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto ___metadata = _o->__metadata ? CreateMsgMetadata(_fbb, _o->__metadata.get(), _rehasher) : 0;
+  auto _name = _fbb.CreateString(_o->name);
+  auto _offset = _o->offset;
+  auto _datatype = _o->datatype;
+  auto _count = _o->count;
+  return fb::sensor_msgs::CreatePointField(
+      _fbb,
+      ___metadata,
+      _name,
+      _offset,
+      _datatype,
+      _count);
+}
+
+inline PointCloud2T *PointCloud2::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  std::unique_ptr<fb::sensor_msgs::PointCloud2T> _o = std::unique_ptr<fb::sensor_msgs::PointCloud2T>(new PointCloud2T());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void PointCloud2::UnPackTo(PointCloud2T *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = __metadata(); if (_e) _o->__metadata = std::unique_ptr<fb::MsgMetadataT>(_e->UnPack(_resolver)); }
+  { auto _e = header(); if (_e) _o->header = std::unique_ptr<fb::std_msgs::HeaderT>(_e->UnPack(_resolver)); }
+  { auto _e = height(); _o->height = _e; }
+  { auto _e = width(); _o->width = _e; }
+  { auto _e = fields(); if (_e) { _o->fields.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->fields[_i] = std::unique_ptr<fb::sensor_msgs::PointFieldT>(_e->Get(_i)->UnPack(_resolver)); } } }
+  { auto _e = is_bigendian(); _o->is_bigendian = _e; }
+  { auto _e = point_step(); _o->point_step = _e; }
+  { auto _e = row_step(); _o->row_step = _e; }
+  { auto _e = data(); if (_e) { _o->data.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->data[_i] = _e->Get(_i); } } }
+  { auto _e = is_dense(); _o->is_dense = _e; }
+}
+
+inline flatbuffers::Offset<PointCloud2> PointCloud2::Pack(flatbuffers::FlatBufferBuilder &_fbb, const PointCloud2T* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreatePointCloud2(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<PointCloud2> CreatePointCloud2(flatbuffers::FlatBufferBuilder &_fbb, const PointCloud2T *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const PointCloud2T* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto ___metadata = _o->__metadata ? CreateMsgMetadata(_fbb, _o->__metadata.get(), _rehasher) : 0;
+  auto _header = _o->header ? CreateHeader(_fbb, _o->header.get(), _rehasher) : 0;
+  auto _height = _o->height;
+  auto _width = _o->width;
+  auto _fields = _fbb.CreateVector<flatbuffers::Offset<fb::sensor_msgs::PointField>> (_o->fields.size(), [](size_t i, _VectorArgs *__va) { return CreatePointField(*__va->__fbb, __va->__o->fields[i].get(), __va->__rehasher); }, &_va );
+  auto _is_bigendian = _o->is_bigendian;
+  auto _point_step = _o->point_step;
+  auto _row_step = _o->row_step;
+  auto _data = _fbb.CreateVector(_o->data);
+  auto _is_dense = _o->is_dense;
+  return fb::sensor_msgs::CreatePointCloud2(
+      _fbb,
+      ___metadata,
+      _header,
+      _height,
+      _width,
+      _fields,
+      _is_bigendian,
+      _point_step,
+      _row_step,
+      _data,
+      _is_dense);
 }
 
 }  // namespace sensor_msgs
