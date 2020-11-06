@@ -11,34 +11,16 @@
 #include <string>
 #include <unordered_map>
 
-struct PrioritizedTopic {
-  const QString topic;
-  const double priority;
-
-  friend bool operator==(const PrioritizedTopic& a, const PrioritizedTopic& b) {
-    return a.topic == b.topic && a.priority == b.priority;
-  }
-};
-
 struct WaitingMessage {
   // the message data
   QByteArray message;
 
   // is this message unsent and waiting?
-  bool is_waiting = false;
+  bool message_ready = false;
 
-  // sum of priority times wall-clock wait time
-  double total_prioritized_wait = 0;
+  double priority = 0;
+  double total_wait = 0;
 };
-
-namespace std {
-template <>
-struct hash<PrioritizedTopic> {
-  std::size_t operator()(const PrioritizedTopic& t) const noexcept {
-    return qHash(t.topic) ^ std::hash<double>()(t.priority);
-  }
-};
-};  // namespace std
 
 /**
  * @brief Queues messages and schedules them on demand.
@@ -52,7 +34,7 @@ class MessageScheduler : public QObject {
   bool is_network_unblocked = true;
 
   std::deque<QByteArray> no_drop_queue;
-  std::unordered_map<PrioritizedTopic, WaitingMessage> topic_queue;
+  std::unordered_map<QString, WaitingMessage> topic_queue;
   Clock::time_point last_schedule_time;
 
  public:
@@ -69,9 +51,9 @@ class MessageScheduler : public QObject {
     if (no_drop) {
       no_drop_queue.push_back(data);
     } else {
-      const auto key = PrioritizedTopic{topic, priority};
-      topic_queue[key].message = data;
-      topic_queue[key].is_waiting = true;
+      topic_queue[topic].message = data;
+      topic_queue[topic].message_ready = true;
+      topic_queue[topic].priority = priority;
     }
     schedule();
   }
@@ -121,21 +103,19 @@ class MessageScheduler : public QObject {
     // select topic with the highest wait time.
     auto next = topic_queue.begin();
     for (auto it = topic_queue.begin(); it != topic_queue.end(); ++it) {
-      const PrioritizedTopic& candidate_key = it->first;
-      WaitingMessage& candidate_val = it->second;
-      candidate_val.total_prioritized_wait +=
-          candidate_key.priority * elapsed_s;
+      const QString& candidate_topic = it->first;
+      WaitingMessage& candidate = it->second;
+      candidate.total_wait += candidate.priority * elapsed_s;
 
-      if (candidate_val.total_prioritized_wait >
-          next->second.total_prioritized_wait) {
+      if (candidate.total_wait > next->second.total_wait) {
         next = it;
       }
     }
 
-    if (next->second.is_waiting) {
+    if (next->second.message_ready) {
       Q_EMIT scheduled(next->second.message);
-      next->second.is_waiting = false;
-      next->second.total_prioritized_wait = 0;
+      next->second.message_ready = false;
+      next->second.total_wait = 0;
       is_network_unblocked = false;
     }
   }
