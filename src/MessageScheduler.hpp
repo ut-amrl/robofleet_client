@@ -11,6 +11,8 @@
 #include <string>
 #include <unordered_map>
 
+using SchedulerClock = std::chrono::high_resolution_clock;
+
 struct WaitingMessage {
   // the message data
   QByteArray message;
@@ -19,7 +21,13 @@ struct WaitingMessage {
   bool message_ready = false;
 
   double priority = 0;
-  double total_wait = 0;
+
+  // when a message was last sent on this topic
+  SchedulerClock::time_point last_send_time = SchedulerClock::now();
+
+  // updated as now() - last_send_time, only when a message is ready
+  std::chrono::duration<double> time_waiting =
+      std::chrono::duration<double>::zero();
 };
 
 /**
@@ -30,15 +38,13 @@ struct WaitingMessage {
  */
 class MessageScheduler : public QObject {
   Q_OBJECT
-  using Clock = std::chrono::high_resolution_clock;
   bool is_network_unblocked = true;
 
   std::deque<QByteArray> no_drop_queue;
   std::unordered_map<QString, WaitingMessage> topic_queue;
-  Clock::time_point last_schedule_time;
 
  public:
-  MessageScheduler() : last_schedule_time(Clock::now()) {
+  MessageScheduler() {
   }
 
  Q_SIGNALS:
@@ -76,14 +82,6 @@ class MessageScheduler : public QObject {
       return;
     }
 
-    // compute time since last schedule()
-    const Clock::time_point now = Clock::now();
-    const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
-                             now - last_schedule_time)
-                             .count();
-    const double elapsed_s = elapsed / 1000.0;
-    last_schedule_time = now;
-
     // flush no-drop queue
     if (!no_drop_queue.empty()) {
       while (!no_drop_queue.empty()) {
@@ -101,21 +99,26 @@ class MessageScheduler : public QObject {
 
     // update wait times for waiting messages.
     // select topic with the highest wait time.
+    const auto now = SchedulerClock::now();
     auto next = topic_queue.begin();
     for (auto it = topic_queue.begin(); it != topic_queue.end(); ++it) {
       const QString& candidate_topic = it->first;
       WaitingMessage& candidate = it->second;
-      candidate.total_wait += candidate.priority * elapsed_s;
 
-      if (candidate.total_wait > next->second.total_wait) {
+      if (candidate.message_ready) {
+        candidate.time_waiting =
+            (now - candidate.last_send_time) * candidate.priority;
+      }
+      if (candidate.time_waiting > next->second.time_waiting) {
         next = it;
       }
+      qDebug() << candidate_topic << candidate.time_waiting.count();
     }
 
     if (next->second.message_ready) {
       Q_EMIT scheduled(next->second.message);
       next->second.message_ready = false;
-      next->second.total_wait = 0;
+      next->second.last_send_time = now;
       is_network_unblocked = false;
     }
   }

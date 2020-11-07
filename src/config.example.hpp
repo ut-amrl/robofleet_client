@@ -36,7 +36,7 @@ static const bool wait_for_pongs = true;
  * latency and fully saturate available bandwidth, but if it is set too high, it
  * could cause message lag.
  */
-static const uint64_t max_queue_before_waiting = 1;
+static const uint64_t max_queue_before_waiting = 0;
 
 /**
  * Whether to run a Websocket server instead of a client, to bypass the need
@@ -92,19 +92,19 @@ static void configure_msg_types(RosClientNode& cn) {
                    .from("/localization")
                    .to(webviz_constants::localization_topic)
                    .rate_limit_hz(10)
-                   .priority(100));
+                   .priority(20));
 
   cn.configure(SendLocalTopic<nav_msgs::Odometry>()
                    .from("/odometry/raw")
                    .to(webviz_constants::odometry_topic)
                    .rate_limit_hz(15)
-                   .priority(100));
+                   .priority(20));
 
   cn.configure(SendLocalTopic<sensor_msgs::LaserScan>()
                    .from("/velodyne_2dscan")
                    .to(webviz_constants::lidar_2d_topic)
                    .rate_limit_hz(15)
-                   .priority(5));
+                   .priority(2));
 
   cn.configure(SendLocalTopic<sensor_msgs::CompressedImage>()
                    .from("/stereo/left/image_raw/compressed")
@@ -121,7 +121,7 @@ static void configure_msg_types(RosClientNode& cn) {
                    .from("/visualization")
                    .to(webviz_constants::visualization_topic)
                    .rate_limit_hz(10)
-                   .priority(3));
+                   .priority(2));
 
   // receive remote commands
   cn.configure(ReceiveRemoteTopic<geometry_msgs::PoseStamped>()
