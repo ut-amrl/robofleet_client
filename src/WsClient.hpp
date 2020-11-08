@@ -3,19 +3,13 @@
 #include <QObject>
 #include <QTimer>
 #include <QtWebSockets/QtWebSockets>
-#include <chrono>
 #include <cstdint>
 #include <iostream>
-#include <unordered_map>
 
 #include "config.hpp"
 
-const static int ws_msg_overhead_bytes = 14;
-
 class WsClient : public QObject {
   Q_OBJECT;
-  using Clock = std::chrono::high_resolution_clock;
-  using TimePoint = Clock::time_point;
 
   QUrl url;
   QWebSocket ws;
@@ -58,7 +52,7 @@ class WsClient : public QObject {
     Q_EMIT message_received(data);
   }
 
-  void on_pong(qint64 _elapsed_time, const QByteArray& payload) {
+  void on_pong(qint64 elapsed_time, const QByteArray& payload) {
     uint64_t ponged_index = *reinterpret_cast<const uint64_t*>(payload.data());
     last_ponged_index = std::max(last_ponged_index, ponged_index);
 
@@ -91,7 +85,6 @@ class WsClient : public QObject {
   void connected();
   void disconnected();
   void message_received(const QByteArray& data);
-  void bandwidth_estimated(double approx_bytes_per_sec);
   void network_unblocked();
 
  public:

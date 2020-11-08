@@ -1,14 +1,10 @@
 #pragma once
 #include <QByteArray>
-#include <QDebug>
 #include <QHash>
 #include <QObject>
 #include <QString>
 #include <chrono>
-#include <cstdint>
 #include <deque>
-#include <map>
-#include <string>
 #include <unordered_map>
 
 using SchedulerClock = std::chrono::high_resolution_clock;
@@ -119,7 +115,6 @@ class MessageScheduler : public QObject {
       if (candidate.time_waiting > next->second.time_waiting) {
         next = it;
       }
-      qDebug() << candidate_topic << candidate.time_waiting.count();
     }
 
     if (next->second.message_ready) {
