@@ -30,6 +30,13 @@ struct WaitingMessage {
       std::chrono::duration<double>::zero();
 };
 
+// for compatibility
+struct QStringHash {
+  std::size_t operator()(const QString& s) const {
+    return qHash(s);
+  }
+};
+
 /**
  * @brief Queues messages and schedules them on demand.
  *
@@ -41,7 +48,7 @@ class MessageScheduler : public QObject {
   bool is_network_unblocked = true;
 
   std::deque<QByteArray> no_drop_queue;
-  std::unordered_map<QString, WaitingMessage> topic_queue;
+  std::unordered_map<QString, WaitingMessage, QStringHash> topic_queue;
 
  public:
   MessageScheduler() {
