@@ -6,7 +6,6 @@
 #include <cstdint>
 #include <iostream>
 
-#include "RosClientNode.hpp"
 #include "config.hpp"
 
 class WsClient : public QObject {
@@ -56,6 +55,10 @@ class WsClient : public QObject {
   void on_pong(qint64 elapsed_time, const QByteArray& payload) {
     uint64_t ponged_index = *reinterpret_cast<const uint64_t*>(payload.data());
     last_ponged_index = std::max(last_ponged_index, ponged_index);
+
+    if (msg_index - last_ponged_index <= config::max_queue_before_waiting) {
+      Q_EMIT network_unblocked();
+    }
   }
 
   void reconnect() {
@@ -73,11 +76,6 @@ class WsClient : public QObject {
   }
 
   void send_message(const QByteArray& data) {
-    // don't buffer more data if we're waiting for old messages to be ACK'd
-    if (config::wait_for_pongs &&
-        msg_index - last_ponged_index > config::max_queue_before_waiting)
-      return;
-
     ++msg_index;
     ws.sendBinaryMessage(data);
     send_ping();
@@ -87,6 +85,7 @@ class WsClient : public QObject {
   void connected();
   void disconnected();
   void message_received(const QByteArray& data);
+  void network_unblocked();
 
  public:
   WsClient(const QUrl& url) : url(url) {
@@ -113,28 +112,6 @@ class WsClient : public QObject {
         &WsClient::on_binary_message);
     QObject::connect(&ws, &QWebSocket::pong, this, &WsClient::on_pong);
     reconnect();
-  }
-
-  void connect_ros_node(const RosClientNode& ros_node) {
-    // send
-    QObject::connect(
-        &ros_node,
-        &RosClientNode::ros_message_encoded,
-        this,
-        &WsClient::send_message);
-    // receive
-    QObject::connect(
-        this,
-        &WsClient::message_received,
-        &ros_node,
-        &RosClientNode::decode_net_message);
-
-    // startup
-    QObject::connect(
-        this,
-        &WsClient::connected,
-        &ros_node,
-        &RosClientNode::subscribe_remote_msgs);
 
     // auto reconnect
     recon_timer.setSingleShot(true);

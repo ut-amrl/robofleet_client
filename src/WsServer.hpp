@@ -7,7 +7,6 @@
 #include <iostream>
 #include <unordered_set>
 
-#include "RosClientNode.hpp"
 #include "config.hpp"
 
 class WsServer : public QObject {
@@ -118,25 +117,5 @@ class WsServer : public QObject {
   ~WsServer() {
     server->close();
     qDeleteAll(clients.begin(), clients.end());
-  }
-
-  void connect_ros_node(const RosClientNode& ros_node) {
-    // send
-    // Need to use string-based connect to support default arg.
-    // https://doc.qt.io/qt-5/signalsandslots-syntaxes.html
-    // Trivial lambda-based version will not work because it is called from
-    // another thread.
-    QObject::connect(
-        &ros_node,
-        SIGNAL(ros_message_encoded(const QByteArray&)),
-        this,
-        SLOT(broadcast_message(const QByteArray&)));
-
-    // receive
-    QObject::connect(
-        this,
-        &WsServer::binary_message_received,
-        &ros_node,
-        &RosClientNode::decode_net_message);
   }
 };
