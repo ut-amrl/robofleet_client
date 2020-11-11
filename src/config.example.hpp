@@ -106,6 +106,12 @@ static void configure_msg_types(RosClientNode& cn) {
                    .rate_limit_hz(15)
                    .priority(2));
 
+  cn.configure(SendLocalTopic<sensor_msgs::PointCloud2>()
+                   .from("/velodyne_points")
+                   .to(webviz_constants::point_cloud_topic)
+                   .rate_limit_hz(10)
+                   .priority(1));
+
   cn.configure(SendLocalTopic<sensor_msgs::CompressedImage>()
                    .from("/stereo/left/image_raw/compressed")
                    .to(webviz_constants::left_image_topic)

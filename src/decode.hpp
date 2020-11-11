@@ -18,6 +18,7 @@
 #include <sensor_msgs/CompressedImage.h>
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/NavSatFix.h>
+#include <sensor_msgs/PointCloud2.h>
 #include <geometry_msgs/PoseStamped.h>
 
 // to add a new message type, specialize this template to decode the message
@@ -293,6 +294,36 @@ sensor_msgs::CompressedImage decode(const void* const data) {
   decode_header(src, dst);
   std::copy(src->data()->begin(), src->data()->end(), dst.data.begin());
   dst.format = src->format()->str();
+  return dst;
+}
+
+
+template <>
+sensor_msgs::PointField decode(const void* const data) {
+  const fb::sensor_msgs::PointField* src =
+      flatbuffers::GetRoot<fb::sensor_msgs::PointField>(data);
+  sensor_msgs::PointField dst;
+  dst.count = src->count();
+  dst.name = src->name()->str();
+  dst.offset = src->offset();
+  dst.datatype = src->datatype();
+  return dst;
+}
+
+template <>
+sensor_msgs::PointCloud2 decode(const void* const data) {
+  const fb::sensor_msgs::PointCloud2* src =
+      flatbuffers::GetRoot<fb::sensor_msgs::PointCloud2>(data);
+  sensor_msgs::PointCloud2 dst;
+  decode_header(src, dst);
+  std::copy(src->data()->begin(), src->data()->end(), dst.data.begin());
+  decode_obj_vector<sensor_msgs::PointField>(src->fields(), dst.fields);
+  dst.height = src->height();
+  dst.width = src->width();
+  dst.is_bigendian = src->is_bigendian();
+  dst.is_dense = src->is_dense();
+  dst.row_step = src->row_step();
+  dst.point_step = src->point_step();
   return dst;
 }
 
