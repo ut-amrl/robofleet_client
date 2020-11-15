@@ -114,12 +114,12 @@ static void configure_msg_types(RosClientNode& cn) {
 
   cn.configure(SendLocalTopic<sensor_msgs::CompressedImage>()
                    .from("/stereo/left/image_raw/compressed")
-                   .to(webviz_constants::left_image_topic)
+                   .to(webviz_constants::compressed_image_prefix + "left")
                    .rate_limit_hz(10)
                    .priority(1));
   cn.configure(SendLocalTopic<sensor_msgs::CompressedImage>()
                    .from("/stereo/right/image_raw/compressed")
-                   .to(webviz_constants::right_image_topic)
+                   .to(webviz_constants::compressed_image_prefix + "right")
                    .rate_limit_hz(10)
                    .priority(1));
 
