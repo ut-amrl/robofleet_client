@@ -37,16 +37,9 @@ static const std::string odometry_topic = "odometry/raw";
 static const std::string lidar_2d_topic = "velodyne_2dscan";
 
 /**
- * @brief (sensor_msgs/CompressedImage) Image from left stereo camera.
+ * @brief (sensor_msgs/CompressedImage) prefix for a Compressed Image from a stereo camera.
  */
-static const std::string left_image_topic = "stereo/left/image_raw/compressed";
-
-
-/**
- * @brief (sensor_msgs/CompressedImage) Image from right stereo camera.
- */
-static const std::string right_image_topic =
-    "stereo/right/image_raw/compressed";
+static const std::string compressed_image_prefix = "image_compressed/";
 
 /**
  * @brief (sensor_msgs/PointCloud2) 3D point cloud
