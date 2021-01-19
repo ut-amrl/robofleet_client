@@ -5,13 +5,15 @@
 #include <amrl_msgs/RobofleetSubscription.h>
 #include <amrl_msgs/VisualizationMsg.h>
 #include <flatbuffers/flatbuffers.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <nav_msgs/Odometry.h>
 #include <schema_generated.h>
 #include <sensor_msgs/CompressedImage.h>
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/NavSatFix.h>
 #include <sensor_msgs/PointCloud2.h>
-#include <geometry_msgs/PoseStamped.h>
+#include <std_msgs/Header.h>
+#include <std_msgs/String.h>
 
 #include <algorithm>
 
@@ -79,6 +81,13 @@ flatbuffers::uoffset_t encode(
       .o;
 }
 
+// std_msgs/String
+template <>
+flatbuffers::uoffset_t encode(
+    FBB& fbb, const std_msgs::String& msg, const MetadataOffset& metadata) {
+  return fb::std_msgs::CreateStringDirect(fbb, metadata, msg.data.c_str()).o;
+}
+
 // geometry_msgs/Point
 template <>
 flatbuffers::uoffset_t encode(
@@ -111,7 +120,8 @@ flatbuffers::uoffset_t encode(
 // geometry_msgs/PoseStamped
 template <>
 flatbuffers::uoffset_t encode(
-    FBB& fbb, const geometry_msgs::PoseStamped& msg, const MetadataOffset& metadata) {
+    FBB& fbb, const geometry_msgs::PoseStamped& msg,
+    const MetadataOffset& metadata) {
   return fb::geometry_msgs::CreatePoseStamped(
              fbb,
              metadata,
@@ -371,17 +381,19 @@ flatbuffers::uoffset_t encode(
       .o;
 }
 
-// flatbuffers::Offset<flatbuffers::Vector<sensor_msgs::PointField_<std::allocator<void> > > >
-// flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<fb::sensor_msgs::PointField> > >
-// sensor_msgs/PointField
+// flatbuffers::Offset<flatbuffers::Vector<sensor_msgs::PointField_<std::allocator<void>
+// > > >
+// flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<fb::sensor_msgs::PointField>
+// > > sensor_msgs/PointField
 template <>
 flatbuffers::uoffset_t encode(
     FBB& fbb, const sensor_msgs::PointField& msg,
     const MetadataOffset& metadata) {
-
   auto name = fbb.CreateString(msg.name);
 
-  return fb::sensor_msgs::CreatePointField(fbb, metadata, name, msg.offset, msg.datatype, msg.count).o;
+  return fb::sensor_msgs::CreatePointField(
+             fbb, metadata, name, msg.offset, msg.datatype, msg.count)
+      .o;
 }
 
 // sensor_msgs/LaserScan
@@ -395,6 +407,16 @@ flatbuffers::uoffset_t encode(
   auto data = fbb.CreateVector(msg.data.data(), msg.data.size());
 
   return fb::sensor_msgs::CreatePointCloud2(
-    fbb, metadata, header, msg.height, msg.width, fields, msg.is_bigendian, msg.point_step, msg.row_step, data, msg.is_dense)
+             fbb,
+             metadata,
+             header,
+             msg.height,
+             msg.width,
+             fields,
+             msg.is_bigendian,
+             msg.point_step,
+             msg.row_step,
+             data,
+             msg.is_dense)
       .o;
 }

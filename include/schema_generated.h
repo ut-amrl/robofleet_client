@@ -20,6 +20,14 @@ struct RosTime;
 
 struct RosDuration;
 
+namespace std_msgs {
+
+struct String;
+struct StringBuilder;
+struct StringT;
+
+}  // namespace std_msgs
+
 namespace amrl_msgs {
 
 struct RobofleetStatus;
@@ -941,6 +949,89 @@ inline flatbuffers::Offset<MsgWithMetadata> CreateMsgWithMetadata(
 }
 
 flatbuffers::Offset<MsgWithMetadata> CreateMsgWithMetadata(flatbuffers::FlatBufferBuilder &_fbb, const MsgWithMetadataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+namespace std_msgs {
+
+struct StringT : public flatbuffers::NativeTable {
+  typedef String TableType;
+  std::unique_ptr<fb::MsgMetadataT> __metadata;
+  std::string data;
+  StringT() {
+  }
+};
+
+struct String FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef StringT NativeTableType;
+  typedef StringBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT___METADATA = 4,
+    VT_DATA = 6
+  };
+  const fb::MsgMetadata *__metadata() const {
+    return GetPointer<const fb::MsgMetadata *>(VT___METADATA);
+  }
+  const flatbuffers::String *data() const {
+    return GetPointer<const flatbuffers::String *>(VT_DATA);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT___METADATA) &&
+           verifier.VerifyTable(__metadata()) &&
+           VerifyOffsetRequired(verifier, VT_DATA) &&
+           verifier.VerifyString(data()) &&
+           verifier.EndTable();
+  }
+  StringT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(StringT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<String> Pack(flatbuffers::FlatBufferBuilder &_fbb, const StringT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct StringBuilder {
+  typedef String Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add___metadata(flatbuffers::Offset<fb::MsgMetadata> __metadata) {
+    fbb_.AddOffset(String::VT___METADATA, __metadata);
+  }
+  void add_data(flatbuffers::Offset<flatbuffers::String> data) {
+    fbb_.AddOffset(String::VT_DATA, data);
+  }
+  explicit StringBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<String> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<String>(end);
+    fbb_.Required(o, String::VT_DATA);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<String> CreateString(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<fb::MsgMetadata> __metadata = 0,
+    flatbuffers::Offset<flatbuffers::String> data = 0) {
+  StringBuilder builder_(_fbb);
+  builder_.add_data(data);
+  builder_.add___metadata(__metadata);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<String> CreateStringDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<fb::MsgMetadata> __metadata = 0,
+    const char *data = nullptr) {
+  auto data__ = data ? _fbb.CreateString(data) : 0;
+  return fb::std_msgs::CreateString(
+      _fbb,
+      __metadata,
+      data__);
+}
+
+flatbuffers::Offset<String> CreateString(flatbuffers::FlatBufferBuilder &_fbb, const StringT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+}  // namespace std_msgs
 
 namespace amrl_msgs {
 
@@ -3899,6 +3990,39 @@ inline flatbuffers::Offset<MsgWithMetadata> CreateMsgWithMetadata(flatbuffers::F
       _fbb,
       ___metadata);
 }
+
+namespace std_msgs {
+
+inline StringT *String::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  std::unique_ptr<fb::std_msgs::StringT> _o = std::unique_ptr<fb::std_msgs::StringT>(new StringT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void String::UnPackTo(StringT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = __metadata(); if (_e) _o->__metadata = std::unique_ptr<fb::MsgMetadataT>(_e->UnPack(_resolver)); }
+  { auto _e = data(); if (_e) _o->data = _e->str(); }
+}
+
+inline flatbuffers::Offset<String> String::Pack(flatbuffers::FlatBufferBuilder &_fbb, const StringT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateString(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<String> CreateString(flatbuffers::FlatBufferBuilder &_fbb, const StringT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const StringT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto ___metadata = _o->__metadata ? CreateMsgMetadata(_fbb, _o->__metadata.get(), _rehasher) : 0;
+  auto _data = _fbb.CreateString(_o->data);
+  return fb::std_msgs::CreateString(
+      _fbb,
+      ___metadata,
+      _data);
+}
+
+}  // namespace std_msgs
 
 namespace amrl_msgs {
 
