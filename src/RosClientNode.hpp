@@ -160,9 +160,11 @@ class RosClientNode : public QObject {
     const std::string& msg_type = ros::message_traits::DataType<T>().value();
 
     if (subs.count(full_to_topic) > 0) {
-      throw std::runtime_error(
-          "Trying to publish to a topic that is registered as a subscription. "
-          "This can create infinite feedback loops and is not allowed.");
+      std::cerr << "Publishing to a topic " << full_to_topic
+                << " that is registered as a subscription. "
+                << "Ensure this is intentional, as it can cause infinite "
+                   "feedback loops."
+                << std::endl;
     }
 
     std::cerr << "listening for remote topics of type " << msg_type

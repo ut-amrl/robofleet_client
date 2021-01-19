@@ -11,6 +11,7 @@
 #include <amrl_msgs/RobofleetSubscription.h>
 #include <amrl_msgs/VisualizationMsg.h>
 #include <flatbuffers/flatbuffers.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <nav_msgs/Odometry.h>
 #include <ros/ros.h>
 #include <ros/time.h>
@@ -19,7 +20,7 @@
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/NavSatFix.h>
 #include <sensor_msgs/PointCloud2.h>
-#include <geometry_msgs/PoseStamped.h>
+#include <std_msgs/String.h>
 
 // to add a new message type, specialize this template to decode the message
 template <typename T>
@@ -71,6 +72,15 @@ static void decode_obj_vector(
 }
 
 // *** specializations below ***
+
+template <>
+std_msgs::String decode(const void* const data) {
+  const fb::std_msgs::String* src =
+      flatbuffers::GetRoot<fb::std_msgs::String>(data);
+  std_msgs::String dst;
+  dst.data = src->data()->str();
+  return dst;
+}
 
 template <>
 amrl_msgs::RobofleetStatus decode(const void* const data) {
@@ -201,7 +211,7 @@ geometry_msgs::PoseStamped decode(const void* const data) {
   const fb::geometry_msgs::PoseStamped* src =
       flatbuffers::GetRoot<fb::geometry_msgs::PoseStamped>(data);
   geometry_msgs::PoseStamped dst;
-  
+
   decode_header(src, dst);
 
   dst.pose.orientation.x = src->pose()->orientation()->x();
@@ -214,7 +224,6 @@ geometry_msgs::PoseStamped decode(const void* const data) {
 
   return dst;
 }
-
 
 template <>
 nav_msgs::Odometry decode(const void* const data) {
@@ -296,7 +305,6 @@ sensor_msgs::CompressedImage decode(const void* const data) {
   dst.format = src->format()->str();
   return dst;
 }
-
 
 template <>
 sensor_msgs::PointField decode(const void* const data) {

@@ -6,6 +6,7 @@
 #include <sensor_msgs/CompressedImage.h>
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/NavSatFix.h>
+#include <std_msgs/String.h>
 
 #include <string>
 
@@ -137,6 +138,22 @@ static void configure_msg_types(RosClientNode& cn) {
   cn.configure(ReceiveRemoteTopic<amrl_msgs::Localization2DMsg>()
                    .from("initialpose")
                    .to("/initialpose"));
+
+  // support for robofleet_benchmark_suite
+  cn.configure(SendLocalTopic<std_msgs::String>()
+                   .from("/robofleet_benchmark_msg")
+                   .to("/robofleet_benchmark_msg")
+                   .no_drop(true));
+  cn.configure(SendLocalTopic<std_msgs::String>()
+                   .from("/robofleet_benchmark_ack")
+                   .to("/robofleet_benchmark_ack")
+                   .no_drop(true));
+  cn.configure(ReceiveRemoteTopic<std_msgs::String>()
+                   .from("/robofleet_benchmark_msg")
+                   .to("/robofleet_benchmark_msg"));
+  cn.configure(ReceiveRemoteTopic<std_msgs::String>()
+                   .from("/robofleet_benchmark_ack")
+                   .to("/robofleet_benchmark_ack"));
 
   // Add additional topics to subscribe and publish here.
 }
