@@ -61,6 +61,7 @@ static T decode_obj(const O* const src) {
 template <typename T, typename Vsrc, typename Vdst>
 static void decode_obj_vector(
     const Vsrc* const src_vector_ptr, Vdst& dst_vector) {
+  dst_vector.resize(src_vector_ptr->size());
   auto src = src_vector_ptr->begin();
   auto dst = dst_vector.begin();
 
@@ -324,6 +325,7 @@ sensor_msgs::PointCloud2 decode(const void* const data) {
       flatbuffers::GetRoot<fb::sensor_msgs::PointCloud2>(data);
   sensor_msgs::PointCloud2 dst;
   decode_header(src, dst);
+  dst.data.resize(src->data()->size());
   std::copy(src->data()->begin(), src->data()->end(), dst.data.begin());
   decode_obj_vector<sensor_msgs::PointField>(src->fields(), dst.fields);
   dst.height = src->height();
