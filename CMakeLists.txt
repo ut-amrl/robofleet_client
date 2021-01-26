@@ -12,7 +12,7 @@ find_package(Qt5 COMPONENTS Core WebSockets REQUIRED)
 list(APPEND Libs Qt5::Core Qt5::WebSockets)
 
 add_executable(client src/main.cpp)
-add_executable(test_client test/decode.cpp)
+add_executable(test_client test/main.cpp)
 
 add_subdirectory(src)
 include_directories(include)
