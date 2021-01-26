@@ -61,6 +61,7 @@ static T decode_obj(const O* const src) {
 template <typename T, typename Vsrc, typename Vdst>
 static void decode_obj_vector(
     const Vsrc* const src_vector_ptr, Vdst& dst_vector) {
+  dst_vector.resize(src_vector_ptr->size());
   auto src = src_vector_ptr->begin();
   auto dst = dst_vector.begin();
 
@@ -268,12 +269,14 @@ sensor_msgs::LaserScan decode(const void* const data) {
   dst.angle_increment = src->angle_increment();
   dst.angle_max = src->angle_max();
   dst.angle_min = src->angle_min();
+  dst.intensities.resize(src->intensities()->size());
   std::copy(
       src->intensities()->begin(),
       src->intensities()->end(),
       dst.intensities.begin());
   dst.range_max = src->range_max();
   dst.range_min = src->range_min();
+  dst.ranges.resize(src->ranges()->size());
   std::copy(src->ranges()->begin(), src->ranges()->end(), dst.ranges.begin());
   dst.scan_time = src->scan_time();
   dst.time_increment = src->time_increment();
@@ -301,6 +304,7 @@ sensor_msgs::CompressedImage decode(const void* const data) {
       flatbuffers::GetRoot<fb::sensor_msgs::CompressedImage>(data);
   sensor_msgs::CompressedImage dst;
   decode_header(src, dst);
+  dst.data.resize(src->data()->size());
   std::copy(src->data()->begin(), src->data()->end(), dst.data.begin());
   dst.format = src->format()->str();
   return dst;
@@ -324,6 +328,7 @@ sensor_msgs::PointCloud2 decode(const void* const data) {
       flatbuffers::GetRoot<fb::sensor_msgs::PointCloud2>(data);
   sensor_msgs::PointCloud2 dst;
   decode_header(src, dst);
+  dst.data.resize(src->data()->size());
   std::copy(src->data()->begin(), src->data()->end(), dst.data.begin());
   decode_obj_vector<sensor_msgs::PointField>(src->fields(), dst.fields);
   dst.height = src->height();
