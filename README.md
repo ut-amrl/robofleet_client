@@ -63,6 +63,9 @@ Note that if you run two client nodes on one machine (even in different namespac
   * Build once to generate amrl_msgs
   * Add `amrl_msgs/msg_gen/cpp/include` to your include paths
   * VS Code editor settings are included
+* Debugging
+  1. `cd build && cmake -DCMAKE_BUILD_TYPE=Debug && make -j`
+  1. Either launch `(gdb) Launch` or `(gdb) Tests` in VSCode or use `gdb build/client`
 
 [names]: https://wiki.ros.org/Names#Resolving
 [name resolution]: https://wiki.ros.org/Names#Resolving
