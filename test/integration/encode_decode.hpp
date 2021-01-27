@@ -22,6 +22,13 @@ TEST(EncodeDecode, PointCloud2) {
   src_field1.offset = 1;
   src.fields.push_back(src_field1);
 
+  sensor_msgs::PointField src_field2;
+  src_field1.count = 60;
+  src_field1.datatype = sensor_msgs::PointField::UINT32;
+  src_field1.name = "test2";
+  src_field1.offset = 2;
+  src.fields.push_back(src_field2);
+
   src.data.insert(src.data.end(), {1u, 2u, 4u, 8u, 16u});
 
   // encode
