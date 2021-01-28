@@ -176,7 +176,8 @@ class RosClientNode : public QObject {
       pub_fns[msg_type] = [this, full_to_topic](
                               const QByteArray& data,
                               const std::string& msg_type) {
-        const T msg = decode<T>(data.data());
+        const auto* root = flatbuffers::GetRoot<typename flatbuffers_type_for<T>::type>(data.data());
+        const T msg = decode<T>(root);
         publish_ros_msg<T>(msg, msg_type, full_to_topic);
       };
     }
