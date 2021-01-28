@@ -9,3 +9,11 @@ jobs:
         with:
           submodules: recursive
       - run: scripts/ci-test.sh 
+  check-format:
+    name: Formatted with `make format`
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - run: make check-format
