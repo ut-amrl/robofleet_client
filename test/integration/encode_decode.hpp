@@ -37,7 +37,8 @@ TEST(EncodeDecode, PointCloud2) {
   fbb.Finish(flatbuffers::Offset<void>(encoded_offset));
 
   // decode
-  const sensor_msgs::PointCloud2 decoded = decode<sensor_msgs::PointCloud2>(fbb.GetBufferPointer());
+  const fb::sensor_msgs::PointCloud2* root = flatbuffers::GetRoot<typename flatbuffers_type_for<sensor_msgs::PointCloud2>::type>(fbb.GetBufferPointer());
+  const sensor_msgs::PointCloud2 decoded = decode<sensor_msgs::PointCloud2>(root);
 
   EXPECT_EQ(src, decoded);
 }
