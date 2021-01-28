@@ -22,18 +22,19 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <std_msgs/String.h>
 
-// to add a new message type, specialize this template to decode the message and...
+// to add a new message type, specialize this template to decode the message
+// and...
 template <typename Dst, typename Src>
 static Dst decode(const Src* const src);
 // specialize this struct to map ROS types to Flatbuffers types
 template <typename RosType>
-struct flatbuffers_type_for {typedef void type;};
-
+struct flatbuffers_type_for {
+  typedef void type;
+};
 
 // *** utility functions ***
 template <typename T, typename Vsrc, typename Vdst>
-static void decode_vector(
-    const Vsrc* const src_vector_ptr, Vdst& dst_vector) {
+static void decode_vector(const Vsrc* const src_vector_ptr, Vdst& dst_vector) {
   dst_vector.resize(src_vector_ptr->size());
   auto src = src_vector_ptr->begin();
   auto dst = dst_vector.begin();
@@ -45,11 +46,12 @@ static void decode_vector(
   }
 }
 
-
 // *** specializations below ***
 
 template <>
-struct flatbuffers_type_for<std_msgs::Header> {typedef fb::std_msgs::Header type;};
+struct flatbuffers_type_for<std_msgs::Header> {
+  typedef fb::std_msgs::Header type;
+};
 template <>
 std_msgs::Header decode(const fb::std_msgs::Header* const src) {
   std_msgs::Header dst;
@@ -61,7 +63,9 @@ std_msgs::Header decode(const fb::std_msgs::Header* const src) {
 }
 
 template <>
-struct flatbuffers_type_for<std_msgs::String> {typedef fb::std_msgs::String type;};
+struct flatbuffers_type_for<std_msgs::String> {
+  typedef fb::std_msgs::String type;
+};
 template <>
 std_msgs::String decode(const fb::std_msgs::String* const src) {
   std_msgs::String dst;
@@ -70,9 +74,12 @@ std_msgs::String decode(const fb::std_msgs::String* const src) {
 }
 
 template <>
-struct flatbuffers_type_for<amrl_msgs::RobofleetStatus> {typedef fb::amrl_msgs::RobofleetStatus type;};
+struct flatbuffers_type_for<amrl_msgs::RobofleetStatus> {
+  typedef fb::amrl_msgs::RobofleetStatus type;
+};
 template <>
-amrl_msgs::RobofleetStatus decode(const fb::amrl_msgs::RobofleetStatus* const src) {
+amrl_msgs::RobofleetStatus decode(
+    const fb::amrl_msgs::RobofleetStatus* const src) {
   amrl_msgs::RobofleetStatus dst;
   dst.battery_level = src->battery_level();
   dst.is_ok = src->is_ok();
@@ -82,9 +89,12 @@ amrl_msgs::RobofleetStatus decode(const fb::amrl_msgs::RobofleetStatus* const sr
 }
 
 template <>
-struct flatbuffers_type_for<amrl_msgs::RobofleetSubscription> {typedef fb::amrl_msgs::RobofleetSubscription type;};
+struct flatbuffers_type_for<amrl_msgs::RobofleetSubscription> {
+  typedef fb::amrl_msgs::RobofleetSubscription type;
+};
 template <>
-amrl_msgs::RobofleetSubscription decode(const fb::amrl_msgs::RobofleetSubscription* const src) {
+amrl_msgs::RobofleetSubscription decode(
+    const fb::amrl_msgs::RobofleetSubscription* const src) {
   amrl_msgs::RobofleetSubscription dst;
   dst.action = src->action();
   dst.topic_regex = src->topic_regex()->str();
@@ -92,7 +102,9 @@ amrl_msgs::RobofleetSubscription decode(const fb::amrl_msgs::RobofleetSubscripti
 }
 
 template <>
-struct flatbuffers_type_for<amrl_msgs::Point2D> {typedef fb::amrl_msgs::Point2D type;};
+struct flatbuffers_type_for<amrl_msgs::Point2D> {
+  typedef fb::amrl_msgs::Point2D type;
+};
 template <>
 amrl_msgs::Point2D decode(const fb::amrl_msgs::Point2D* const src) {
   amrl_msgs::Point2D dst;
@@ -103,7 +115,9 @@ amrl_msgs::Point2D decode(const fb::amrl_msgs::Point2D* const src) {
 }
 
 template <>
-struct flatbuffers_type_for<amrl_msgs::Pose2Df> {typedef fb::amrl_msgs::Pose2Df type;};
+struct flatbuffers_type_for<amrl_msgs::Pose2Df> {
+  typedef fb::amrl_msgs::Pose2Df type;
+};
 template <>
 amrl_msgs::Pose2Df decode(const fb::amrl_msgs::Pose2Df* const src) {
   amrl_msgs::Pose2Df dst;
@@ -115,7 +129,9 @@ amrl_msgs::Pose2Df decode(const fb::amrl_msgs::Pose2Df* const src) {
 }
 
 template <>
-struct flatbuffers_type_for<amrl_msgs::ColoredArc2D> {typedef fb::amrl_msgs::ColoredArc2D type;};
+struct flatbuffers_type_for<amrl_msgs::ColoredArc2D> {
+  typedef fb::amrl_msgs::ColoredArc2D type;
+};
 template <>
 amrl_msgs::ColoredArc2D decode(const fb::amrl_msgs::ColoredArc2D* const src) {
   amrl_msgs::ColoredArc2D dst;
@@ -129,7 +145,9 @@ amrl_msgs::ColoredArc2D decode(const fb::amrl_msgs::ColoredArc2D* const src) {
 }
 
 template <>
-struct flatbuffers_type_for<amrl_msgs::ColoredLine2D> {typedef fb::amrl_msgs::ColoredLine2D type;};
+struct flatbuffers_type_for<amrl_msgs::ColoredLine2D> {
+  typedef fb::amrl_msgs::ColoredLine2D type;
+};
 template <>
 amrl_msgs::ColoredLine2D decode(const fb::amrl_msgs::ColoredLine2D* const src) {
   amrl_msgs::ColoredLine2D dst;
@@ -141,9 +159,12 @@ amrl_msgs::ColoredLine2D decode(const fb::amrl_msgs::ColoredLine2D* const src) {
 }
 
 template <>
-struct flatbuffers_type_for<amrl_msgs::ColoredPoint2D> {typedef fb::amrl_msgs::ColoredPoint2D type;};
+struct flatbuffers_type_for<amrl_msgs::ColoredPoint2D> {
+  typedef fb::amrl_msgs::ColoredPoint2D type;
+};
 template <>
-amrl_msgs::ColoredPoint2D decode(const fb::amrl_msgs::ColoredPoint2D* const src) {
+amrl_msgs::ColoredPoint2D decode(
+    const fb::amrl_msgs::ColoredPoint2D* const src) {
   amrl_msgs::ColoredPoint2D dst;
 
   dst.color = src->color();
@@ -152,9 +173,12 @@ amrl_msgs::ColoredPoint2D decode(const fb::amrl_msgs::ColoredPoint2D* const src)
 }
 
 template <>
-struct flatbuffers_type_for<amrl_msgs::PathVisualization> {typedef fb::amrl_msgs::PathVisualization type;};
+struct flatbuffers_type_for<amrl_msgs::PathVisualization> {
+  typedef fb::amrl_msgs::PathVisualization type;
+};
 template <>
-amrl_msgs::PathVisualization decode(const fb::amrl_msgs::PathVisualization* const src) {
+amrl_msgs::PathVisualization decode(
+    const fb::amrl_msgs::PathVisualization* const src) {
   amrl_msgs::PathVisualization dst;
 
   dst.clearance = src->clearance();
@@ -164,9 +188,12 @@ amrl_msgs::PathVisualization decode(const fb::amrl_msgs::PathVisualization* cons
 }
 
 template <>
-struct flatbuffers_type_for<amrl_msgs::VisualizationMsg> {typedef fb::amrl_msgs::VisualizationMsg type;};
+struct flatbuffers_type_for<amrl_msgs::VisualizationMsg> {
+  typedef fb::amrl_msgs::VisualizationMsg type;
+};
 template <>
-amrl_msgs::VisualizationMsg decode(const fb::amrl_msgs::VisualizationMsg* const src) {
+amrl_msgs::VisualizationMsg decode(
+    const fb::amrl_msgs::VisualizationMsg* const src) {
   amrl_msgs::VisualizationMsg dst;
   dst.header = decode<std_msgs::Header>(src->header());
 
@@ -181,9 +208,12 @@ amrl_msgs::VisualizationMsg decode(const fb::amrl_msgs::VisualizationMsg* const 
 }
 
 template <>
-struct flatbuffers_type_for<amrl_msgs::Localization2DMsg> {typedef fb::amrl_msgs::Localization2DMsg type;};
+struct flatbuffers_type_for<amrl_msgs::Localization2DMsg> {
+  typedef fb::amrl_msgs::Localization2DMsg type;
+};
 template <>
-amrl_msgs::Localization2DMsg decode(const fb::amrl_msgs::Localization2DMsg* const src) {
+amrl_msgs::Localization2DMsg decode(
+    const fb::amrl_msgs::Localization2DMsg* const src) {
   amrl_msgs::Localization2DMsg dst;
   dst.header = decode<std_msgs::Header>(src->header());
   dst.map = src->map()->str();
@@ -194,9 +224,12 @@ amrl_msgs::Localization2DMsg decode(const fb::amrl_msgs::Localization2DMsg* cons
 }
 
 template <>
-struct flatbuffers_type_for<geometry_msgs::PoseStamped> {typedef fb::geometry_msgs::PoseStamped type;};
+struct flatbuffers_type_for<geometry_msgs::PoseStamped> {
+  typedef fb::geometry_msgs::PoseStamped type;
+};
 template <>
-geometry_msgs::PoseStamped decode(const fb::geometry_msgs::PoseStamped* const src) {
+geometry_msgs::PoseStamped decode(
+    const fb::geometry_msgs::PoseStamped* const src) {
   geometry_msgs::PoseStamped dst;
 
   dst.header = decode<std_msgs::Header>(src->header());
@@ -213,7 +246,9 @@ geometry_msgs::PoseStamped decode(const fb::geometry_msgs::PoseStamped* const sr
 }
 
 template <>
-struct flatbuffers_type_for<nav_msgs::Odometry> {typedef fb::nav_msgs::Odometry type;};
+struct flatbuffers_type_for<nav_msgs::Odometry> {
+  typedef fb::nav_msgs::Odometry type;
+};
 template <>
 nav_msgs::Odometry decode(const fb::nav_msgs::Odometry* const src) {
   nav_msgs::Odometry dst;
@@ -247,7 +282,9 @@ nav_msgs::Odometry decode(const fb::nav_msgs::Odometry* const src) {
 }
 
 template <>
-struct flatbuffers_type_for<sensor_msgs::LaserScan> {typedef fb::sensor_msgs::LaserScan type;};
+struct flatbuffers_type_for<sensor_msgs::LaserScan> {
+  typedef fb::sensor_msgs::LaserScan type;
+};
 template <>
 sensor_msgs::LaserScan decode(const fb::sensor_msgs::LaserScan* const src) {
   sensor_msgs::LaserScan dst;
@@ -270,7 +307,9 @@ sensor_msgs::LaserScan decode(const fb::sensor_msgs::LaserScan* const src) {
 }
 
 template <>
-struct flatbuffers_type_for<sensor_msgs::NavSatFix> {typedef fb::sensor_msgs::NavSatFix type;};
+struct flatbuffers_type_for<sensor_msgs::NavSatFix> {
+  typedef fb::sensor_msgs::NavSatFix type;
+};
 template <>
 sensor_msgs::NavSatFix decode(const fb::sensor_msgs::NavSatFix* const src) {
   sensor_msgs::NavSatFix dst;
@@ -285,9 +324,12 @@ sensor_msgs::NavSatFix decode(const fb::sensor_msgs::NavSatFix* const src) {
 }
 
 template <>
-struct flatbuffers_type_for<sensor_msgs::CompressedImage> {typedef fb::sensor_msgs::CompressedImage type;};
+struct flatbuffers_type_for<sensor_msgs::CompressedImage> {
+  typedef fb::sensor_msgs::CompressedImage type;
+};
 template <>
-sensor_msgs::CompressedImage decode(const fb::sensor_msgs::CompressedImage* const src) {
+sensor_msgs::CompressedImage decode(
+    const fb::sensor_msgs::CompressedImage* const src) {
   sensor_msgs::CompressedImage dst;
   dst.header = decode<std_msgs::Header>(src->header());
   dst.data.resize(src->data()->size());
@@ -297,7 +339,9 @@ sensor_msgs::CompressedImage decode(const fb::sensor_msgs::CompressedImage* cons
 }
 
 template <>
-struct flatbuffers_type_for<sensor_msgs::PointField> {typedef fb::sensor_msgs::PointField type;};
+struct flatbuffers_type_for<sensor_msgs::PointField> {
+  typedef fb::sensor_msgs::PointField type;
+};
 template <>
 sensor_msgs::PointField decode(const fb::sensor_msgs::PointField* const src) {
   sensor_msgs::PointField dst;
@@ -309,7 +353,9 @@ sensor_msgs::PointField decode(const fb::sensor_msgs::PointField* const src) {
 }
 
 template <>
-struct flatbuffers_type_for<sensor_msgs::PointCloud2> {typedef fb::sensor_msgs::PointCloud2 type;};
+struct flatbuffers_type_for<sensor_msgs::PointCloud2> {
+  typedef fb::sensor_msgs::PointCloud2 type;
+};
 template <>
 sensor_msgs::PointCloud2 decode(const fb::sensor_msgs::PointCloud2* const src) {
   sensor_msgs::PointCloud2 dst;
