@@ -21,7 +21,7 @@ TEST(DecodeObjectTest, HandlesStdHeader) {
   encode_std_header(fbb);
 
   const fb::std_msgs::Header* encoded = flatbuffers::GetRoot<fb::std_msgs::Header>(fbb.GetBufferPointer());
-  const std_msgs::Header decoded = decode_obj<std_msgs::Header>(encoded);
+  const std_msgs::Header decoded = decode<std_msgs::Header>(encoded);
 
   EXPECT_EQ(decoded.frame_id, "frame");
   EXPECT_EQ(decoded.seq, 100);

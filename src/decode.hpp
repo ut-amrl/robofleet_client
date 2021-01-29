@@ -23,50 +23,24 @@
 #include <std_msgs/String.h>
 
 // to add a new message type, specialize this template to decode the message
-template <typename T>
-static T decode(const void* const data);
+// and...
+template <typename Dst, typename Src>
+static Dst decode(const Src* const src);
+// specialize this struct to map ROS types to Flatbuffers types
+template <typename RosType>
+struct flatbuffers_type_for {
+  typedef void type;
+};
 
 // *** utility functions ***
-/**
- * @brief Copy the ROS header from a flatbuffers Object API object src to a
- * ROS class object dst.
- *
- * @tparam Tsrc a generated flatbuffers Object API type
- * @tparam Tdst a ROS class type
- * @param src source
- * @param dst destination
- */
-template <typename Tsrc, typename Tdst>
-static void decode_header(const Tsrc& src, Tdst& dst) {
-  dst.header.frame_id = src->header()->frame_id()->str();
-  dst.header.seq = src->header()->seq();
-  dst.header.stamp = ros::Time(
-      src->header()->stamp()->secs(), src->header()->stamp()->nsecs());
-}
-
-/**
- * @brief Given a flatbuffers Object API object and a target ROS class type T,
- * call the decode<T>() function on the object's data.
- *
- * @tparam T target ROS class type
- * @tparam O a generated flatbuffers Object API type
- * @param src the flatbuffers object to decode
- * @return T the result of calling decode<T>() on src's data
- */
-template <typename T, typename O>
-static T decode_obj(const O* const src) {
-  return decode<T>(flatbuffers::GetBufferStartFromRootPointer(src));
-}
-
 template <typename T, typename Vsrc, typename Vdst>
-static void decode_obj_vector(
-    const Vsrc* const src_vector_ptr, Vdst& dst_vector) {
+static void decode_vector(const Vsrc* const src_vector_ptr, Vdst& dst_vector) {
   dst_vector.resize(src_vector_ptr->size());
   auto src = src_vector_ptr->begin();
   auto dst = dst_vector.begin();
 
   while (src != src_vector_ptr->end()) {
-    *dst = decode_obj<T>(*src);
+    *dst = decode<T>(*src);
     ++src;
     ++dst;
   }
@@ -75,18 +49,37 @@ static void decode_obj_vector(
 // *** specializations below ***
 
 template <>
-std_msgs::String decode(const void* const data) {
-  const fb::std_msgs::String* src =
-      flatbuffers::GetRoot<fb::std_msgs::String>(data);
+struct flatbuffers_type_for<std_msgs::Header> {
+  typedef fb::std_msgs::Header type;
+};
+template <>
+std_msgs::Header decode(const fb::std_msgs::Header* const src) {
+  std_msgs::Header dst;
+
+  dst.frame_id = src->frame_id()->str();
+  dst.seq = src->seq();
+  dst.stamp = ros::Time(src->stamp()->secs(), src->stamp()->nsecs());
+  return dst;
+}
+
+template <>
+struct flatbuffers_type_for<std_msgs::String> {
+  typedef fb::std_msgs::String type;
+};
+template <>
+std_msgs::String decode(const fb::std_msgs::String* const src) {
   std_msgs::String dst;
   dst.data = src->data()->str();
   return dst;
 }
 
 template <>
-amrl_msgs::RobofleetStatus decode(const void* const data) {
-  const fb::amrl_msgs::RobofleetStatus* src =
-      flatbuffers::GetRoot<fb::amrl_msgs::RobofleetStatus>(data);
+struct flatbuffers_type_for<amrl_msgs::RobofleetStatus> {
+  typedef fb::amrl_msgs::RobofleetStatus type;
+};
+template <>
+amrl_msgs::RobofleetStatus decode(
+    const fb::amrl_msgs::RobofleetStatus* const src) {
   amrl_msgs::RobofleetStatus dst;
   dst.battery_level = src->battery_level();
   dst.is_ok = src->is_ok();
@@ -96,9 +89,12 @@ amrl_msgs::RobofleetStatus decode(const void* const data) {
 }
 
 template <>
-amrl_msgs::RobofleetSubscription decode(const void* const data) {
-  const fb::amrl_msgs::RobofleetSubscription* src =
-      flatbuffers::GetRoot<fb::amrl_msgs::RobofleetSubscription>(data);
+struct flatbuffers_type_for<amrl_msgs::RobofleetSubscription> {
+  typedef fb::amrl_msgs::RobofleetSubscription type;
+};
+template <>
+amrl_msgs::RobofleetSubscription decode(
+    const fb::amrl_msgs::RobofleetSubscription* const src) {
   amrl_msgs::RobofleetSubscription dst;
   dst.action = src->action();
   dst.topic_regex = src->topic_regex()->str();
@@ -106,9 +102,11 @@ amrl_msgs::RobofleetSubscription decode(const void* const data) {
 }
 
 template <>
-amrl_msgs::Point2D decode(const void* const data) {
-  const fb::amrl_msgs::Point2D* src =
-      flatbuffers::GetRoot<fb::amrl_msgs::Point2D>(data);
+struct flatbuffers_type_for<amrl_msgs::Point2D> {
+  typedef fb::amrl_msgs::Point2D type;
+};
+template <>
+amrl_msgs::Point2D decode(const fb::amrl_msgs::Point2D* const src) {
   amrl_msgs::Point2D dst;
 
   dst.x = src->x();
@@ -117,9 +115,11 @@ amrl_msgs::Point2D decode(const void* const data) {
 }
 
 template <>
-amrl_msgs::Pose2Df decode(const void* const data) {
-  const fb::amrl_msgs::Pose2Df* src =
-      flatbuffers::GetRoot<fb::amrl_msgs::Pose2Df>(data);
+struct flatbuffers_type_for<amrl_msgs::Pose2Df> {
+  typedef fb::amrl_msgs::Pose2Df type;
+};
+template <>
+amrl_msgs::Pose2Df decode(const fb::amrl_msgs::Pose2Df* const src) {
   amrl_msgs::Pose2Df dst;
 
   dst.theta = src->theta();
@@ -129,12 +129,14 @@ amrl_msgs::Pose2Df decode(const void* const data) {
 }
 
 template <>
-amrl_msgs::ColoredArc2D decode(const void* const data) {
-  const fb::amrl_msgs::ColoredArc2D* src =
-      flatbuffers::GetRoot<fb::amrl_msgs::ColoredArc2D>(data);
+struct flatbuffers_type_for<amrl_msgs::ColoredArc2D> {
+  typedef fb::amrl_msgs::ColoredArc2D type;
+};
+template <>
+amrl_msgs::ColoredArc2D decode(const fb::amrl_msgs::ColoredArc2D* const src) {
   amrl_msgs::ColoredArc2D dst;
 
-  dst.center = decode_obj<amrl_msgs::Point2D>(src->center());
+  dst.center = decode<amrl_msgs::Point2D>(src->center());
   dst.color = src->color();
   dst.end_angle = src->end_angle();
   dst.radius = src->radius();
@@ -143,32 +145,40 @@ amrl_msgs::ColoredArc2D decode(const void* const data) {
 }
 
 template <>
-amrl_msgs::ColoredLine2D decode(const void* const data) {
-  const fb::amrl_msgs::ColoredLine2D* src =
-      flatbuffers::GetRoot<fb::amrl_msgs::ColoredLine2D>(data);
+struct flatbuffers_type_for<amrl_msgs::ColoredLine2D> {
+  typedef fb::amrl_msgs::ColoredLine2D type;
+};
+template <>
+amrl_msgs::ColoredLine2D decode(const fb::amrl_msgs::ColoredLine2D* const src) {
   amrl_msgs::ColoredLine2D dst;
 
   dst.color = src->color();
-  dst.p0 = decode_obj<amrl_msgs::Point2D>(src->p0());
-  dst.p1 = decode_obj<amrl_msgs::Point2D>(src->p1());
+  dst.p0 = decode<amrl_msgs::Point2D>(src->p0());
+  dst.p1 = decode<amrl_msgs::Point2D>(src->p1());
   return dst;
 }
 
 template <>
-amrl_msgs::ColoredPoint2D decode(const void* const data) {
-  const fb::amrl_msgs::ColoredPoint2D* src =
-      flatbuffers::GetRoot<fb::amrl_msgs::ColoredPoint2D>(data);
+struct flatbuffers_type_for<amrl_msgs::ColoredPoint2D> {
+  typedef fb::amrl_msgs::ColoredPoint2D type;
+};
+template <>
+amrl_msgs::ColoredPoint2D decode(
+    const fb::amrl_msgs::ColoredPoint2D* const src) {
   amrl_msgs::ColoredPoint2D dst;
 
   dst.color = src->color();
-  dst.point = decode_obj<amrl_msgs::Point2D>(src->point());
+  dst.point = decode<amrl_msgs::Point2D>(src->point());
   return dst;
 }
 
 template <>
-amrl_msgs::PathVisualization decode(const void* const data) {
-  const fb::amrl_msgs::PathVisualization* src =
-      flatbuffers::GetRoot<fb::amrl_msgs::PathVisualization>(data);
+struct flatbuffers_type_for<amrl_msgs::PathVisualization> {
+  typedef fb::amrl_msgs::PathVisualization type;
+};
+template <>
+amrl_msgs::PathVisualization decode(
+    const fb::amrl_msgs::PathVisualization* const src) {
   amrl_msgs::PathVisualization dst;
 
   dst.clearance = src->clearance();
@@ -178,28 +188,34 @@ amrl_msgs::PathVisualization decode(const void* const data) {
 }
 
 template <>
-amrl_msgs::VisualizationMsg decode(const void* const data) {
-  const fb::amrl_msgs::VisualizationMsg* src =
-      flatbuffers::GetRoot<fb::amrl_msgs::VisualizationMsg>(data);
+struct flatbuffers_type_for<amrl_msgs::VisualizationMsg> {
+  typedef fb::amrl_msgs::VisualizationMsg type;
+};
+template <>
+amrl_msgs::VisualizationMsg decode(
+    const fb::amrl_msgs::VisualizationMsg* const src) {
   amrl_msgs::VisualizationMsg dst;
-  decode_header(src, dst);
+  dst.header = decode<std_msgs::Header>(src->header());
 
   dst.ns = src->ns()->str();
-  decode_obj_vector<amrl_msgs::ColoredArc2D>(src->arcs(), dst.arcs);
-  decode_obj_vector<amrl_msgs::ColoredLine2D>(src->lines(), dst.lines);
-  decode_obj_vector<amrl_msgs::PathVisualization>(
+  decode_vector<amrl_msgs::ColoredArc2D>(src->arcs(), dst.arcs);
+  decode_vector<amrl_msgs::ColoredLine2D>(src->lines(), dst.lines);
+  decode_vector<amrl_msgs::PathVisualization>(
       src->path_options(), dst.path_options);
-  decode_obj_vector<amrl_msgs::Pose2Df>(src->particles(), dst.particles);
-  decode_obj_vector<amrl_msgs::ColoredPoint2D>(src->points(), dst.points);
+  decode_vector<amrl_msgs::Pose2Df>(src->particles(), dst.particles);
+  decode_vector<amrl_msgs::ColoredPoint2D>(src->points(), dst.points);
   return dst;
 }
 
 template <>
-amrl_msgs::Localization2DMsg decode(const void* const data) {
-  const fb::amrl_msgs::Localization2DMsg* src =
-      flatbuffers::GetRoot<fb::amrl_msgs::Localization2DMsg>(data);
+struct flatbuffers_type_for<amrl_msgs::Localization2DMsg> {
+  typedef fb::amrl_msgs::Localization2DMsg type;
+};
+template <>
+amrl_msgs::Localization2DMsg decode(
+    const fb::amrl_msgs::Localization2DMsg* const src) {
   amrl_msgs::Localization2DMsg dst;
-  decode_header(src, dst);
+  dst.header = decode<std_msgs::Header>(src->header());
   dst.map = src->map()->str();
   dst.pose.x = src->pose()->x();
   dst.pose.y = src->pose()->y();
@@ -208,12 +224,15 @@ amrl_msgs::Localization2DMsg decode(const void* const data) {
 }
 
 template <>
-geometry_msgs::PoseStamped decode(const void* const data) {
-  const fb::geometry_msgs::PoseStamped* src =
-      flatbuffers::GetRoot<fb::geometry_msgs::PoseStamped>(data);
+struct flatbuffers_type_for<geometry_msgs::PoseStamped> {
+  typedef fb::geometry_msgs::PoseStamped type;
+};
+template <>
+geometry_msgs::PoseStamped decode(
+    const fb::geometry_msgs::PoseStamped* const src) {
   geometry_msgs::PoseStamped dst;
 
-  decode_header(src, dst);
+  dst.header = decode<std_msgs::Header>(src->header());
 
   dst.pose.orientation.x = src->pose()->orientation()->x();
   dst.pose.orientation.y = src->pose()->orientation()->y();
@@ -227,11 +246,13 @@ geometry_msgs::PoseStamped decode(const void* const data) {
 }
 
 template <>
-nav_msgs::Odometry decode(const void* const data) {
-  const fb::nav_msgs::Odometry* src =
-      flatbuffers::GetRoot<fb::nav_msgs::Odometry>(data);
+struct flatbuffers_type_for<nav_msgs::Odometry> {
+  typedef fb::nav_msgs::Odometry type;
+};
+template <>
+nav_msgs::Odometry decode(const fb::nav_msgs::Odometry* const src) {
   nav_msgs::Odometry dst;
-  decode_header(src, dst);
+  dst.header = decode<std_msgs::Header>(src->header());
 
   dst.child_frame_id = src->child_frame_id()->str();
 
@@ -261,11 +282,13 @@ nav_msgs::Odometry decode(const void* const data) {
 }
 
 template <>
-sensor_msgs::LaserScan decode(const void* const data) {
-  const fb::sensor_msgs::LaserScan* src =
-      flatbuffers::GetRoot<fb::sensor_msgs::LaserScan>(data);
+struct flatbuffers_type_for<sensor_msgs::LaserScan> {
+  typedef fb::sensor_msgs::LaserScan type;
+};
+template <>
+sensor_msgs::LaserScan decode(const fb::sensor_msgs::LaserScan* const src) {
   sensor_msgs::LaserScan dst;
-  decode_header(src, dst);
+  dst.header = decode<std_msgs::Header>(src->header());
   dst.angle_increment = src->angle_increment();
   dst.angle_max = src->angle_max();
   dst.angle_min = src->angle_min();
@@ -284,11 +307,13 @@ sensor_msgs::LaserScan decode(const void* const data) {
 }
 
 template <>
-sensor_msgs::NavSatFix decode(const void* const data) {
-  const fb::sensor_msgs::NavSatFix* src =
-      flatbuffers::GetRoot<fb::sensor_msgs::NavSatFix>(data);
+struct flatbuffers_type_for<sensor_msgs::NavSatFix> {
+  typedef fb::sensor_msgs::NavSatFix type;
+};
+template <>
+sensor_msgs::NavSatFix decode(const fb::sensor_msgs::NavSatFix* const src) {
   sensor_msgs::NavSatFix dst;
-  decode_header(src, dst);
+  dst.header = decode<std_msgs::Header>(src->header());
   dst.altitude = src->altitude();
   dst.latitude = src->latitude();
   dst.longitude = src->longitude();
@@ -299,11 +324,14 @@ sensor_msgs::NavSatFix decode(const void* const data) {
 }
 
 template <>
-sensor_msgs::CompressedImage decode(const void* const data) {
-  const fb::sensor_msgs::CompressedImage* src =
-      flatbuffers::GetRoot<fb::sensor_msgs::CompressedImage>(data);
+struct flatbuffers_type_for<sensor_msgs::CompressedImage> {
+  typedef fb::sensor_msgs::CompressedImage type;
+};
+template <>
+sensor_msgs::CompressedImage decode(
+    const fb::sensor_msgs::CompressedImage* const src) {
   sensor_msgs::CompressedImage dst;
-  decode_header(src, dst);
+  dst.header = decode<std_msgs::Header>(src->header());
   dst.data.resize(src->data()->size());
   std::copy(src->data()->begin(), src->data()->end(), dst.data.begin());
   dst.format = src->format()->str();
@@ -311,9 +339,11 @@ sensor_msgs::CompressedImage decode(const void* const data) {
 }
 
 template <>
-sensor_msgs::PointField decode(const void* const data) {
-  const fb::sensor_msgs::PointField* src =
-      flatbuffers::GetRoot<fb::sensor_msgs::PointField>(data);
+struct flatbuffers_type_for<sensor_msgs::PointField> {
+  typedef fb::sensor_msgs::PointField type;
+};
+template <>
+sensor_msgs::PointField decode(const fb::sensor_msgs::PointField* const src) {
   sensor_msgs::PointField dst;
   dst.count = src->count();
   dst.name = src->name()->str();
@@ -323,31 +353,21 @@ sensor_msgs::PointField decode(const void* const data) {
 }
 
 template <>
-sensor_msgs::PointCloud2 decode(const void* const data) {
-  const fb::sensor_msgs::PointCloud2* src =
-      flatbuffers::GetRoot<fb::sensor_msgs::PointCloud2>(data);
+struct flatbuffers_type_for<sensor_msgs::PointCloud2> {
+  typedef fb::sensor_msgs::PointCloud2 type;
+};
+template <>
+sensor_msgs::PointCloud2 decode(const fb::sensor_msgs::PointCloud2* const src) {
   sensor_msgs::PointCloud2 dst;
-  decode_header(src, dst);
+  dst.header = decode<std_msgs::Header>(src->header());
   dst.data.resize(src->data()->size());
   std::copy(src->data()->begin(), src->data()->end(), dst.data.begin());
-  decode_obj_vector<sensor_msgs::PointField>(src->fields(), dst.fields);
+  decode_vector<sensor_msgs::PointField>(src->fields(), dst.fields);
   dst.height = src->height();
   dst.width = src->width();
   dst.is_bigendian = src->is_bigendian();
   dst.is_dense = src->is_dense();
   dst.row_step = src->row_step();
   dst.point_step = src->point_step();
-  return dst;
-}
-
-template <>
-std_msgs::Header decode(const void* const data) {
-  const fb::std_msgs::Header* src =
-      flatbuffers::GetRoot<fb::std_msgs::Header>(data);
-  std_msgs::Header dst;
-
-  dst.frame_id = src->frame_id()->str();
-  dst.seq = src->seq();
-  dst.stamp = ros::Time(src->stamp()->secs(), src->stamp()->nsecs());
   return dst;
 }
