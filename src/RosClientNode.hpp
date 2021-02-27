@@ -210,8 +210,6 @@ class RosClientNode : public QObject {
         flatbuffers::GetRoot<fb::MsgWithMetadata>(data.data());
     const std::string& msg_type = msg->__metadata()->type()->str();
     const std::string& topic = msg->__metadata()->topic()->str();
-    std::cerr << "received " << msg_type << " message on " << topic
-              << std::endl;
 
     // try to publish
     if (pub_fns.count(msg_type) == 0) {
