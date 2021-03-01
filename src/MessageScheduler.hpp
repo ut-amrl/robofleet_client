@@ -6,8 +6,8 @@
 #include <chrono>
 #include <deque>
 #include <unordered_map>
-
-#include "config.hpp"
+#include <vector>
+#include <iostream>
 
 using SchedulerClock = std::chrono::high_resolution_clock;
 
@@ -44,13 +44,13 @@ struct QStringHash {
 class MessageScheduler : public QObject {
   Q_OBJECT
   int network_backpressure_counter = 0;
+  const uint64_t max_queue_before_waiting;
 
   std::deque<QByteArray> no_drop_queue;
   std::unordered_map<QString, WaitingMessage, QStringHash> topic_queue;
 
  public:
-  MessageScheduler() {
-  }
+  MessageScheduler(uint64_t mq) : max_queue_before_waiting(mq) {}
 
  Q_SIGNALS:
   void scheduled(const QByteArray& data);
@@ -71,11 +71,10 @@ class MessageScheduler : public QObject {
 
   /**
    * @brief Fire this to indicate that the network is free
+   * Updates the counter for network backpressure
    */
-  void network_unblocked() {
-    if (network_backpressure_counter > 0) {
-      network_backpressure_counter--;
-    }
+  void network_unblocked(uint64_t message_index, uint64_t last_ponged_index) {
+    network_backpressure_counter = std::min(message_index - last_ponged_index, max_queue_before_waiting);
     schedule();
   }
 
@@ -85,9 +84,10 @@ class MessageScheduler : public QObject {
    * Then, messages are sent by topic priority.
    */
   void schedule() {
-    if (network_backpressure_counter > config::max_queue_before_waiting) {
+    if (network_backpressure_counter > max_queue_before_waiting) {
       return;
     }
+
 
     // flush no-drop queue
     if (!no_drop_queue.empty()) {
@@ -97,36 +97,46 @@ class MessageScheduler : public QObject {
         no_drop_queue.pop_front();
         network_backpressure_counter++;
       }
-      if (network_backpressure_counter > config::max_queue_before_waiting) {
+      if (network_backpressure_counter > max_queue_before_waiting) {
         return;
       }
     }
 
+    if (topic_queue.empty()) {
+      return;
+    }
+
+    int messages_to_send = std::min((max_queue_before_waiting - network_backpressure_counter) + 1, topic_queue.size());
     const auto now = SchedulerClock::now();
-    while (network_backpressure_counter <= config::max_queue_before_waiting && !topic_queue.empty()) {
-      // update wait times for waiting messages.
-      // select topic with the highest wait time.
-      auto next = topic_queue.begin();
-      for (auto it = topic_queue.begin(); it != topic_queue.end(); ++it) {
-        const QString& candidate_topic = it->first;
-        WaitingMessage& candidate = it->second;
 
-        if (candidate.message_ready) {
-          candidate.time_waiting =
-              (now - candidate.last_send_time) * candidate.priority;
-        }
-        if (candidate.time_waiting > next->second.time_waiting) {
-          next = it;
-        }
-      } 
+    // Collect candidates
+    std::vector<WaitingMessage*> candidates;
+    for (auto it = topic_queue.begin(); it != topic_queue.end(); ++it) {
+      const QString& candidate_topic = it->first;
+      WaitingMessage& candidate = it->second;
 
-      if (next->second.message_ready) {
-        Q_EMIT scheduled(next->second.message);
-        next->second.message_ready = false;
-        next->second.last_send_time = now;
+      if (candidate.message_ready) {
+        candidate.time_waiting = (now - candidate.last_send_time) * candidate.priority;
+      }
+      
+      candidates.push_back(&candidate);
+    }
+
+    // Sort candidates
+    auto compare = [](WaitingMessage* lhs, WaitingMessage* rhs)
+    {
+      return lhs->time_waiting < rhs->time_waiting;
+    };
+    std::sort(candidates.begin(), candidates.end(), compare);
+
+    // attampt to publish top-K candidates
+    for(int cand_idx = 0; cand_idx < messages_to_send; cand_idx++) {
+      if (candidates[cand_idx]->message_ready) {
+        Q_EMIT scheduled(candidates[cand_idx]->message);
+        candidates[cand_idx]->message_ready = false;
+        candidates[cand_idx]->last_send_time = now;
+        candidates[cand_idx]->time_waiting = std::chrono::duration<double>::zero();
         network_backpressure_counter++;
-      } else {
-        break;
       }
     }
   }

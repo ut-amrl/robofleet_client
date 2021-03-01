@@ -7,11 +7,11 @@
 #include <iostream>
 #include <string>
 
+#include "config.hpp"
 #include "MessageScheduler.hpp"
 #include "RosClientNode.hpp"
 #include "WsClient.hpp"
 #include "WsServer.hpp"
-#include "config.hpp"
 
 void connect_server(
     WsServer& ws_server, RosClientNode& ros_node, MessageScheduler& scheduler);
@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
   RosClientNode ros_node;
   config::configure_msg_types(ros_node);
 
-  MessageScheduler scheduler;
+  MessageScheduler scheduler(config::max_queue_before_waiting);
 
   if (config::direct_mode) {
     // Websocket server

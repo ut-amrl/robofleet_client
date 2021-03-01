@@ -53,12 +53,10 @@ class WsClient : public QObject {
   }
 
   void on_pong(qint64 elapsed_time, const QByteArray& payload) {
-    // uint64_t ponged_index = *reinterpret_cast<const uint64_t*>(payload.data());
-    // last_ponged_index = std::max(last_ponged_index, ponged_index);
+    uint64_t ponged_index = *reinterpret_cast<const uint64_t*>(payload.data());
+    last_ponged_index = std::max(last_ponged_index, ponged_index);
 
-    // if (msg_index - last_ponged_index <= config::max_queue_before_waiting) {
-      Q_EMIT network_unblocked();
-    // }
+    Q_EMIT network_unblocked(msg_index, last_ponged_index);
   }
 
   void reconnect() {
@@ -85,7 +83,7 @@ class WsClient : public QObject {
   void connected();
   void disconnected();
   void message_received(const QByteArray& data);
-  void network_unblocked();
+  void network_unblocked(uint64_t msg_index, uint64_t last_ponged_index);
 
  public:
   WsClient(const QUrl& url) : url(url) {
