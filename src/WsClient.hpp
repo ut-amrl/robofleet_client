@@ -53,12 +53,12 @@ class WsClient : public QObject {
   }
 
   void on_pong(qint64 elapsed_time, const QByteArray& payload) {
-    uint64_t ponged_index = *reinterpret_cast<const uint64_t*>(payload.data());
-    last_ponged_index = std::max(last_ponged_index, ponged_index);
+    // uint64_t ponged_index = *reinterpret_cast<const uint64_t*>(payload.data());
+    // last_ponged_index = std::max(last_ponged_index, ponged_index);
 
-    if (msg_index - last_ponged_index <= config::max_queue_before_waiting) {
+    // if (msg_index - last_ponged_index <= config::max_queue_before_waiting) {
       Q_EMIT network_unblocked();
-    }
+    // }
   }
 
   void reconnect() {
