@@ -9,6 +9,7 @@
 * CMake
 * ROS Melodic
 * Qt5 >= 5.5
+* libqt5websockets5-dev
 
 ## Configuration
 
