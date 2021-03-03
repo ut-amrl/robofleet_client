@@ -10,7 +10,6 @@
 #include <thread>
 #include <unordered_map>
 
-#include "MessageScheduler.hpp"
 #include "decode.hpp"
 #include "encode.hpp"
 #include "topic_config.hpp"
