@@ -33,11 +33,11 @@ static const bool wait_for_pongs = true;
 
 /**
  * If wait_for_acks, how many more messages to send before waiting for first
- * PONG? This can be set to a value greater than 0 to compensate for network
+ * PONG? This can be set to a value greater than 1 to compensate for network
  * latency and fully saturate available bandwidth, but if it is set too high, it
  * could cause message lag.
  */
-static const uint64_t max_queue_before_waiting = 0;
+static const uint64_t max_queue_before_waiting = 1;
 
 /**
  * Whether to run a Websocket server instead of a client, to bypass the need

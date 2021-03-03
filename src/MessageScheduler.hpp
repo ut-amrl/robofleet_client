@@ -5,9 +5,10 @@
 #include <QString>
 #include <chrono>
 #include <deque>
+#include <iostream>
 #include <unordered_map>
 #include <vector>
-#include <iostream>
+#include "config.hpp"
 
 using SchedulerClock = std::chrono::high_resolution_clock;
 
@@ -44,13 +45,13 @@ struct QStringHash {
 class MessageScheduler : public QObject {
   Q_OBJECT
   int network_backpressure_counter = 0;
-  const uint64_t max_queue_before_waiting;
 
   std::deque<QByteArray> no_drop_queue;
   std::unordered_map<QString, WaitingMessage, QStringHash> topic_queue;
 
  public:
-  MessageScheduler(uint64_t mq) : max_queue_before_waiting(mq) {}
+  MessageScheduler() {
+  }
 
  Q_SIGNALS:
   void scheduled(const QByteArray& data);
@@ -73,8 +74,8 @@ class MessageScheduler : public QObject {
    * @brief Fire this to indicate that the network is free
    * Updates the counter for network backpressure
    */
-  void network_unblocked(uint64_t message_index, uint64_t last_ponged_index) {
-    network_backpressure_counter = std::min(message_index - last_ponged_index, max_queue_before_waiting);
+  void backpressure_update(uint64_t message_index, uint64_t last_ponged_index) {
+    network_backpressure_counter = message_index - last_ponged_index;
     schedule();
   }
 
@@ -84,10 +85,9 @@ class MessageScheduler : public QObject {
    * Then, messages are sent by topic priority.
    */
   void schedule() {
-    if (network_backpressure_counter > max_queue_before_waiting) {
+    if (network_backpressure_counter > config::max_queue_before_waiting) {
       return;
     }
-
 
     // flush no-drop queue
     if (!no_drop_queue.empty()) {
@@ -97,7 +97,7 @@ class MessageScheduler : public QObject {
         no_drop_queue.pop_front();
         network_backpressure_counter++;
       }
-      if (network_backpressure_counter > max_queue_before_waiting) {
+      if (network_backpressure_counter > config::max_queue_before_waiting) {
         return;
       }
     }
@@ -106,7 +106,6 @@ class MessageScheduler : public QObject {
       return;
     }
 
-    int messages_to_send = std::min((max_queue_before_waiting - network_backpressure_counter) + 1, topic_queue.size());
     const auto now = SchedulerClock::now();
 
     // Collect candidates
@@ -116,26 +115,27 @@ class MessageScheduler : public QObject {
       WaitingMessage& candidate = it->second;
 
       if (candidate.message_ready) {
-        candidate.time_waiting = (now - candidate.last_send_time) * candidate.priority;
+        candidate.time_waiting =
+            (now - candidate.last_send_time) * candidate.priority;
+        candidates.push_back(&candidate);
       }
-      
-      candidates.push_back(&candidate);
     }
+    int messages_to_send = std::min(
+        (config::max_queue_before_waiting - network_backpressure_counter),
+        candidates.size());
 
     // Sort candidates
-    auto compare = [](WaitingMessage* lhs, WaitingMessage* rhs)
-    {
+    auto compare = [](WaitingMessage* lhs, WaitingMessage* rhs) {
       return lhs->time_waiting < rhs->time_waiting;
     };
     std::sort(candidates.begin(), candidates.end(), compare);
 
     // attampt to publish top-K candidates
-    for(int cand_idx = 0; cand_idx < messages_to_send; cand_idx++) {
+    for (int cand_idx = 0; cand_idx < messages_to_send; cand_idx++) {
       if (candidates[cand_idx]->message_ready) {
         Q_EMIT scheduled(candidates[cand_idx]->message);
         candidates[cand_idx]->message_ready = false;
         candidates[cand_idx]->last_send_time = now;
-        candidates[cand_idx]->time_waiting = std::chrono::duration<double>::zero();
         network_backpressure_counter++;
       }
     }

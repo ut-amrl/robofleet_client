@@ -56,7 +56,7 @@ class WsClient : public QObject {
     uint64_t ponged_index = *reinterpret_cast<const uint64_t*>(payload.data());
     last_ponged_index = std::max(last_ponged_index, ponged_index);
 
-    Q_EMIT network_unblocked(msg_index, last_ponged_index);
+    Q_EMIT backpressure_update(msg_index, last_ponged_index);
   }
 
   void reconnect() {
@@ -68,8 +68,8 @@ class WsClient : public QObject {
   void send_ping() {
     // reinterprets msg_index as a byte array;
     // endianness is not important since this data is just echoed back as is.
-    const QByteArray msg_index_payload{
-        reinterpret_cast<char*>(&msg_index), sizeof(msg_index)};
+    const QByteArray msg_index_payload{reinterpret_cast<char*>(&msg_index),
+                                       sizeof(msg_index)};
     ws.ping(msg_index_payload);
   }
 
@@ -83,7 +83,7 @@ class WsClient : public QObject {
   void connected();
   void disconnected();
   void message_received(const QByteArray& data);
-  void network_unblocked(uint64_t msg_index, uint64_t last_ponged_index);
+  void backpressure_update(uint64_t msg_index, uint64_t last_ponged_index);
 
  public:
   WsClient(const QUrl& url) : url(url) {

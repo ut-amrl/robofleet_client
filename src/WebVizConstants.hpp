@@ -37,7 +37,8 @@ static const std::string odometry_topic = "odometry/raw";
 static const std::string lidar_2d_topic = "velodyne_2dscan";
 
 /**
- * @brief (sensor_msgs/CompressedImage) prefix for a Compressed Image from a stereo camera.
+ * @brief (sensor_msgs/CompressedImage) prefix for a Compressed Image from a
+ * stereo camera.
  */
 static const std::string compressed_image_prefix = "image_compressed/";
 
