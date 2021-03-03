@@ -85,7 +85,7 @@ class MessageScheduler : public QObject {
    * Then, messages are sent by topic priority.
    */
   void schedule() {
-    if (network_backpressure_counter > config::max_queue_before_waiting) {
+    if (network_backpressure_counter >= config::max_queue_before_waiting) {
       return;
     }
 
@@ -97,7 +97,7 @@ class MessageScheduler : public QObject {
         no_drop_queue.pop_front();
         network_backpressure_counter++;
       }
-      if (network_backpressure_counter > config::max_queue_before_waiting) {
+      if (network_backpressure_counter >= config::max_queue_before_waiting) {
         return;
       }
     }
