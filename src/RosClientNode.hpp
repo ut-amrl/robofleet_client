@@ -10,7 +10,6 @@
 #include <thread>
 #include <unordered_map>
 
-#include "MessageScheduler.hpp"
 #include "decode.hpp"
 #include "encode.hpp"
 #include "topic_config.hpp"
@@ -78,9 +77,8 @@ class RosClientNode : public QObject {
     auto metadata = encode_metadata(fbb, msg_type, to_topic);
     auto root_offset = encode<T>(fbb, msg, metadata);
     fbb.Finish(flatbuffers::Offset<void>(root_offset));
-    const QByteArray data{
-        reinterpret_cast<const char*>(fbb.GetBufferPointer()),
-        static_cast<int>(fbb.GetSize())};
+    const QByteArray data{reinterpret_cast<const char*>(fbb.GetBufferPointer()),
+                          static_cast<int>(fbb.GetSize())};
     const TopicParams& params = topic_params[from_topic];
     Q_EMIT ros_message_encoded(
         QString::fromStdString(to_topic),
@@ -210,8 +208,6 @@ class RosClientNode : public QObject {
         flatbuffers::GetRoot<fb::MsgWithMetadata>(data.data());
     const std::string& msg_type = msg->__metadata()->type()->str();
     const std::string& topic = msg->__metadata()->topic()->str();
-    std::cerr << "received " << msg_type << " message on " << topic
-              << std::endl;
 
     // try to publish
     if (pub_fns.count(msg_type) == 0) {

@@ -53,9 +53,9 @@ void connect_client(
   // run scheduler
   QObject::connect(
       &ws_client,
-      &WsClient::network_unblocked,
+      &WsClient::backpressure_update,
       &scheduler,
-      &MessageScheduler::network_unblocked);
+      &MessageScheduler::backpressure_update);
   // send scheduled message
   QObject::connect(
       &scheduler,
