@@ -120,6 +120,8 @@ class MessageScheduler : public QObject {
         candidates.push_back(&candidate);
       }
     }
+
+    // Determine how many messages we are allowed to send
     int messages_to_send = std::min(
         (config::max_queue_before_waiting - network_backpressure_counter),
         candidates.size());
@@ -130,14 +132,12 @@ class MessageScheduler : public QObject {
     };
     std::sort(candidates.begin(), candidates.end(), compare);
 
-    // attampt to publish top-K candidates
+    // attempt to publish top-K candidates
     for (int cand_idx = 0; cand_idx < messages_to_send; cand_idx++) {
-      if (candidates[cand_idx]->message_ready) {
-        Q_EMIT scheduled(candidates[cand_idx]->message);
-        candidates[cand_idx]->message_ready = false;
-        candidates[cand_idx]->last_send_time = now;
-        network_backpressure_counter++;
-      }
+      Q_EMIT scheduled(candidates[cand_idx]->message);
+      candidates[cand_idx]->message_ready = false;
+      candidates[cand_idx]->last_send_time = now;
+      network_backpressure_counter++;
     }
   }
 };
