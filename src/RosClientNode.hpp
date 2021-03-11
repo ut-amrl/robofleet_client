@@ -129,9 +129,7 @@ class RosClientNode : public QObject {
 
 
     if (verbosity_ > 0) {
-      std::cout << "registering " << msg_type << ": subscribing to "
-                << full_from_topic << " and sending as " << full_to_topic
-                << std::endl;
+      printf("Publishing Local Messages: %s [%s]->%s\n", full_from_topic.c_str(), msg_type.c_str(), full_to_topic.c_str());
     }
 
     // create subscription
@@ -171,9 +169,7 @@ class RosClientNode : public QObject {
     }
 
     if (verbosity_ > 0) {
-      std::cout << "listening for remote topics of type " << msg_type
-                << " on topic " << full_from_topic << " and publishing as "
-                << full_to_topic << std::endl;
+      printf("Receiving Remote Messages: %s [%s]->%s\n", full_from_topic.c_str(), msg_type.c_str(), full_to_topic.c_str());
     }
 
     // create function that will decode and publish a T message to any topic
@@ -244,8 +240,6 @@ class RosClientNode : public QObject {
    */
   void subscribe_remote_msgs() {
     for (auto topic : pub_remote_topics) {
-      printf(
-          "Registering for remote subscription to topic %s\n", topic.c_str());
       // Now, subscribe to the appropriate remote message
       amrl_msgs::RobofleetSubscription sub_msg;
       sub_msg.action = amrl_msgs::RobofleetSubscription::ACTION_SUBSCRIBE;
