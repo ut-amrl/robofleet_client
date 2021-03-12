@@ -42,6 +42,8 @@ class RosClientNode : public QObject {
       MsgTypeString, std::function<void(const QByteArray&, const TopicString&)>>
       pub_fns;
 
+  const int verbosity_;
+
   /**
    * @brief Emit a ros_message_encoded() signal given a message and metadata.
    *
@@ -125,9 +127,10 @@ class RosClientNode : public QObject {
           "unique.");
     }
 
-    std::cerr << "registering " << msg_type << ": subscribing to "
-              << full_from_topic << " and sending as " << full_to_topic
-              << std::endl;
+
+    if (verbosity_ > 0) {
+      printf("Publishing Local Messages: %s [%s]->%s\n", full_from_topic.c_str(), msg_type.c_str(), full_to_topic.c_str());
+    }
 
     // create subscription
     // have to use boost function because of how roscpp is implemented
@@ -165,9 +168,9 @@ class RosClientNode : public QObject {
                 << std::endl;
     }
 
-    std::cerr << "listening for remote topics of type " << msg_type
-              << " on topic " << full_from_topic << " and publishing as "
-              << full_to_topic << std::endl;
+    if (verbosity_ > 0) {
+      printf("Receiving Remote Messages: %s [%s]->%s\n", full_from_topic.c_str(), msg_type.c_str(), full_to_topic.c_str());
+    }
 
     // create function that will decode and publish a T message to any topic
     if (pub_fns.count(msg_type) == 0) {
@@ -215,10 +218,17 @@ class RosClientNode : public QObject {
       // 1) you have registered the message type you intend to receive in your
       // configuration, and 2) you are sending a valid, fully-qualified message
       // type name (if you manually construct the flatbuffer)
-      std::cerr << "ignoring message of unregistered type " << msg_type
-                << std::endl;
+      if (verbosity_ > 0) {
+        std::cerr << "ignoring message of unregistered type " << msg_type
+                  << std::endl;
+      }
       return;
     }
+
+    if (verbosity_ > 1) {
+      std::cout << "Received message of type " << msg_type << " on topic " << topic << std::endl;
+    }
+
     pub_fns[msg_type](data, topic);
   }
 
@@ -230,8 +240,6 @@ class RosClientNode : public QObject {
    */
   void subscribe_remote_msgs() {
     for (auto topic : pub_remote_topics) {
-      printf(
-          "Registering for remote subscription to topic %s\n", topic.c_str());
       // Now, subscribe to the appropriate remote message
       amrl_msgs::RobofleetSubscription sub_msg;
       sub_msg.action = amrl_msgs::RobofleetSubscription::ACTION_SUBSCRIBE;
@@ -269,9 +277,11 @@ class RosClientNode : public QObject {
     register_remote_msg_type<T>(config.from, config.to);
   }
 
-  RosClientNode() {
+  RosClientNode(int verbosity) : verbosity_(verbosity)  {
     // run forever
     spinner.start();
-    std::cerr << "Started ROS Node" << std::endl;
+    if (verbosity_ > 0) {
+      std::cout << "Started ROS Node" << std::endl;
+    }
   }
 };

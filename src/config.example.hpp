@@ -37,7 +37,7 @@ static const bool wait_for_pongs = true;
  * latency and fully saturate available bandwidth, but if it is set too high, it
  * could cause message lag.
  */
-static const uint64_t max_queue_before_waiting = 1;
+static const uint64_t max_queue_before_waiting = 5;
 
 /**
  * Whether to run a Websocket server instead of a client, to bypass the need
@@ -49,6 +49,15 @@ static const quint16 direct_mode_port =
 static const quint64 direct_mode_bytes_per_sec =
     2048000;  // avoid network backpressure in direct mode: sets maximum upload
               // speed
+
+/**
+  * Controls the verbosity of the logging to standard output
+  * 0 - Minimal Logging
+  * 1 - Log for subscriptions, new message types, etc.
+  * 2 - Full logging, including indication of every received message
+  */
+static const int verbosity = 1;
+
 
 /**
  * @brief Configure which topics and types of messages the client will handle.
@@ -138,22 +147,6 @@ static void configure_msg_types(RosClientNode& cn) {
   cn.configure(ReceiveRemoteTopic<amrl_msgs::Localization2DMsg>()
                    .from("initialpose")
                    .to("/initialpose"));
-
-  // support for robofleet_benchmark_suite
-  cn.configure(SendLocalTopic<std_msgs::String>()
-                   .from("/robofleet_benchmark_msg")
-                   .to("/robofleet_benchmark_msg")
-                   .no_drop(true));
-  cn.configure(SendLocalTopic<std_msgs::String>()
-                   .from("/robofleet_benchmark_ack")
-                   .to("/robofleet_benchmark_ack")
-                   .no_drop(true));
-  cn.configure(ReceiveRemoteTopic<std_msgs::String>()
-                   .from("/robofleet_benchmark_msg")
-                   .to("/robofleet_benchmark_msg"));
-  cn.configure(ReceiveRemoteTopic<std_msgs::String>()
-                   .from("/robofleet_benchmark_ack")
-                   .to("/robofleet_benchmark_ack"));
 
   // Add additional topics to subscribe and publish here.
 }

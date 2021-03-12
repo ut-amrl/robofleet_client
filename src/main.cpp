@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
       argc, argv, config::ros_node_name, ros::init_options::NoSigintHandler);
 
   // Client ROS node
-  RosClientNode ros_node;
+  RosClientNode ros_node(config::verbosity);
   config::configure_msg_types(ros_node);
 
   MessageScheduler scheduler;
