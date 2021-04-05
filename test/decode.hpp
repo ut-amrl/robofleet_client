@@ -2,7 +2,7 @@
 
 #include <std_msgs/Header.h>
 #include "schema_generated.h"
-#include "../src/decode.hpp"
+#include "../src/decode_ros.hpp"
 
 static void encode_std_header(flatbuffers::FlatBufferBuilder& fbb) {
   const fb::RosTime ros_time(200, 300);

@@ -10,8 +10,8 @@
 #include <thread>
 #include <unordered_map>
 
-#include "decode.hpp"
-#include "encode.hpp"
+#include "decode_ros.hpp"
+#include "encode_ros.hpp"
 #include "topic_config.hpp"
 
 class RosClientNode : public QObject {

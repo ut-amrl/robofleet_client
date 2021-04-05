@@ -21,30 +21,8 @@
 #include <sensor_msgs/NavSatFix.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <std_msgs/String.h>
+#include "decode.hpp"
 
-// to add a new message type, specialize this template to decode the message
-// and...
-template <typename Dst, typename Src>
-static Dst decode(const Src* const src);
-// specialize this struct to map ROS types to Flatbuffers types
-template <typename RosType>
-struct flatbuffers_type_for {
-  typedef void type;
-};
-
-// *** utility functions ***
-template <typename T, typename Vsrc, typename Vdst>
-static void decode_vector(const Vsrc* const src_vector_ptr, Vdst& dst_vector) {
-  dst_vector.resize(src_vector_ptr->size());
-  auto src = src_vector_ptr->begin();
-  auto dst = dst_vector.begin();
-
-  while (src != src_vector_ptr->end()) {
-    *dst = decode<T>(*src);
-    ++src;
-    ++dst;
-  }
-}
 
 // *** specializations below ***
 
