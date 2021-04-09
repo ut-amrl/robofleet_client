@@ -14,8 +14,8 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <std_msgs/Header.h>
 #include <std_msgs/String.h>
-
 #include <algorithm>
+#include "encode.hpp"
 
 using FBB = flatbuffers::FlatBufferBuilder;
 using MetadataOffset = flatbuffers::Offset<fb::MsgMetadata>;
@@ -38,35 +38,6 @@ using MetadataOffset = flatbuffers::Offset<fb::MsgMetadata>;
 template <typename T>
 static flatbuffers::uoffset_t encode(
     FBB& fbb, const T& msg, const MetadataOffset& metadata);
-
-// *** utility functions ***
-static flatbuffers::Offset<fb::MsgMetadata> encode_metadata(
-    FBB& fbb, const std::string& msg_type, const std::string& topic) {
-  return fb::CreateMsgMetadataDirect(fbb, msg_type.c_str(), topic.c_str());
-}
-
-/**
- * @brief Create a flatbuffer vector from a vector of ROS items by calling
- * encode<T>() on each item.
- *
- * @tparam TEncoded the target flatbuffers type to encode to
- * @tparam T the source ROS message type to encode from
- * @param fbb the flatbuffer builder in which to create the vector
- * @param metadata an optional metadata item to pass to encode() (pass 0 for
- * null)
- * @param src the vector of ROS messages to encode
- * @return flatbuffers::uoffset_t the offset of the vector within fbb
- */
-template <typename TEncoded, typename T>
-static flatbuffers::uoffset_t encode_vector(
-    FBB& fbb, const MetadataOffset& metadata, std::vector<T> src) {
-  std::vector<flatbuffers::Offset<TEncoded>> dst(src.size());
-  std::transform(
-      src.begin(), src.end(), dst.begin(), [&fbb, &metadata](const T& item) {
-        return encode<T>(fbb, item, metadata);
-      });
-  return fbb.CreateVector(dst).o;
-}
 
 // *** specializations below ***
 

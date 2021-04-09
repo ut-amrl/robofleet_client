@@ -2,9 +2,9 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/PointField.h>
 
-#include "../../include/schema_generated.h"
-#include "../../src/encode.hpp"
-#include "../../src/decode.hpp"
+#include "../../robofleet_client_lib/include/schema_generated.h"
+#include "../../src/encode_ros.hpp"
+#include "../../src/decode_ros.hpp"
 
 TEST(EncodeDecode, PointCloud2) {
   sensor_msgs::PointCloud2 src;

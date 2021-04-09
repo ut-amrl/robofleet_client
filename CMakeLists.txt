@@ -34,6 +34,8 @@ add_custom_target(amrl_msgs
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/amrl_msgs
 )
 include_directories(amrl_msgs/msg_gen/cpp/include)
+include_directories(robofleet_client_lib)
+include_directories(robofleet_client_lib/include)
 add_dependencies(client amrl_msgs)
 add_dependencies(test_client amrl_msgs)
 
