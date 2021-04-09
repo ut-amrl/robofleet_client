@@ -41,9 +41,9 @@ class MessageScheduler : public QObject {
 
  public Q_SLOTS:
   void enqueue(
-      const QString& topic, const QByteArray& data, double priority,
+      const QString& topic, const QByteArray& data, double priority, double rate_limit,
       bool no_drop) {
-    ms->enqueue(topic.toUtf8().constData(), data, priority, no_drop);
+    ms->enqueue(topic.toUtf8().constData(), data, priority, rate_limit, no_drop);
   }
 
   /**
