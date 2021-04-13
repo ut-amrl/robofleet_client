@@ -19,6 +19,7 @@ class RosClientNode : public QObject {
 
   struct TopicParams {
     double priority;
+    double rate_limit;
     bool no_drop;
   };
 
@@ -30,13 +31,6 @@ class RosClientNode : public QObject {
   std::vector<TopicString> pub_remote_topics;
   std::unordered_map<TopicString, ros::Subscriber> subs;
   std::unordered_map<TopicString, ros::Publisher> pubs;
-  // Map from topic name to pair of <last publication time, publication
-  // interval?(sec)>
-  std::unordered_map<
-      TopicString,
-      std::pair<
-          std::chrono::time_point<std::chrono::high_resolution_clock>, double>>
-      rate_limits;
   std::unordered_map<TopicString, TopicParams> topic_params;
   std::unordered_map<
       MsgTypeString, std::function<void(const QByteArray&, const TopicString&)>>
@@ -58,21 +52,6 @@ class RosClientNode : public QObject {
   void encode_ros_msg(
       const T& msg, const std::string& msg_type, const std::string& from_topic,
       const std::string& to_topic) {
-    // check rate limits
-    if (rate_limits.count(from_topic)) {
-      auto& rate_info = rate_limits[from_topic];
-      const auto curr_time = std::chrono::high_resolution_clock::now();
-      const auto duration =
-          std::chrono::duration_cast<std::chrono::milliseconds>(
-              curr_time - rate_info.first);
-      const double elapsed_sec = duration.count() / 1000.0;
-
-      if (elapsed_sec > rate_info.second) {
-        rate_info.first = curr_time;
-      } else {
-        return;
-      }
-    }
 
     // encode message
     flatbuffers::FlatBufferBuilder fbb;
@@ -86,6 +65,7 @@ class RosClientNode : public QObject {
         QString::fromStdString(to_topic),
         data,
         params.priority,
+        params.rate_limit,
         params.no_drop);
   }
 
@@ -94,14 +74,6 @@ class RosClientNode : public QObject {
       const T& msg, const std::string& msg_type, const std::string& to_topic) {
     pubs[msg_type].publish(msg);
   }
-
-  void set_rate_limit(const std::string& from_topic, double rate_limit_hz) {
-    const std::string full_from_topic = ros::names::resolve(from_topic);
-    double publish_interval_sec = 1.0 / rate_limit_hz;
-    rate_limits[full_from_topic] = std::make_pair(
-        std::chrono::high_resolution_clock::now(), publish_interval_sec);
-  }
-
   /**
    * @brief Set up pub/sub for a particular message type and topic.
    *
@@ -195,7 +167,7 @@ class RosClientNode : public QObject {
 
  Q_SIGNALS:
   void ros_message_encoded(
-      const QString& topic, const QByteArray& data, double priority,
+      const QString& topic, const QByteArray& data, double priority, double rate_limit,
       bool no_drop);
 
  public Q_SLOTS:
@@ -263,12 +235,9 @@ class RosClientNode : public QObject {
   void configure(const topic_config::SendLocalTopic<T>& config) {
     config.assert_valid();
     register_local_msg_type<T>(config.from, config.to);
-    if (config.rate_limit_hz.is_set()) {
-      set_rate_limit(config.from, config.rate_limit_hz);
-    }
     const std::string full_from_topic = ros::names::resolve(config.from);
     topic_params[full_from_topic] =
-        TopicParams{config.priority, config.no_drop};
+        TopicParams{config.priority, config.rate_limit_hz.is_set() ? config.rate_limit_hz : 0, config.no_drop};
   }
 
   template <typename T>
