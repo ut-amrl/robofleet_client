@@ -10,6 +10,7 @@
 #include <amrl_msgs/RobofleetStatus.h>
 #include <amrl_msgs/RobofleetSubscription.h>
 #include <amrl_msgs/VisualizationMsg.h>
+#include <amrl_msgs/ElevatorStatus.h>
 #include <flatbuffers/flatbuffers.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <nav_msgs/Odometry.h>
@@ -347,5 +348,18 @@ sensor_msgs::PointCloud2 decode(const fb::sensor_msgs::PointCloud2* const src) {
   dst.is_dense = src->is_dense();
   dst.row_step = src->row_step();
   dst.point_step = src->point_step();
+  return dst;
+}
+
+template <>
+struct flatbuffers_type_for<amrl_msgs::ElevatorStatus> {
+  typedef fb::amrl_msgs::ElevatorStatus type;
+};
+template <>
+amrl_msgs::ElevatorStatus decode(
+    const fb::amrl_msgs::ElevatorStatus* const src) {
+  amrl_msgs::ElevatorStatus dst;
+  dst.floor = src->floor();
+  dst.door = src->door();
   return dst;
 }

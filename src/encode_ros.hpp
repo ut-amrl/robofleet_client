@@ -12,6 +12,7 @@
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/NavSatFix.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <amrl_msgs/ElevatorCommand.h>
 #include <std_msgs/Header.h>
 #include <std_msgs/String.h>
 #include <algorithm>
@@ -390,4 +391,16 @@ flatbuffers::uoffset_t encode(
              data,
              msg.is_dense)
       .o;
+}
+
+// amrl_msgs/ElevatorCommand
+template <>
+flatbuffers::uoffset_t encode(
+    FBB& fbb, const amrl_msgs::ElevatorCommand& msg,
+    const MetadataOffset& metadata) {
+  return fb::amrl_msgs::CreateElevatorCommand(
+    fbb,
+    metadata,
+    msg.floor_cmd,
+    msg.hold_door).o;
 }
