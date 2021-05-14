@@ -237,7 +237,7 @@ class RosClientNode : public QObject {
     register_local_msg_type<T>(config.from, config.to);
     const std::string full_from_topic = ros::names::resolve(config.from);
     topic_params[full_from_topic] =
-        TopicParams{config.priority, config.rate_limit_hz.is_set() ? config.rate_limit_hz : 0, config.no_drop};
+        TopicParams{config.priority, config.rate_limit_hz.is_set() ? config.rate_limit_hz : 0.0, config.no_drop};
   }
 
   template <typename T>
