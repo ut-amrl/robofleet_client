@@ -6,6 +6,7 @@
 #include <amrl_msgs/VisualizationMsg.h>
 #include <flatbuffers/flatbuffers.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <nav_msgs/Odometry.h>
 #include <schema_generated.h>
 #include <sensor_msgs/CompressedImage.h>
@@ -114,6 +115,20 @@ flatbuffers::uoffset_t encode(
              fbb.CreateVector(msg.covariance.data(), msg.covariance.size()))
       .o;
 }
+
+// geometry_msgs/PoseWithCovarianceStamped
+template <>
+flatbuffers::uoffset_t encode(
+    FBB& fbb, const geometry_msgs::PoseWithCovarianceStamped& msg,
+    const MetadataOffset& metadata) {
+  return fb::geometry_msgs::CreatePoseWithCovarianceStamped(
+             fbb,
+             metadata,
+	     encode(fbb, msg.header, 0),
+             encode(fbb, msg.pose, 0))
+      .o;
+}
+
 
 // geometry_msgs/Vector3
 template <>

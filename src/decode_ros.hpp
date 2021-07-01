@@ -13,6 +13,7 @@
 #include <amrl_msgs/ElevatorStatus.h>
 #include <flatbuffers/flatbuffers.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <nav_msgs/Odometry.h>
 #include <ros/ros.h>
 #include <ros/time.h>
@@ -223,7 +224,32 @@ geometry_msgs::PoseStamped decode(
 
   return dst;
 }
+template <>
+struct flatbuffers_type_for<geometry_msgs::PoseWithCovarianceStamped> {
+  typedef fb::geometry_msgs::PoseWithCovarianceStamped type;
+};
+template <>
+geometry_msgs::PoseWithCovarianceStamped decode(
+    const fb::geometry_msgs::PoseWithCovarianceStamped* const src) {
+  geometry_msgs::PoseWithCovarianceStamped dst;
 
+  dst.header = decode<std_msgs::Header>(src->header());
+
+  dst.pose.pose.orientation.x = src->pose()->pose()->orientation()->x();
+  dst.pose.pose.orientation.y = src->pose()->pose()->orientation()->y();
+  dst.pose.pose.orientation.z = src->pose()->pose()->orientation()->z();
+  dst.pose.pose.orientation.w = src->pose()->pose()->orientation()->w();
+  dst.pose.pose.position.x = src->pose()->pose()->position()->x();
+  dst.pose.pose.position.y = src->pose()->pose()->position()->y();
+  dst.pose.pose.position.z = src->pose()->pose()->position()->z();
+
+  std::copy(
+      src->pose()->covariance()->begin(),
+      src->pose()->covariance()->end(),
+      dst.pose.covariance.begin());
+ 
+  return dst;
+}
 template <>
 struct flatbuffers_type_for<nav_msgs::Odometry> {
   typedef fb::nav_msgs::Odometry type;
