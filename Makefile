@@ -1,3 +1,4 @@
+SHELL = /bin/bash
 .SUFFIXES:
 
 .PHONY: all
@@ -18,6 +19,10 @@ clean:
 .PHONY: format
 format:
 	clang-format --style=file -i src/**.cpp src/**.hpp
+
+.PHONY: check-format
+check-format:
+	diff -u <(cat src/**.cpp src/**.hpp) <(clang-format --style=file src/**.cpp src/**.hpp)
 
 build/client: build/Makefile
 	(cd build; make -j)
