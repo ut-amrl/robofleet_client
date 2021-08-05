@@ -39,7 +39,7 @@ static const std::string lidar_2d_topic = "velodyne_2dscan";
 /**
  * @brief (sensor_msgs/LaserScan) LIDAR scan data for navigation
  */
-static const std::string obstacle_scan = "obstacle_scan";
+static const std::string obstacle_scan_topic = "obstacle_scan";
 
 /**
  * @brief (sensor_msgs/CompressedImage) prefix for a Compressed Image from a
