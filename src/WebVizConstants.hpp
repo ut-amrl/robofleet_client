@@ -32,9 +32,14 @@ static const std::string localization_topic = "localization";
 static const std::string odometry_topic = "odometry/raw";
 
 /**
- * @brief (sensor_msgs/LaserScan) LIDAR scan data
+ * @brief (sensor_msgs/LaserScan) LIDAR scan data for localization
  */
 static const std::string lidar_2d_topic = "velodyne_2dscan";
+
+/**
+ * @brief (sensor_msgs/LaserScan) LIDAR scan data for navigation
+ */
+static const std::string obstacle_scan_topic = "obstacle_scan";
 
 /**
  * @brief (sensor_msgs/CompressedImage) prefix for a Compressed Image from a
