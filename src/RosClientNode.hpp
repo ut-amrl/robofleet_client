@@ -51,7 +51,7 @@ class RosClientNode : public QObject {
   template <typename T>
   void encode_ros_msg(
       const T& msg, const std::string& msg_type, const std::string& from_topic,
-      const std::string& to_topic) {
+      const std::string& to_topic, const TopicParams& params) {
 
     // encode message
     flatbuffers::FlatBufferBuilder fbb;
@@ -60,7 +60,6 @@ class RosClientNode : public QObject {
     fbb.Finish(flatbuffers::Offset<void>(root_offset));
     const QByteArray data{reinterpret_cast<const char*>(fbb.GetBufferPointer()),
                           static_cast<int>(fbb.GetSize())};
-    const TopicParams& params = topic_params[from_topic];
     Q_EMIT ros_message_encoded(
         QString::fromStdString(to_topic),
         data,
@@ -108,7 +107,7 @@ class RosClientNode : public QObject {
     // have to use boost function because of how roscpp is implemented
     boost::function<void(T)> subscriber_handler =
         [this, msg_type, full_from_topic, full_to_topic](T msg) {
-          encode_ros_msg<T>(msg, msg_type, full_from_topic, full_to_topic);
+          encode_ros_msg<T>(msg, msg_type, full_from_topic, full_to_topic, topic_params[full_from_topic]);
         };
     subs[full_from_topic] =
         n.subscribe<T>(full_from_topic, 1, subscriber_handler);
@@ -216,12 +215,16 @@ class RosClientNode : public QObject {
       amrl_msgs::RobofleetSubscription sub_msg;
       sub_msg.action = amrl_msgs::RobofleetSubscription::ACTION_SUBSCRIBE;
       sub_msg.topic_regex = topic;
+      TopicParams params;
+      params.no_drop = true;
       encode_ros_msg<amrl_msgs::RobofleetSubscription>(
           sub_msg,
           ros::message_traits::DataType<amrl_msgs::RobofleetSubscription>()
               .value(),
           "/subscriptions",
-          "/subscriptions");
+          "/subscriptions",
+          params
+      );
     }
   }
 
