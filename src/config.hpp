@@ -155,7 +155,7 @@ static void configure_msg_types(RosClientNode& cn) {
 
   cn.configure(ReceiveRemoteTopic<amrl_msgs::Localization2DMsg>()
                    .from("initialpose")
-                   .to("/initialpose_a1_121"));
+                   .to("/initialpose"));
 
   // Add additional topics to subscribe and publish here.
 }
