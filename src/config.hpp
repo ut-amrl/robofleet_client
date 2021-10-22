@@ -108,19 +108,19 @@ static void configure_msg_types(RosClientNode& cn) {
                    .priority(20));
 
   cn.configure(SendLocalTopic<nav_msgs::Odometry>()
-                   .from("/odometry/raw")
+                   .from("/odom")
                    .to(webviz_constants::odometry_topic)
                    .rate_limit_hz(15)
                    .priority(20));
 
   cn.configure(SendLocalTopic<sensor_msgs::LaserScan>()
-                   .from("/velodyne_2dscan")
+                   .from("/scan")
                    .to(webviz_constants::lidar_2d_topic)
                    .rate_limit_hz(15)
                    .priority(2));
 
   cn.configure(SendLocalTopic<sensor_msgs::LaserScan>()
-                   .from("/obstacle_scan")
+                   .from("/depth2scan")
                    .to(webviz_constants::obstacle_scan_topic)
                    .rate_limit_hz(15)
                    .priority(2));
@@ -131,16 +131,16 @@ static void configure_msg_types(RosClientNode& cn) {
                    .rate_limit_hz(10)
                    .priority(1));
 
-  cn.configure(SendLocalTopic<sensor_msgs::CompressedImage>()
-                   .from("/stereo/left/image_raw/compressed")
-                   .to(webviz_constants::compressed_image_prefix + "left")
-                   .rate_limit_hz(10)
-                   .priority(1));
-  cn.configure(SendLocalTopic<sensor_msgs::CompressedImage>()
-                   .from("/stereo/right/image_raw/compressed")
-                   .to(webviz_constants::compressed_image_prefix + "right")
-                   .rate_limit_hz(10)
-                   .priority(1));
+  // cn.configure(SendLocalTopic<sensor_msgs::CompressedImage>()
+  //                  .from("/stereo/left/image_raw/compressed")
+  //                  .to(webviz_constants::compressed_image_prefix + "left")
+  //                  .rate_limit_hz(10)
+  //                  .priority(1));
+  // cn.configure(SendLocalTopic<sensor_msgs::CompressedImage>()
+  //                  .from("/stereo/right/image_raw/compressed")
+  //                  .to(webviz_constants::compressed_image_prefix + "right")
+  //                  .rate_limit_hz(10)
+  //                  .priority(1));
 
   cn.configure(SendLocalTopic<amrl_msgs::VisualizationMsg>()
                    .from("/visualization")
@@ -155,7 +155,7 @@ static void configure_msg_types(RosClientNode& cn) {
 
   cn.configure(ReceiveRemoteTopic<amrl_msgs::Localization2DMsg>()
                    .from("initialpose")
-                   .to("/initialpose"));
+                   .to("/initialpose_a1_121"));
 
   // Add additional topics to subscribe and publish here.
 }
