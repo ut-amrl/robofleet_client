@@ -404,5 +404,6 @@ amrl_msgs::ErrorReport decode(
   dst.laser_header = decode<std_msgs::Header>(src->laser_header());
   dst.severity_level = src->severity_level();
   dst.failed_subsystem = src->failed_subsystem();
+  dst.details = src->details();
   return dst;
 }
