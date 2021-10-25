@@ -11,8 +11,10 @@
 #include <amrl_msgs/RobofleetSubscription.h>
 #include <amrl_msgs/VisualizationMsg.h>
 #include <amrl_msgs/ElevatorStatus.h>
+#include <amrl_msgs/ErrorReport.h>
 #include <flatbuffers/flatbuffers.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/PoseWithCovariance.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <nav_msgs/Odometry.h>
 #include <ros/ros.h>
@@ -387,5 +389,20 @@ amrl_msgs::ElevatorStatus decode(
   amrl_msgs::ElevatorStatus dst;
   dst.floor = src->floor();
   dst.door = src->door();
+  return dst;
+}
+
+template <>
+struct flatbuffers_type_for<amrl_msgs::ErrorReport> {
+  typedef fb::amrl_msgs::ErrorReport type;
+};
+template <>
+amrl_msgs::ErrorReport decode(
+    const fb::amrl_msgs::ErrorReport* const src) {
+  amrl_msgs::ErrorReport dst;
+  dst.header = decode<std_msgs::Header>(src->header());
+  dst.laser_header = decode<std_msgs::Header>(src->laser_header());
+  dst.severity_level = src->severity_level();
+  dst.failed_subsystem = src->failed_subsystem();
   return dst;
 }
