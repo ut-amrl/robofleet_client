@@ -7,6 +7,8 @@
 #include <flatbuffers/flatbuffers.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <nav_msgs/Odometry.h>
+#include <nav_msgs/OccupancyGrid.h>
+#include <nav_msgs/MapMetaData.h>
 #include <schema_generated.h>
 #include <sensor_msgs/CompressedImage.h>
 #include <sensor_msgs/LaserScan.h>
@@ -404,3 +406,35 @@ flatbuffers::uoffset_t encode(
     msg.floor_cmd,
     msg.hold_door).o;
 }
+
+// nav_msgs/MapMetaData
+template <>
+flatbuffers::uoffset_t encode(
+    FBB& fbb, const nav_msgs::MapMetaData& msg,
+    const MetadataOffset& metadata) {
+    auto map_load_time = fb::RosTime(msg.map_load_time.toSec(), msg.map_load_time.toNSec());
+    return fb::nav_msgs::CreateMapMetaData(
+             fbb,
+             metadata,
+             &map_load_time,
+             msg.resolution,
+             msg.width,
+             msg.height,
+             encode(fbb, msg.origin, 0)).o;
+}
+
+// nav_msgs/OccupancyGrid
+template <>
+flatbuffers::uoffset_t encode(
+    FBB& fbb, const nav_msgs::OccupancyGrid& msg,
+    const MetadataOffset& metadata) {
+  auto data = fbb.CreateVector(msg.data.data(), msg.data.size());
+  return fb::nav_msgs::CreateOccupancyGrid(
+             fbb,
+             metadata,
+             encode(fbb, msg.header, 0),
+             encode(fbb, msg.info, 0),
+             data).o;
+}
+
+

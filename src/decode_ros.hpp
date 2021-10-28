@@ -14,6 +14,8 @@
 #include <flatbuffers/flatbuffers.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <nav_msgs/Odometry.h>
+#include <nav_msgs/MapMetaData.h>
+#include <nav_msgs/OccupancyGrid.h>
 #include <ros/ros.h>
 #include <ros/time.h>
 #include <schema_generated.h>
@@ -361,5 +363,47 @@ amrl_msgs::ElevatorStatus decode(
   amrl_msgs::ElevatorStatus dst;
   dst.floor = src->floor();
   dst.door = src->door();
+  return dst;
+}
+
+template <>
+struct flatbuffers_type_for<nav_msgs::MapMetaData> {
+  typedef fb::nav_msgs::MapMetaData type;
+};
+template <>
+nav_msgs::MapMetaData decode(
+    const fb::nav_msgs::MapMetaData* const src) {
+  nav_msgs::MapMetaData dst;
+  dst.map_load_time = ros::Time(src->map_load_time()->secs(), src->map_load_time()->nsecs());
+  dst.resolution = src->resolution();
+  dst.width = src->width();
+  dst.height = src->height();
+  
+  dst.origin.orientation.x = src->origin()->orientation()->x();
+  dst.origin.orientation.y = src->origin()->orientation()->y();
+  dst.origin.orientation.z = src->origin()->orientation()->z();
+  dst.origin.orientation.w = src->origin()->orientation()->w();
+  dst.origin.position.x = src->origin()->position()->x();
+  dst.origin.position.y = src->origin()->position()->y();
+  dst.origin.position.z = src->origin()->position()->z();
+
+  return dst;
+}
+
+template <>
+struct flatbuffers_type_for<nav_msgs::OccupancyGrid> {
+  typedef fb::nav_msgs::OccupancyGrid type;
+};
+template <>
+nav_msgs::OccupancyGrid decode(
+    const fb::nav_msgs::OccupancyGrid* const src) {
+  nav_msgs::OccupancyGrid dst;
+
+  dst.header = decode<std_msgs::Header>(src->header());
+  dst.info = decode<nav_msgs::MapMetaData>(src->info());
+
+  dst.data.resize(src->data()->size());
+  std::copy(src->data()->begin(), src->data()->end(), dst.data.begin());
+
   return dst;
 }
