@@ -9,6 +9,7 @@
 #include <sensor_msgs/NavSatFix.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <std_msgs/String.h>
 
 #include <string>
@@ -107,6 +108,13 @@ static void configure_msg_types(RosClientNode& cn) {
                    .rate_limit_hz(10)
                    .priority(20));
 
+  cn.configure(SendLocalTopic<geometry_msgs::PoseStamped>()
+                   .from("/global_pose_a1_950")
+                   .to("global_pose")
+                   .rate_limit_hz(10)
+                   .priority(20));
+
+
   cn.configure(SendLocalTopic<nav_msgs::Odometry>()
                    .from("/odom")
                    .to(webviz_constants::odometry_topic)
@@ -124,23 +132,6 @@ static void configure_msg_types(RosClientNode& cn) {
                    .to(webviz_constants::obstacle_scan_topic)
                    .rate_limit_hz(15)
                    .priority(2));
-
-  // cn.configure(SendLocalTopic<sensor_msgs::PointCloud2>()
-  //                  .from("/velodyne_points")
-  //                  .to(webviz_constants::point_cloud_topic)
-  //                  .rate_limit_hz(10)
-  //                  .priority(1));
-
-  // cn.configure(SendLocalTopic<sensor_msgs::CompressedImage>()
-  //                  .from("/stereo/left/image_raw/compressed")
-  //                  .to(webviz_constants::compressed_image_prefix + "left")
-  //                  .rate_limit_hz(10)
-  //                  .priority(1));
-  // cn.configure(SendLocalTopic<sensor_msgs::CompressedImage>()
-  //                  .from("/stereo/right/image_raw/compressed")
-  //                  .to(webviz_constants::compressed_image_prefix + "right")
-  //                  .rate_limit_hz(10)
-  //                  .priority(1));
 
   cn.configure(SendLocalTopic<amrl_msgs::VisualizationMsg>()
                    .from("/visualization")
