@@ -157,6 +157,10 @@ static void configure_msg_types(RosClientNode& cn) {
                    .from("initialpose")
                    .to("/initialpose"));
 
+  cn.configure(ReceiveRemoteTopic<nav_msgs::OccupancyGrid>()
+                   .from("/a1_950/costmap")
+                   .to("/a1_950/costmap"));
+
   // Add additional topics to subscribe and publish here.
 }
 }  // namespace config
