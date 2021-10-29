@@ -119,7 +119,7 @@ static void configure_msg_types(RosClientNode& cn) {
                    .from("/odom")
                    .to(webviz_constants::odometry_topic)
                    .rate_limit_hz(15)
-                   .priority(20));
+                   .priority(2));
 
   cn.configure(SendLocalTopic<sensor_msgs::LaserScan>()
                    .from("/hokuyo_scan")
@@ -133,22 +133,22 @@ static void configure_msg_types(RosClientNode& cn) {
                    .rate_limit_hz(15)
                    .priority(2));
 
-  cn.configure(SendLocalTopic<amrl_msgs::VisualizationMsg>()
-                   .from("/visualization")
-                   .to(webviz_constants::visualization_topic)
-                   .rate_limit_hz(10)
-                   .priority(2));
+  // cn.configure(SendLocalTopic<amrl_msgs::VisualizationMsg>()
+  //                  .from("/visualization")
+  //                  .to(webviz_constants::visualization_topic)
+  //                  .rate_limit_hz(10)
+  //                  .priority(2));
 
   cn.configure(SendLocalTopic<nav_msgs::OccupancyGrid>()
                .from("/costmap_node/costmap/costmap")
                .to("costmap")
                .rate_limit_hz(10)
-               .priority(2));
+               .priority(20));
 
   // receive remote commands
   cn.configure(ReceiveRemoteTopic<geometry_msgs::PoseStamped>()
-                   .from("move_base_simple/goal")
-                   .to("/move_base_simple/goal"));
+                   .from("/a1_121/goal_agent2")
+                   .to("/goal_agent2"));
 
   cn.configure(ReceiveRemoteTopic<amrl_msgs::Localization2DMsg>()
                    .from("initialpose")
