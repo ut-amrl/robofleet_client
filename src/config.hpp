@@ -160,6 +160,16 @@ static void configure_msg_types(RosClientNode& cn) {
   cn.configure(ReceiveRemoteTopic<nav_msgs::OccupancyGrid>()
                    .from("/a1_950/costmap")
                    .to("/a1_950/costmap"));
+  cn.configure(ReceiveRemoteTopic<nav_msgs::OccupancyGrid>()
+                   .from("/hsr/costmap")
+                   .to("/hsr/costmap"));
+
+  cn.configure(ReceiveRemoteTopic<geometry_msgs::PoseStamped>()
+                   .from("/a1_950/global_pose")
+                   .to("/a1_950/global_pose"));
+  cn.configure(ReceiveRemoteTopic<geometry_msgs::PoseStamped>()
+                   .from("/hsr/global_pose")
+                   .to("/hsr/global_pose"));
 
   // Add additional topics to subscribe and publish here.
 }
