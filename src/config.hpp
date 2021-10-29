@@ -139,6 +139,12 @@ static void configure_msg_types(RosClientNode& cn) {
                    .rate_limit_hz(10)
                    .priority(2));
 
+  cn.configure(SendLocalTopic<nav_msgs::OccupancyGrid>()
+               .from("/costmap_node/costmap/costmap")
+               .to("costmap")
+               .rate_limit_hz(10)
+               .priority(2));
+
   // receive remote commands
   cn.configure(ReceiveRemoteTopic<geometry_msgs::PoseStamped>()
                    .from("move_base_simple/goal")
