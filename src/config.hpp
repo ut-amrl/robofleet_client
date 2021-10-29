@@ -172,5 +172,17 @@ static void configure_msg_types(RosClientNode& cn) {
                    .to("/hsr/global_pose"));
 
   // Add additional topics to subscribe and publish here.
+
+  cn.configure(SendLocalTopic<geometry_msgs::PoseStamped>()
+                   .from("/goal_agent2")
+                   .to("goal_agent2")
+                   .rate_limit_hz(10)
+                   .priority(20));
+  cn.configure(SendLocalTopic<geometry_msgs::PoseStamped>()
+                   .from("/goal_agent3")
+                   .to("goal_agent3")
+                   .rate_limit_hz(10)
+                   .priority(20));
+
 }
 }  // namespace config
