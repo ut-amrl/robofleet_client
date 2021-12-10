@@ -114,13 +114,13 @@ static void configure_msg_types(RosClientNode& cn) {
                    .priority(20));
 
   cn.configure(SendLocalTopic<sensor_msgs::LaserScan>()
-                   .from("/base_scan")
+                   .from("/hsrb/base_scan")
                    .to(webviz_constants::lidar_2d_topic)
                    .rate_limit_hz(15)
                    .priority(2));
 
   cn.configure(SendLocalTopic<geometry_msgs::PoseStamped>()
-	       .from("/global_pose_hsr")
+	       .from("/global_pose")
 	       .to("global_pose")
 	       .rate_limit_hz(10)
 	       .priority(20));
@@ -160,7 +160,7 @@ static void configure_msg_types(RosClientNode& cn) {
                    .from("initialpose")
                    .to("/initialpose"));
 
-  cn.configure(ReceiveRemoteTopic<geometry_msgs::PoseStamped>()
+  cn.configure(ReceiveRemoteTopic<nav_msgs::Path>()
 		  .from("/a1_121/goal_agent3")
 		  .to("/goal_agent3"));
 
