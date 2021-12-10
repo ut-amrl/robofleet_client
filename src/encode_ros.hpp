@@ -8,6 +8,7 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <nav_msgs/Odometry.h>
+#include <nav_msgs/Path.h>
 #include <nav_msgs/OccupancyGrid.h>
 #include <nav_msgs/MapMetaData.h>
 #include <schema_generated.h>
@@ -302,6 +303,21 @@ flatbuffers::uoffset_t encode(
       .o;
 }
 
+////////////////////////////////
+// nav_msgs/Path
+template <>
+flatbuffers::uoffset_t encode(
+    FBB& fbb, const nav_msgs::Path& msg,
+    const MetadataOffset& metadata) {
+  return fb::nav_msgs::CreatePath(
+             fbb,
+             metadata,
+             encode(fbb, msg.header, 0),
+             encode_vector<fb::geometry_msgs::PoseStamped>(fbb, 0, msg.poses))
+      .o;
+}
+////////////////////////////////
+
 // sensor_msgs/LaserScan
 template <>
 flatbuffers::uoffset_t encode(
@@ -421,7 +437,6 @@ flatbuffers::uoffset_t encode(
     msg.floor_cmd,
     msg.hold_door).o;
 }
-
 // nav_msgs/MapMetaData
 template <>
 flatbuffers::uoffset_t encode(
@@ -451,5 +466,6 @@ flatbuffers::uoffset_t encode(
              encode(fbb, msg.info, 0),
              data).o;
 }
+
 
 

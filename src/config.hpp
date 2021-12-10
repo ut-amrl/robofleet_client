@@ -122,7 +122,7 @@ static void configure_msg_types(RosClientNode& cn) {
                    .priority(2));
 
   cn.configure(SendLocalTopic<sensor_msgs::LaserScan>()
-                   .from("/hokuyo_scan")
+                   .from("/scan")
                    .to(webviz_constants::lidar_2d_topic)
                    .rate_limit_hz(15)
                    .priority(2));
@@ -146,7 +146,7 @@ static void configure_msg_types(RosClientNode& cn) {
                .priority(20));
 
   // receive remote commands
-  cn.configure(ReceiveRemoteTopic<geometry_msgs::PoseStamped>()
+  cn.configure(ReceiveRemoteTopic<nav_msgs::Path>()
                    .from("/a1_121/goal_agent2")
                    .to("/goal_agent2"));
 
