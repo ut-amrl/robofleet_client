@@ -15,6 +15,7 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <nav_msgs/Odometry.h>
+#include <nav_msgs/Path.h>
 #include <nav_msgs/MapMetaData.h>
 #include <nav_msgs/OccupancyGrid.h>
 #include <ros/ros.h>
@@ -287,6 +288,20 @@ nav_msgs::Odometry decode(const fb::nav_msgs::Odometry* const src) {
   dst.twist.twist.linear.z = src->twist()->twist()->linear()->z();
   return dst;
 }
+//////////////////////////////////////
+template <>
+struct flatbuffers_type_for<nav_msgs::Path> {
+  typedef fb::nav_msgs::Path type;
+};
+template <>
+nav_msgs::Path decode(
+    const fb::nav_msgs::Path* const src) {
+  nav_msgs::Path dst;
+  dst.header = decode<std_msgs::Header>(src->header());
+  decode_vector<geometry_msgs::PoseStamped>(src->poses(), dst.poses);
+  return dst;
+}
+//////////////////////////////////////
 
 template <>
 struct flatbuffers_type_for<sensor_msgs::LaserScan> {

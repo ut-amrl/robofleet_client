@@ -173,12 +173,12 @@ static void configure_msg_types(RosClientNode& cn) {
 
   // Add additional topics to subscribe and publish here.
 
-  cn.configure(SendLocalTopic<geometry_msgs::PoseStamped>()
+  cn.configure(SendLocalTopic<nav_msgs::Path>()
                    .from("/goal_agent2")
                    .to("goal_agent2")
                    .rate_limit_hz(10)
                    .priority(20));
-  cn.configure(SendLocalTopic<geometry_msgs::PoseStamped>()
+  cn.configure(SendLocalTopic<nav_msgs::Path>()
                    .from("/goal_agent3")
                    .to("goal_agent3")
                    .rate_limit_hz(10)
