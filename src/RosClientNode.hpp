@@ -217,6 +217,8 @@ class RosClientNode : public QObject {
       sub_msg.topic_regex = topic;
       TopicParams params;
       params.no_drop = true;
+      params.priority = 1.0;
+      params.rate_limit = 1.0;
       encode_ros_msg<amrl_msgs::RobofleetSubscription>(
           sub_msg,
           ros::message_traits::DataType<amrl_msgs::RobofleetSubscription>()
