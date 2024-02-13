@@ -1,9 +1,12 @@
 [submodule "amrl_msgs"]
 	path = amrl_msgs
 	url = https://github.com/ut-amrl/amrl_msgs
+    branch=ecocar
 [submodule "googletest"]
 	path = googletest
 	url = https://github.com/google/googletest
+    branch=master
 [submodule "robofleet_client_lib"]
 	path = robofleet_client_lib
 	url = https://github.com/ut-amrl/robofleet_client_lib
+    branch=master
